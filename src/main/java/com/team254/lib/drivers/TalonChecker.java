@@ -1,12 +1,13 @@
 package com.team254.lib.drivers;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team254.frc2020.subsystems.Subsystem;
 
 import java.util.ArrayList;
 
-public class TalonSRXChecker extends MotorChecker<TalonSRX> {
+public class TalonChecker extends MotorChecker<BaseTalon> {
     private static class StoredTalonSRXConfiguration {
         public ControlMode mMode;
         public double mSetValue;
@@ -15,16 +16,16 @@ public class TalonSRXChecker extends MotorChecker<TalonSRX> {
     protected ArrayList<StoredTalonSRXConfiguration> mStoredConfigurations = new ArrayList<>();
 
     public static boolean checkMotors(Subsystem subsystem,
-                                      ArrayList<MotorConfig<TalonSRX>> motorsToCheck,
+                                      ArrayList<MotorConfig<BaseTalon>> motorsToCheck,
                                       CheckerConfig checkerConfig) {
-        TalonSRXChecker checker = new TalonSRXChecker();
+        TalonChecker checker = new TalonChecker();
         return checker.checkMotorsImpl(subsystem, motorsToCheck, checkerConfig);
     }
 
     @Override
     protected void storeConfiguration() {
         // record previous configuration for all talons
-        for (MotorConfig<TalonSRX> config : mMotorsToCheck) {
+        for (MotorConfig<BaseTalon> config : mMotorsToCheck) {
             LazyTalonSRX talon = (LazyTalonSRX) config.mMotor;
 
             StoredTalonSRXConfiguration configuration = new StoredTalonSRXConfiguration();
@@ -44,12 +45,12 @@ public class TalonSRXChecker extends MotorChecker<TalonSRX> {
     }
 
     @Override
-    protected void setMotorOutput(TalonSRX motor, double output) {
+    protected void setMotorOutput(BaseTalon motor, double output) {
         motor.set(ControlMode.PercentOutput, output);
     }
 
     @Override
-    protected double getMotorCurrent(TalonSRX motor) {
-        return motor.getOutputCurrent();
+    protected double getMotorCurrent(BaseTalon motor) {
+        return motor.getSupplyCurrent();
     }
 }

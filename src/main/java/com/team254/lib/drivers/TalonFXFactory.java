@@ -2,13 +2,15 @@ package com.team254.lib.drivers;
 
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 /**
  * Creates CANTalon objects and configures all the parameters we care about to factory defaults. Closed-loop and sensor
  * parameters are not set, as these are expected to be set by the application.
  */
-public class TalonSRXFactory {
+public class TalonFXFactory {
 
     private final static int kTimeoutMs = 100;
 
@@ -17,7 +19,12 @@ public class TalonSRXFactory {
         // factory default
         public double NEUTRAL_DEADBAND = 0.04;
 
-        public boolean ENABLE_CURRENT_LIMIT = false;
+        public SensorInitializationStrategy SENSOR_INITIALIZATION_STRATEGY = SensorInitializationStrategy.BootToZero;
+        public double SENSOR_OFFSET_DEGREES = 0;
+
+        public boolean ENABLE_SUPPLY_CURRENT_LIMIT = false;
+        public boolean ENABLE_STATOR_CURRENT_LIMIT = false;
+
         public boolean ENABLE_SOFT_LIMIT = false;
         public boolean ENABLE_LIMIT_SWITCH = false;
         public int FORWARD_SOFT_LIMIT = 0;
@@ -58,18 +65,18 @@ public class TalonSRXFactory {
     }
 
     // create a CANTalon with the default (out of the box) configuration
-    public static TalonSRX createDefaultTalon(int id) {
+    public static TalonFX createDefaultTalon(int id) {
         return createTalon(id, kDefaultConfiguration);
     }
 
-    public static TalonSRX createPermanentSlaveTalon(int id, int master_id) {
-        final TalonSRX talon = createTalon(id, kSlaveConfiguration);
+    public static TalonFX createPermanentSlaveTalon(int id, int master_id) {
+        final TalonFX talon = createTalon(id, kSlaveConfiguration);
         talon.set(ControlMode.Follower, master_id);
         return talon;
     }
 
-    public static TalonSRX createTalon(int id, Configuration config) {
-        TalonSRX talon = new LazyTalonSRX(id);
+    public static TalonFX createTalon(int id, Configuration config) {
+        TalonFX talon = new LazyTalonFX(id);
         talon.set(ControlMode.PercentOutput, 0.0);
 
         talon.changeMotionControlFramePeriod(config.MOTION_CONTROL_FRAME_PERIOD_MS);
@@ -93,6 +100,8 @@ public class TalonSRXFactory {
         talon.configNominalOutputForward(0, kTimeoutMs);
         talon.configNominalOutputReverse(0, kTimeoutMs);
         talon.configNeutralDeadband(config.NEUTRAL_DEADBAND, kTimeoutMs);
+
+        talon.configMotorCommutation(MotorCommutation.Trapezoidal);
 
         talon.configPeakOutputForward(1.0, kTimeoutMs);
         talon.configPeakOutputReverse(-1.0, kTimeoutMs);
@@ -122,7 +131,12 @@ public class TalonSRXFactory {
         talon.configVoltageMeasurementFilter(32, kTimeoutMs);
         talon.enableVoltageCompensation(false);
 
-        talon.enableCurrentLimit(config.ENABLE_CURRENT_LIMIT);
+        talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(config.ENABLE_STATOR_CURRENT_LIMIT, 0, 0, 0), kTimeoutMs);
+        talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(config.ENABLE_SUPPLY_CURRENT_LIMIT, 0,0,0), kTimeoutMs);
+
+        talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,kTimeoutMs);
+        talon.configIntegratedSensorInitializationStrategy(config.SENSOR_INITIALIZATION_STRATEGY, kTimeoutMs);
+        talon.configIntegratedSensorOffset(config.SENSOR_OFFSET_DEGREES, kTimeoutMs);
 
         talon.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General,
                 config.GENERAL_STATUS_FRAME_RATE_MS, kTimeoutMs);
