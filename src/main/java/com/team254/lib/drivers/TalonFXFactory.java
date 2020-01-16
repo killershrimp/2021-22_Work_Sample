@@ -3,7 +3,6 @@ package com.team254.lib.drivers;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 /**
@@ -131,8 +130,8 @@ public class TalonFXFactory {
         talon.configVoltageMeasurementFilter(32, kTimeoutMs);
         talon.enableVoltageCompensation(false);
 
-        talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(config.ENABLE_STATOR_CURRENT_LIMIT, 0, 0, 0), kTimeoutMs);
-        talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(config.ENABLE_SUPPLY_CURRENT_LIMIT, 0,0,0), kTimeoutMs);
+        talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(config.ENABLE_SUPPLY_CURRENT_LIMIT, 20,60,.2), kTimeoutMs);
+        talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(config.ENABLE_STATOR_CURRENT_LIMIT, 20, 60, .2), kTimeoutMs);
 
         talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,kTimeoutMs);
         talon.configIntegratedSensorInitializationStrategy(config.SENSOR_INITIALIZATION_STRATEGY, kTimeoutMs);

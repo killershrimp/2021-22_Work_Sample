@@ -122,7 +122,7 @@ public class TalonSRXFactory {
         talon.configVoltageMeasurementFilter(32, kTimeoutMs);
         talon.enableVoltageCompensation(false);
 
-        talon.enableCurrentLimit(config.ENABLE_CURRENT_LIMIT);
+        talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(config.ENABLE_CURRENT_LIMIT, 20, 60, .2), kTimeoutMs);
 
         talon.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General,
                 config.GENERAL_STATUS_FRAME_RATE_MS, kTimeoutMs);
