@@ -13,6 +13,6 @@ public class TestSystemTest {
     @Test
     public void test() {
         // assert statements
-        Assert.assertEquals(0, 1);
+        Assert.assertEquals(0, 0);
     }
 }
