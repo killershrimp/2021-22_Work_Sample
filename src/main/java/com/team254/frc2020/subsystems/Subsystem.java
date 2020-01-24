@@ -13,7 +13,7 @@ import com.team254.frc2020.loops.ILooper;
  * instantializing all member components at the start of the match.
  */
 public abstract class Subsystem {
-    public void writeToLog() {}
+    public void writeToLog() {
 
     // Optional design pattern for caching periodic reads to avoid hammering the HAL/CAN.
     public void readPeriodicInputs() {}
