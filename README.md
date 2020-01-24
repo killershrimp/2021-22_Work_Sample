@@ -1,4 +1,4 @@
-# FRC 2020
+# FRC 2020 [![Java CI Status](https://github.com/Team254/FRC-2020/workflows/Java%20CI/badge.svg)](https://github.com/Team254/FRC-2020/actions?query=workflow%3A%22Java+CI%22)
 
 This repository contains Team 254's 2020 FRC robot code. The code is written in Java and is based off of WPILib's Java control system.
 
