@@ -17,6 +17,12 @@ public class Constants {
     // Control board
     public static final double kJoystickThreshold = 0.2;
 
+    // Vision
+    public static final double kMaxTrackerDistance = 9.0;
+    public static final double kMaxGoalTrackAge = 2.5;
+    public static final double kMaxGoalTrackSmoothingTime = 0.5;
+    public static final double kCameraFrameRate = 90.0; // fps
+
     /**
      * @return the MAC address of the robot
      */
