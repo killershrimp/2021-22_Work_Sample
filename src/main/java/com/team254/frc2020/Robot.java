@@ -14,8 +14,8 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
 import com.team254.lib.util.VelocityCheesyDriveHelper;
+import com.team254.lib.wpilib.TimedRobot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Robot extends TimedRobot {
