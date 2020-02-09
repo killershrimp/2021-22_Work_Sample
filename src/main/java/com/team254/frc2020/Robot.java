@@ -1,8 +1,13 @@
 package com.team254.frc2020;
 
+import java.util.Optional;
+
+import com.team254.frc2020.auto.AutoModeExecutor;
+import com.team254.frc2020.auto.modes.AutoModeBase;
 import com.team254.frc2020.controlboard.ControlBoard;
 import com.team254.frc2020.controlboard.IControlBoard;
 import com.team254.frc2020.loops.Looper;
+import com.team254.frc2020.paths.TrajectoryGenerator;
 import com.team254.frc2020.subsystems.Drive;
 import com.team254.frc2020.subsystems.RobotStateEstimator;
 import com.team254.lib.geometry.Pose2d;
@@ -21,9 +26,9 @@ public class Robot extends TimedRobot {
 
     private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-    // private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
-    // private AutoModeExecutor mAutoModeExecutor;
-    // private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
+    private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
+    private AutoModeExecutor mAutoModeExecutor;
+    private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
 
     // subsystems
     private final Drive mDrive = Drive.getInstance();
@@ -44,13 +49,13 @@ public class Robot extends TimedRobot {
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
             
-            // mTrajectoryGenerator.generateTrajectories();
+            mTrajectoryGenerator.generateTrajectories();
 
-            // Robot starts forwards.
+            // Robot starts forwards. (TODO use robotstate turret reset method once readded)
             mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mDrive.setHeading(Rotation2d.identity());
 
-            // mAutoModeSelector.updateModeCreator();
+            mAutoModeSelector.updateModeCreator();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -64,12 +69,12 @@ public class Robot extends TimedRobot {
             mEnabledLooper.stop();
 
             // Reset all auto mode state.
-            // if (mAutoModeExecutor != null) {
-            //     mAutoModeExecutor.stop();
-            // }
-            // mAutoModeSelector.reset();
-            // mAutoModeSelector.updateModeCreator();
-            // mAutoModeExecutor = new AutoModeExecutor();
+            if (mAutoModeExecutor != null) {
+                mAutoModeExecutor.stop();
+            }
+            mAutoModeSelector.reset();
+            mAutoModeSelector.updateModeCreator();
+            mAutoModeExecutor = new AutoModeExecutor();
 
             mDisabledLooper.start();
 
@@ -91,7 +96,7 @@ public class Robot extends TimedRobot {
             mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mDrive.setHeading(Rotation2d.identity());
 
-            // mAutoModeExecutor.start();
+            mAutoModeExecutor.start();
 
             mEnabledLooper.start();
         } catch (Throwable t) {
@@ -106,9 +111,9 @@ public class Robot extends TimedRobot {
             CrashTracker.logTeleopInit();
             mDisabledLooper.stop();
 
-            // if (mAutoModeExecutor != null) {
-            //     mAutoModeExecutor.stop();
-            // }
+            if (mAutoModeExecutor != null) {
+                mAutoModeExecutor.stop();
+            }
 
             mEnabledLooper.start();
         } catch (Throwable t) {
@@ -142,7 +147,7 @@ public class Robot extends TimedRobot {
         try {
             mSubsystemManager.outputToSmartDashboard();
             RobotState.getInstance().outputToSmartDashboard();
-            // mAutoModeSelector.outputToSmartDashboard();
+            mAutoModeSelector.outputToSmartDashboard();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -154,13 +159,13 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         try {
             // Update auto modes
-            // mAutoModeSelector.updateModeCreator();
+            mAutoModeSelector.updateModeCreator();
 
-            // Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
-            // if (autoMode.isPresent() && autoMode.get() != mAutoModeExecutor.getAutoMode()) {
-            //     System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
-            //     mAutoModeExecutor.setAutoMode(autoMode.get());
-            // }
+            Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
+            if (autoMode.isPresent() && autoMode.get() != mAutoModeExecutor.getAutoMode()) {
+                System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
+                mAutoModeExecutor.setAutoMode(autoMode.get());
+            }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
