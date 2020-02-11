@@ -37,8 +37,8 @@ public class Constants {
 
     // gear ratios (TODO set)
     public static final double kDriveEncoderPPR = 2048.0;
-    public static final double kDriveRotationsPerTickHighGear = 1.0 / 2048.0 * 1.0 / 8.0; // ticks * kDriveRotationsPerTicksHighGear = wheel rotations
-    public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / 12.99; // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
+    public static final double kDriveRotationsPerTickHighGear = 1.0 / 2048.0 * 1.0 / 8.80; // ticks * kDriveRotationsPerTicksHighGear = wheel rotations
+    public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 10.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
 
     // wheels (TODO tune)
     public static final double kDriveWheelTrackWidthInches = 0.0;
@@ -77,7 +77,7 @@ public class Constants {
     public static final int kPigeonIMUId = 0;
 
     // Pneumatics (TODO set)
-    public static final int kPCMId = 1;
+    public static final int kPCMId = 0;
     public static final int kShifterSolenoidId = 7;
 
     // Vision

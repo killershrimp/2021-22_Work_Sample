@@ -197,8 +197,11 @@ public class Drive extends Subsystem {
         if (mDriveControlState == DriveControlState.OPEN_LOOP) {
             mLeftMaster1.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
             mLeftMaster2.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
+            mLeftMaster3.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
+
             mRightMaster1.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
             mRightMaster2.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
+            mRightMaster3.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
         } else if (mDriveControlState == DriveControlState.VELOCITY || mDriveControlState == DriveControlState.PATH_FOLLOWING) {
             double kd = isHighGear() ? Constants.kDriveHighGearKd : Constants.kDriveLowGearKd;
 
@@ -206,9 +209,14 @@ public class Drive extends Subsystem {
                     mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0);
             mLeftMaster2.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0);
+            mLeftMaster3.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
+                    mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0);
+
             mRightMaster1.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0);
             mRightMaster2.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
+                    mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0);
+            mRightMaster3.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0);
         }
     }
@@ -389,8 +397,11 @@ public class Drive extends Subsystem {
 
         mLeftMaster1.selectProfileSlot(desired_slot_idx, 0);
         mLeftMaster2.selectProfileSlot(desired_slot_idx, 0);
+        mLeftMaster3.selectProfileSlot(desired_slot_idx, 0);
+
         mRightMaster1.selectProfileSlot(desired_slot_idx, 0);
         mRightMaster2.selectProfileSlot(desired_slot_idx, 0);
+        mRightMaster3.selectProfileSlot(desired_slot_idx, 0);
     }
 
     public synchronized void setHighGear(boolean wantsHighGear) {
@@ -410,10 +421,14 @@ public class Drive extends Subsystem {
         if (mIsBrakeMode != shouldEnable) {
             mIsBrakeMode = shouldEnable;
             NeutralMode mode = shouldEnable ? NeutralMode.Brake : NeutralMode.Coast;
-            mRightMaster1.setNeutralMode(mode);
-            mRightMaster2.setNeutralMode(mode);
+
             mLeftMaster1.setNeutralMode(mode);
             mLeftMaster2.setNeutralMode(mode);
+            mLeftMaster3.setNeutralMode(mode);
+
+            mRightMaster1.setNeutralMode(mode);
+            mRightMaster2.setNeutralMode(mode);
+            mRightMaster3.setNeutralMode(mode);
         }
     }
 
@@ -433,8 +448,12 @@ public class Drive extends Subsystem {
     public synchronized void resetEncoders() {
         mLeftMaster1.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
         mLeftMaster2.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+        mLeftMaster3.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+
         mRightMaster1.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
         mRightMaster2.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+        mRightMaster3.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+
         mPeriodicIO = new PeriodicIO();
     }
 
