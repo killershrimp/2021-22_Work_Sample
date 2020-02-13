@@ -42,7 +42,7 @@ public class Constants {
 
     // wheels (TODO tune)
     public static final double kDriveWheelTrackWidthInches = 25.884; //todo characterize?
-    public static final double kDriveWheelDiameterInches = 0.0;
+    public static final double kDriveWheelDiameterInches = 6.1439046227; //tuned 2/12
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kDriveWheelTrackRadiusWidthMeters = kDriveWheelTrackWidthInches / 2.0 * 0.0254;
     public static final double kTrackScrubFactor = 1.0;
