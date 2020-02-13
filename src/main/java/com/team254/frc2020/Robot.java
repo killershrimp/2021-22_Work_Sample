@@ -13,6 +13,7 @@ import com.team254.frc2020.subsystems.RobotStateEstimator;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
+import com.team254.lib.util.OpenLoopCheesyDriveHelper;
 import com.team254.lib.util.VelocityCheesyDriveHelper;
 import com.team254.lib.wpilib.TimedRobot;
 
@@ -187,8 +188,10 @@ public class Robot extends TimedRobot {
 
     public void manualControl(boolean sandstorm) {
         mDrive.setHighGear(!mControlBoard.getWantsLowGear());
-        mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
-                -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
+//        mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
+//                -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
+        mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
+                -mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
     }
 
     @Override
