@@ -41,7 +41,7 @@ public class Constants {
     public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 10.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
 
     // wheels (TODO tune)
-    public static final double kDriveWheelTrackWidthInches = 0.0;
+    public static final double kDriveWheelTrackWidthInches = 25.884; //todo characterize?
     public static final double kDriveWheelDiameterInches = 0.0;
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kDriveWheelTrackRadiusWidthMeters = kDriveWheelTrackWidthInches / 2.0 * 0.0254;
