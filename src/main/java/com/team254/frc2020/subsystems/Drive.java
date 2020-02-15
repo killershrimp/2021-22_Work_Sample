@@ -62,7 +62,7 @@ public class Drive extends Subsystem {
 
     private void configureTalon(TalonFX talon, boolean left, boolean main_encoder_talon) {
         // general
-        talon.setInverted(left);
+        talon.setInverted(!left);
         talon.configForwardSoftLimitEnable(false);
         talon.configReverseSoftLimitEnable(false);
 

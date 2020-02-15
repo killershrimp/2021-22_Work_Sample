@@ -76,9 +76,9 @@ public class Constants {
     // Pigeon IMU
     public static final int kPigeonIMUId = 0;
 
-    // Pneumatics (TODO set)
+    // Pneumatics
     public static final int kPCMId = 0;
-    public static final int kShifterSolenoidId = 7;
+    public static final int kShifterSolenoidId = 0;
 
     // Vision
     public static final double kMaxTrackerDistance = 9.0;

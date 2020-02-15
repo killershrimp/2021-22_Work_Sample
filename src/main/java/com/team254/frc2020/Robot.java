@@ -190,8 +190,8 @@ public class Robot extends TimedRobot {
         mDrive.setHighGear(!mControlBoard.getWantsLowGear());
 //        mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
 //                -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
-        mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
-                -mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
+        mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
+                mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
     }
 
     @Override
