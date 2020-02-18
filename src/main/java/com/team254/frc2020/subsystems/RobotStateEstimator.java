@@ -1,5 +1,6 @@
 package com.team254.frc2020.subsystems;
 
+import com.team254.frc2020.Constants;
 import com.team254.frc2020.Kinematics;
 import com.team254.frc2020.RobotState;
 import com.team254.frc2020.loops.ILooper;
@@ -61,10 +62,9 @@ public class RobotStateEstimator extends Subsystem {
                     delta_left, delta_right, prev_heading_.inverse().rotateBy(gyro_angle).getRadians()).scaled(1.0 / dt);
             final Twist2d predicted_velocity = Kinematics.forwardKinematics(mDrive.getLeftLinearVelocity(),
                     mDrive.getRightLinearVelocity()).scaled(dt);
-            
-            // TODO add turret
-            // mRobotState.addVehicleToTurretObservation(timestamp,
-            //         new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Turret.getInstance().getAngle())));
+
+            mRobotState.addVehicleToTurretObservation(timestamp,
+                    new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Turret.getInstance().getAngle())));
 
             mRobotState.addObservations(timestamp, odometry_twist, measured_velocity,
                     predicted_velocity);
