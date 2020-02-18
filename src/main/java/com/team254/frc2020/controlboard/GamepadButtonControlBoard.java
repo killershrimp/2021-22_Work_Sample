@@ -19,4 +19,14 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     private GamepadButtonControlBoard() {
         mController = new XboxController(Constants.kButtonGamepadPort);
     }
+
+    @Override
+    public boolean getShoot() {
+        return mController.getTrigger(XboxController.Side.RIGHT);
+    }
+
+    @Override
+    public boolean getMoveToZero() {
+        return mController.getButton(XboxController.Button.BACK) && mController.getButton(XboxController.Button.START);
+    }
 }

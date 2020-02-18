@@ -9,7 +9,13 @@ import com.team254.frc2020.controlboard.IControlBoard;
 import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
 import com.team254.frc2020.subsystems.Drive;
+import com.team254.frc2020.subsystems.Hood;
 import com.team254.frc2020.subsystems.RobotStateEstimator;
+import com.team254.frc2020.subsystems.Serializer;
+import com.team254.frc2020.subsystems.Shooter;
+import com.team254.frc2020.subsystems.Superstructure;
+import com.team254.frc2020.subsystems.Turret;
+import com.team254.frc2020.subsystems.limelight.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
@@ -33,6 +39,8 @@ public class Robot extends TimedRobot {
 
     // subsystems
     private final Drive mDrive = Drive.getInstance();
+    private final Limelight mLimelight = new Limelight(Constants.kLimelightConstants, Constants.kLowRes1xZoom);
+    private final Superstructure mSuperstructure = Superstructure.getInstance();
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -45,15 +53,23 @@ public class Robot extends TimedRobot {
         try {
             CrashTracker.logRobotInit();
 
-            mSubsystemManager.setSubsystems(RobotStateEstimator.getInstance(), mDrive);
+            mSubsystemManager.setSubsystems(
+                RobotStateEstimator.getInstance(),
+                mDrive, Turret.getInstance(),
+                Hood.getInstance(),
+                Shooter.getInstance(),
+                Serializer.getInstance(),
+                mSuperstructure, // TODO uncomment for superstructure
+                mLimelight
+            );
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
             
             mTrajectoryGenerator.generateTrajectories();
 
-            // Robot starts forwards. (TODO use robotstate turret reset method once readded)
-            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
+            // Robot starts forwards, turret starts backwards
+            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity(), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretStartingPositionDegrees)));
             mDrive.setHeading(Rotation2d.identity());
 
             mAutoModeSelector.updateModeCreator();
@@ -93,8 +109,8 @@ public class Robot extends TimedRobot {
 
             mDisabledLooper.stop();
 
-            // Robot starts forwards. (TODO use robotstate turret reset method once readded)
-            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
+            // Robot starts forwards, turret starts backwards
+            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity(), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretStartingPositionDegrees)));
             mDrive.setHeading(Rotation2d.identity());
 
             mAutoModeExecutor.start();
@@ -188,10 +204,25 @@ public class Robot extends TimedRobot {
 
     public void manualControl(boolean sandstorm) {
         mDrive.setHighGear(!mControlBoard.getWantsLowGear());
-//        mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
-//                -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
+        // mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
+        //         -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
         mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
                 mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
+
+        // TODO uncomment for superstructure
+        if (mControlBoard.getShoot()) {
+            mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
+        } else if (mControlBoard.getMoveToZero()) {
+            mSuperstructure.setWantedState(Superstructure.WantedState.MOVE_TO_ZERO);
+        } else {
+            mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
+        }
+
+        // if (mControlBoard.getShoot()) {
+        //     Shooter.getInstance().setOpenLoop(0.75);
+        // } else {
+        //     Shooter.getInstance().setOpenLoop(0.0);
+        // }
     }
 
     @Override

@@ -41,4 +41,14 @@ public class ControlBoard implements IControlBoard {
     public boolean getWantsLowGear() {
         return mDriveControlBoard.getWantsLowGear();
     }
+
+    @Override
+    public boolean getShoot() {
+        return mButtonControlBoard.getShoot();
+    }
+
+    @Override
+    public boolean getMoveToZero() {
+        return mButtonControlBoard.getMoveToZero();
+    }
 }
