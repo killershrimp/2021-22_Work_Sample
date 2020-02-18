@@ -53,8 +53,7 @@ public class Limelight extends Subsystem {
     private PipelineConfiguration mPipelineConfig;
 
     private final CameraResolution undistortRasterResolution = CameraResolution.F_320x240;
-
-    private final UndistortMap undistortMap = new UndistortMap(undistortRasterResolution.getWidth(), undistortRasterResolution.getHeight(), true);
+    private final UndistortMap undistortMap = new UndistortMap(CameraResolution.F_320x240, true);
 
     private final PeriodicIO mPeriodicIO = new PeriodicIO();
     private boolean mOutputsHaveChanged = true;

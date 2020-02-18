@@ -18,16 +18,14 @@ public class UndistortMap {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    private int width;
-    private int height;
+    private CameraResolution cameraResolution;
     double[][][] map;
 
     private AtomicBoolean loaded = new AtomicBoolean(false);
 
-    public UndistortMap(int width, int height, boolean loadAsync) {
-        this.width = width;
-        this.height = height;
-        this.map = new double[width][height][2];
+    public UndistortMap(CameraResolution cameraResolution, boolean loadAsync) {
+        this.cameraResolution = cameraResolution;
+        this.map = new double[cameraResolution.getWidth()][cameraResolution.getHeight()][2];
         if (loadAsync) {
             new Thread(this::load).start();
         } else {
@@ -36,10 +34,10 @@ public class UndistortMap {
     }
 
     private void load() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+        for (int i = 0; i < cameraResolution.getWidth(); i++) {
+            for (int j = 0; j < cameraResolution.getHeight(); j++) {
                 // run undistort
-                double[] undistorted = undistortFromOpenCV(new double[]{i * 1.0 / width * 1.0, j * 1.0 / height * 1.0});
+                double[] undistorted = undistortFromOpenCV(new double[]{i * 1.0 / cameraResolution.getWidth() * 1.0, j * 1.0 / cameraResolution.getHeight() * 1.0});
                 // output undistorted x and y
                 for (int k = 0; k < 2; k++) {
                     map[i][j][k] = (float) undistorted[k];
@@ -51,10 +49,10 @@ public class UndistortMap {
 
     public double[] getUndistortedPoint(double x, double y) {
         if (loaded.get()) {
-            x *= width;
-            y *= height;
-            int intX = (int) Util.limit(x, 0, width);
-            int intY = (int) Util.limit(y, 0, height);
+            double denormalizedX = x * cameraResolution.getWidth();
+            double denormalizedY = y * cameraResolution.getHeight();
+            int intX = (int) Util.limit(denormalizedX, 0, cameraResolution.getWidth());
+            int intY = (int) Util.limit(denormalizedY, 0, cameraResolution.getHeight());
             return map[intX][intY];
         } else {
             // Return an undistorted point until this is loaded
