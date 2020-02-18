@@ -1,5 +1,6 @@
 package com.team254.frc2020.subsystems.limelight;
 
+import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
 import com.team254.frc2020.subsystems.limelight.CameraResolution;
 import com.team254.frc2020.subsystems.limelight.Limelight;
@@ -19,7 +20,6 @@ import java.util.List;
 
 @RunWith(JUnit4.class)
 public class LimelightTest {
-
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
@@ -72,10 +72,17 @@ public class LimelightTest {
      * Tests distance calculation. All the distance and coordinate data was collected on a development board
      */
     @Test
-    public void testGetCameraToVisionTargetPose() {
+    public void testGetCameraToVisionTargetPose() throws InterruptedException {
         List<TargetInfo> targets = new ArrayList<>();
         PipelineConfiguration noZoomPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
         PipelineConfiguration zoomedPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
+
+        Limelight limelight = new Limelight(Constants.kLimelightConstants, Constants.kLowRes1xZoom);
+        UndistortMap undistortMap = limelight.getUndistortMap();
+
+        while (!undistortMap.isLoaded()) {
+            Thread.sleep(10);
+        }
 
         double cameraHeight = 14.125;
         Rotation2d cameraPitch = Rotation2d.fromDegrees(1.6);
@@ -87,7 +94,7 @@ public class LimelightTest {
                 new double[]{135, 192, 178, 148},
                 new double[]{7, 10, 33, 33}
         );
-        targets = Limelight.getRawTargetInfos(topCorners1, noZoomPipeline, targets);
+        targets = Limelight.getRawTargetInfos(topCorners1, noZoomPipeline, targets, undistortMap);
         double[] distances1 = averageTargetInfos(targets, cameraHeight, cameraPitch);
         Assert.assertEquals(15*12 + 5, distances1[0], acceptedError);
         targets.clear();
@@ -97,7 +104,7 @@ public class LimelightTest {
                 new double[]{149,177, 171, 155},
                 new double[]{67, 67, 79, 79}
         );
-        Limelight.getRawTargetInfos(topCorners2, noZoomPipeline, targets);
+        Limelight.getRawTargetInfos(topCorners2, noZoomPipeline, targets, undistortMap);
         double[] distances2 = averageTargetInfos(targets, cameraHeight, cameraPitch);
         Assert.assertEquals(30*12 + 3, distances2[0], acceptedError);
         targets.clear();
@@ -107,7 +114,7 @@ public class LimelightTest {
                         new double[]{153, 180, 174, 159},
                         new double[]{67, 67, 80, 79}
         );
-        Limelight.getRawTargetInfos(topCorners3, noZoomPipeline, targets);
+        Limelight.getRawTargetInfos(topCorners3, noZoomPipeline, targets, undistortMap);
         double[] distances3 = averageTargetInfos(targets, cameraHeight, cameraPitch);
         Assert.assertEquals(30*12 + 1, distances3[0], acceptedError);
         targets.clear();
@@ -117,7 +124,7 @@ public class LimelightTest {
                 new double[]{146, 201, 187, 160},
                 new double[]{15, 15, 39, 39}
         );
-        targets = Limelight.getRawTargetInfos(topCorners4, zoomedPipeline, targets);
+        targets = Limelight.getRawTargetInfos(topCorners4, zoomedPipeline, targets, undistortMap);
         double[] distances4 = averageTargetInfos(targets, cameraHeight, cameraPitch);
         Assert.assertEquals(30*12 + 1, distances4[0], acceptedError);
         targets.clear();
@@ -127,7 +134,7 @@ public class LimelightTest {
                         new double[]{163, 218, 206, 176},
                         new double[]{19, 19, 44, 44}
         );
-        Limelight.getRawTargetInfos(topCorners5, zoomedPipeline, targets);
+        Limelight.getRawTargetInfos(topCorners5, zoomedPipeline, targets, undistortMap);
         double[] distances5 = averageTargetInfos(targets, cameraHeight, cameraPitch);
         Assert.assertEquals(30*12 + 10, distances5[0], acceptedError);
         targets.clear();
@@ -137,7 +144,7 @@ public class LimelightTest {
                 new double[]{163, 190, 184, 168},
                 new double[]{69, 69, 82, 82}
         );
-        Limelight.getRawTargetInfos(topCorners6, noZoomPipeline, targets);
+        Limelight.getRawTargetInfos(topCorners6, noZoomPipeline, targets, undistortMap);
         double[] distances6 = averageTargetInfos(targets, cameraHeight, cameraPitch);
         Assert.assertEquals(31*12 + 1, distances6[0], acceptedError);
         targets.clear();

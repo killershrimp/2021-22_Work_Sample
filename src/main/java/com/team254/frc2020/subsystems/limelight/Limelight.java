@@ -52,10 +52,10 @@ public class Limelight extends Subsystem {
     private final LimelightConstants mConstants;
     private PipelineConfiguration mPipelineConfig;
 
-    private static final CameraResolution undistortRasterResolution = CameraResolution.F_320x240;
-    private static final UndistortMap undistortMap = new UndistortMap(undistortRasterResolution.getWidth(), undistortRasterResolution.getHeight());
+    private final CameraResolution undistortRasterResolution = CameraResolution.F_320x240;
 
-;
+    private final UndistortMap undistortMap = new UndistortMap(undistortRasterResolution.getWidth(), undistortRasterResolution.getHeight(), true);
+
     private final PeriodicIO mPeriodicIO = new PeriodicIO();
     private boolean mOutputsHaveChanged = true;
     private final double[] mZeroArray = new double[]{0, 0, 0, 0, 0, 0, 0, 0};
@@ -192,11 +192,11 @@ public class Limelight extends Subsystem {
         return null;
     }
 
-    private synchronized List<TargetInfo> getRawTargetInfos() {
-        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets);
+    public synchronized List<TargetInfo> getRawTargetInfos() {
+        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets, undistortMap);
     }
 
-    public static List<TargetInfo> getRawTargetInfos(List<double[]> corners, PipelineConfiguration pipeline, List<TargetInfo> targets) {
+    public static List<TargetInfo> getRawTargetInfos(List<double[]> corners, PipelineConfiguration pipeline, List<TargetInfo> targets, UndistortMap undistortMap) {
         if (corners == null) {
             return null;
         }
@@ -303,5 +303,9 @@ public class Limelight extends Subsystem {
 
     public double getLatency() {
         return mPeriodicIO.latency;
+    }
+
+    public UndistortMap getUndistortMap() {
+        return undistortMap;
     }
 }
