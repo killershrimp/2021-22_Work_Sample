@@ -2,9 +2,6 @@ package com.team254.frc2020.subsystems.limelight;
 
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
-import com.team254.frc2020.subsystems.limelight.CameraResolution;
-import com.team254.frc2020.subsystems.limelight.Limelight;
-import com.team254.frc2020.subsystems.limelight.PipelineConfiguration;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.Util;
@@ -15,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.opencv.core.Core;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +67,19 @@ public class LimelightTest {
         Assert.assertArrayEquals(new double[]{134.0, 46.0}, topCorners6.get(1), Util.kEpsilon);
     }
 
+    @Test
+    public void testBuildUndistortMapAsync() throws InterruptedException {
+        UndistortMap undistortMap = new UndistortMap(CameraResolution.F_320x240, true);
+        Instant startLoad = Instant.now();
+        while (!undistortMap.getReady()) {
+            Thread.sleep(100);
+            if (Math.abs(Duration.between(Instant.now(), startLoad).getSeconds()) > 60) {
+                System.err.println("Could not load undistort map");
+                return;
+            }
+        }
+    }
+
     /**
      * Tests distance calculation. All the distance and coordinate data was collected on a development board
      */
@@ -76,13 +88,7 @@ public class LimelightTest {
         List<TargetInfo> targets = new ArrayList<>();
         PipelineConfiguration noZoomPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
         PipelineConfiguration zoomedPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
-
-        Limelight limelight = new Limelight(Constants.kLimelightConstants, Constants.kLowRes1xZoom);
-        UndistortMap undistortMap = limelight.getUndistortMap();
-
-        while (!undistortMap.isLoaded()) {
-            Thread.sleep(10);
-        }
+        UndistortMap undistortMap = new UndistortMap(CameraResolution.F_320x240, false);
 
         double cameraHeight = 14.125;
         Rotation2d cameraPitch = Rotation2d.fromDegrees(1.6);

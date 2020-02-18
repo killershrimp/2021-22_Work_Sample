@@ -21,6 +21,7 @@ public class UndistortMap {
     private CameraResolution cameraResolution;
     double[][][] map;
 
+    private AtomicBoolean ready = new AtomicBoolean(false);
     private AtomicBoolean loaded = new AtomicBoolean(false);
 
     public UndistortMap(CameraResolution cameraResolution, boolean loadAsync) {
@@ -34,21 +35,27 @@ public class UndistortMap {
     }
 
     private void load() {
-        for (int i = 0; i < cameraResolution.getWidth(); i++) {
-            for (int j = 0; j < cameraResolution.getHeight(); j++) {
-                // run undistort
-                double[] undistorted = undistortFromOpenCV(new double[]{i * 1.0 / cameraResolution.getWidth() * 1.0, j * 1.0 / cameraResolution.getHeight() * 1.0});
-                // output undistorted x and y
-                for (int k = 0; k < 2; k++) {
-                    map[i][j][k] = (float) undistorted[k];
+        try {
+            for (int i = 0; i < cameraResolution.getWidth(); i++) {
+                for (int j = 0; j < cameraResolution.getHeight(); j++) {
+                    // run undistort
+                    double[] undistorted = undistortFromOpenCV(new double[]{i * 1.0 / cameraResolution.getWidth() * 1.0, j * 1.0 / cameraResolution.getHeight() * 1.0});
+                    // output undistorted x and y
+                    for (int k = 0; k < 2; k++) {
+                        map[i][j][k] = (float) undistorted[k];
+                    }
                 }
             }
+            loaded.set(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ready.set(true);
         }
-        loaded.set(true);
     }
 
     public double[] getUndistortedPoint(double x, double y) {
-        if (loaded.get()) {
+        if (ready.get()) {
             double denormalizedX = x * cameraResolution.getWidth();
             double denormalizedY = y * cameraResolution.getHeight();
             int intX = (int) Util.limit(denormalizedX, 0, cameraResolution.getWidth());
@@ -87,7 +94,11 @@ public class UndistortMap {
         return dst.get(0, 0);
     }
 
-    public boolean isLoaded() {
+    public boolean getReady() {
+        return ready.get();
+    }
+
+    public boolean getLoaded() {
         return loaded.get();
     }
 }
