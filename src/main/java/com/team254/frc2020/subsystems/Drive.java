@@ -82,9 +82,9 @@ public class Drive extends Subsystem {
         talon.enableVoltageCompensation(true);
 
         if (main_encoder_talon) {
-            // status frames
-            TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "could not set drive feedback frame");
-            TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 10, Constants.kLongCANTimeoutMs), "could not set drive voltage frame");
+            // status frames (maybe set for characterization?)
+            // TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "could not set drive feedback frame");
+            // TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 10, Constants.kLongCANTimeoutMs), "could not set drive voltage frame");
 
             // velocity measurement
             TalonUtil.checkError(talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
