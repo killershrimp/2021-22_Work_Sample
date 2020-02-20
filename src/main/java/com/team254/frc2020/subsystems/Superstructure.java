@@ -221,8 +221,6 @@ public class Superstructure extends Subsystem {
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
-
-
     private void writeShootDesiredState(double timestamp) {
         mSerializer.feed();
         mTurret.setPosition(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());

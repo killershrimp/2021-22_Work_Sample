@@ -119,7 +119,7 @@ public class Constants {
     public static final double kHoodKf = 0.0;
     public static final int kHoodCruiseVelocity = 14293; // ticks / 100ms
     public static final int kHoodAcceleration = 42880; // 3* cruise velocity ticks / 100 ms / s
-    public static final int kHoodAllowableClosedloopError = 883;
+    public static final int kHoodAllowableClosedloopError = 100;
 
     // Shooter (TODO tune)
     public static final int kShooterLeftMasterId = 12;
@@ -129,7 +129,7 @@ public class Constants {
     public static final double kShooterKd = 0.0;
     public static final double kShooterKf = 0.05033127788;
     public static final double kShooterTicksPerRevolution = 2048.0 ; // based on gear reduction between encoder and output shaft, and encoder ppr
-    public static final double kShooterAllowableErrorRPM = 1000; // TODO
+    public static final double kShooterAllowableErrorRPM = 100; // TODO
 
     // Serializer
     public static final int kSerializerSpinCycleMasterId = 7;
