@@ -213,6 +213,8 @@ public class Robot extends TimedRobot {
         // TODO uncomment for superstructure
         if (mControlBoard.getShoot()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
+        } else if (mControlBoard.getAim()) {
+            mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
         } else if (mControlBoard.getMoveToZero()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.MOVE_TO_ZERO);
         } else {

@@ -48,6 +48,11 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
+    public boolean getAim() {
+        return mButtonControlBoard.getAim();
+    }
+
+    @Override
     public boolean getMoveToZero() {
         return mButtonControlBoard.getMoveToZero();
     }

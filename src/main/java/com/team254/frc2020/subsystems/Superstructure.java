@@ -38,13 +38,14 @@ public class Superstructure extends Subsystem {
 
     public enum WantedState {
         IDLE,
+        AIM,
         SHOOT,
         MOVE_TO_ZERO
     }
 
     public enum SystemState {
         IDLE,
-        PREPARE_TO_SHOOT,
+        AIMING,
         SHOOT,
         MOVE_TO_ZERO
     }
@@ -89,8 +90,8 @@ public class Superstructure extends Subsystem {
                         case IDLE:
                             newState = handleIdle(mWantedState);
                             break;
-                        case PREPARE_TO_SHOOT:
-                            newState = handlePrepareToShoot(mWantedState);
+                        case AIMING:
+                            newState = handleAiming(mWantedState);
                             break;
                         case SHOOT:
                             newState = handleShoot(mWantedState);
@@ -115,8 +116,8 @@ public class Superstructure extends Subsystem {
                         case IDLE:
                             writeIdleDesiredState();
                             break;
-                        case PREPARE_TO_SHOOT:
-                            writePrepareToShootDesiredState(timestamp);
+                        case AIMING:
+                            writeAimingDesiredState(timestamp);
                             break;
                         case SHOOT:
                             writeShootDesiredState(timestamp);
@@ -141,7 +142,9 @@ public class Superstructure extends Subsystem {
     private SystemState handleIdle(WantedState wantedState) {
         switch (wantedState) {
             case SHOOT:
-                return SystemState.PREPARE_TO_SHOOT;
+                return SystemState.AIMING;
+            case AIM:
+                return SystemState.AIMING;
             case MOVE_TO_ZERO:
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
@@ -150,18 +153,18 @@ public class Superstructure extends Subsystem {
         }
     }
 
-    private SystemState handlePrepareToShoot(WantedState wantedState) {
+    private SystemState handleAiming(WantedState wantedState) {
         switch (wantedState) {
             case MOVE_TO_ZERO:
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
                 return SystemState.IDLE;
             case SHOOT:
-                if (isOnTarget() && Shooter.getInstance().isAtSetpoint() && Hood.getInstance().isAtSetpoint()) {
+               // if (isOnTarget() && Shooter.getInstance().isAtSetpoint() && Hood.getInstance().isAtSetpoint()) {
                     return SystemState.SHOOT;
-                }
+                //}
             default:
-                return SystemState.PREPARE_TO_SHOOT;
+                return SystemState.AIMING;
         }
     }
 
@@ -171,9 +174,11 @@ public class Superstructure extends Subsystem {
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
                 return SystemState.IDLE;
+            case AIM:
+                return SystemState.AIMING;
             case SHOOT:
                 if (!isOnTarget() || !Hood.getInstance().isAtSetpoint()) {
-                    return SystemState.PREPARE_TO_SHOOT;
+                    return SystemState.AIMING;
                 }
             default:
                 return SystemState.SHOOT;
@@ -184,8 +189,10 @@ public class Superstructure extends Subsystem {
         switch (wantedState) {
             case IDLE:
                 return SystemState.IDLE;
+            case AIM:
+                return SystemState.AIMING;
             case SHOOT:
-                return SystemState.PREPARE_TO_SHOOT;
+                return SystemState.AIMING;
             case MOVE_TO_ZERO:
             default:
                 return SystemState.MOVE_TO_ZERO;
@@ -203,7 +210,7 @@ public class Superstructure extends Subsystem {
         mShooter.setOpenLoop(0.0);
     }
 
-    private void writePrepareToShootDesiredState(double timestamp) {
+    private void writeAimingDesiredState(double timestamp) {
         mSerializer.serialize();
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();

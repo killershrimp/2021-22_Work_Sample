@@ -26,6 +26,11 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
+    public boolean getAim() {
+        return mController.getTrigger(XboxController.Side.LEFT);
+    }
+
+    @Override
     public boolean getMoveToZero() {
         return mController.getButton(XboxController.Button.BACK) && mController.getButton(XboxController.Button.START);
     }
