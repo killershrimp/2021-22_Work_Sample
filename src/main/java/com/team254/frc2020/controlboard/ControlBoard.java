@@ -63,5 +63,22 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
-    public void reset() {}
+    public boolean wantsIntake() {
+        return mButtonControlBoard.wantsIntake();
+    }
+
+    @Override
+    public boolean wantsReverseIntake() {
+        return mButtonControlBoard.wantsReverseIntake();
+    }
+
+    @Override
+    public boolean wantsStowIntake() {
+        return mButtonControlBoard.wantsStowIntake();
+    }
+
+    @Override
+    public void reset() {
+        mButtonControlBoard.reset();
+    }
 }

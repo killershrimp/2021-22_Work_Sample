@@ -43,12 +43,6 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
-    public void reset() {
-        mLastCardinal = CardinalDirection.NONE;
-        mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);
-    }
-
-    @Override
     public CardinalDirection getTurretHint() {
         int dPad = mController.getDPad();
         CardinalDirection newCardinal = dPad == -1 ? CardinalDirection.NONE : CardinalDirection.findClosest(Rotation2d.fromDegrees(-dPad));
@@ -66,5 +60,26 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
             mLastCardinal = newCardinal;
         }
         return CardinalDirection.NONE;
+    }
+
+    @Override
+    public boolean wantsIntake() {
+        return mController.getButton(XboxController.Button.RB);
+    }
+
+    @Override
+    public boolean wantsReverseIntake() {
+        return mController.getButton(XboxController.Button.LB);
+    }
+
+    @Override
+    public boolean wantsStowIntake() {
+        return mController.getButton(XboxController.Button.A);
+    }
+
+    @Override
+    public void reset() {
+        mLastCardinal = CardinalDirection.NONE;
+        mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);
     }
 }

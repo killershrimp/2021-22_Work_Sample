@@ -136,12 +136,16 @@ public class Constants {
     public static final int kSerializerLeftRollerMasterId = 8;
     public static final int kSerializerRightRollerMasterId = 9;
 
+    // Intake
+    public static final int kIntakeMasterId = 14;
+
     // Pigeon IMU
     public static final int kPigeonIMUId = 0;
 
     // Pneumatics
     public static final int kPCMId = 0;
     public static final int kShifterSolenoidId = 0;
+    public static final int kIntakeSolenoidId = 2;
 
     // Vision
     public static final double kHorizontalFOV = 63.709400992230975; // degrees

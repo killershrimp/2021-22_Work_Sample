@@ -9,13 +9,7 @@ import com.team254.frc2020.controlboard.IButtonControlBoard;
 import com.team254.frc2020.controlboard.IControlBoard;
 import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
-import com.team254.frc2020.subsystems.Drive;
-import com.team254.frc2020.subsystems.Hood;
-import com.team254.frc2020.subsystems.RobotStateEstimator;
-import com.team254.frc2020.subsystems.Serializer;
-import com.team254.frc2020.subsystems.Shooter;
-import com.team254.frc2020.subsystems.Superstructure;
-import com.team254.frc2020.subsystems.Turret;
+import com.team254.frc2020.subsystems.*;
 import com.team254.frc2020.subsystems.limelight.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
@@ -42,6 +36,7 @@ public class Robot extends TimedRobot {
     private final Drive mDrive = Drive.getInstance();
     private final Limelight mLimelight = new Limelight(Constants.kLimelightConstants, Constants.kLowRes1xZoom);
     private final Superstructure mSuperstructure = Superstructure.getInstance();
+    private final Intake mIntake = Intake.getInstance();
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -60,6 +55,7 @@ public class Robot extends TimedRobot {
                 Hood.getInstance(),
                 Shooter.getInstance(),
                 Serializer.getInstance(),
+                mIntake,
                 mSuperstructure, // TODO uncomment for superstructure
                 mLimelight
             );
@@ -196,14 +192,14 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         try {
-            manualControl(/*sandstorm=*/false);
+            manualControl();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
         }
     }
 
-    public void manualControl(boolean sandstorm) {
+    public void manualControl() {
         mDrive.setHighGear(!mControlBoard.getWantsLowGear());
         // mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
         //         -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
@@ -230,6 +226,16 @@ public class Robot extends TimedRobot {
         } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirection.RIGHT) {
             mSuperstructure.setTurretHint(90);
         }
+
+        if (mControlBoard.wantsIntake()) {
+//            mIntake.deploy();
+            mIntake.setOpenLoop(0.8);
+        } else if (mControlBoard.wantsReverseIntake()) {
+//            mIntake.deploy();
+            mIntake.setOpenLoop(-0.8);
+        }/* else if (mControlBoard.wantsStowIntake()) {
+            mIntake.stow();
+        }*/
 
         // if (mControlBoard.getShoot()) {
         //     Shooter.getInstance().setOpenLoop(0.75);

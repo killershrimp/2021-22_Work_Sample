@@ -60,4 +60,10 @@ public interface IButtonControlBoard {
     CardinalDirection getTurretHint();
 
     void reset();
+
+    boolean wantsIntake();
+
+    boolean wantsReverseIntake();
+
+    boolean wantsStowIntake();
 }
