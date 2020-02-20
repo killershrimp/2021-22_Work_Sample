@@ -62,6 +62,8 @@ public class Superstructure extends Subsystem {
     private boolean mEnforceAutoAimMinDistance = false;
     private double mAutoAimMinDistance = 500;
 
+    private Optional<Double> turretHint = Optional.empty();
+
     private double mTurretFeedforwardVFromVision = 0.0;
 
     @Override
@@ -75,6 +77,11 @@ public class Superstructure extends Subsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Superstructure.this) {
+                    // Reset hint if needed
+                    if (turretHint.isPresent() && (isOnTarget() || visionHasTarget())) {
+                        turretHint = Optional.empty();
+                    }
+
                     SystemState newState = mSystemState;
                     double timeInState = timestamp - mCurrentStateStartTime;
             
@@ -194,16 +201,37 @@ public class Superstructure extends Subsystem {
 
     private void writePrepareToShootDesiredState(double timestamp) {
         mSerializer.serialize();
-        mTurret.setMotionMagic(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
+        double visionAngle = getTurretSetpointFromVision(timestamp);
+        double angleToSet = mTurret.getAngle();
+        double ffToSet = 0;
+        if (visionHasTarget()) {
+            angleToSet = visionAngle;
+            ffToSet = getTurretFeedforwardVFromVision();;
+        } else if (turretHint.isPresent()) {
+            angleToSet = turretHint.get();
+        }
+        mTurret.setPosition(angleToSet, ffToSet);
         if (mLatestAimingParameters.isPresent()) {
             mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
         }
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
+
+
     private void writeShootDesiredState(double timestamp) {
         mSerializer.feed();
-        mTurret.setPosition(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
+        double visionAngle = getTurretSetpointFromVision(timestamp);
+        double angleToSet = mTurret.getAngle();
+        double ffToSet = 0;
+        if (visionHasTarget()) {
+            angleToSet = visionAngle;
+            ffToSet = getTurretFeedforwardVFromVision();;
+        }
+        else if (turretHint.isPresent()) {
+            angleToSet = turretHint.get();
+        }
+        mTurret.setPosition(angleToSet, ffToSet);
         if (mLatestAimingParameters.isPresent()) {
             mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
         }
@@ -241,6 +269,10 @@ public class Superstructure extends Subsystem {
 
     public synchronized SystemState getSystemState() {
         return mSystemState;
+    }
+
+    public boolean visionHasTarget() {
+        return mHasTarget;
     }
 
     public double getTurretSetpointFromVision(double timestamp) {
@@ -312,5 +344,11 @@ public class Superstructure extends Subsystem {
 
     public synchronized boolean isOnTarget() {
         return mOnTarget;
+    }
+
+    public synchronized void setTurretHint(double hint) {
+        if (!visionHasTarget()) {
+            turretHint = Optional.of(hint);
+        }
     }
 }

@@ -99,7 +99,7 @@ public class Constants {
     public static final int kTurretAcceleration = 52694; // 3 * cruise vel (ticks / 100 ms / s)
     public static final int kTurretMotionMagicAllowableClosedloopError = 146; // ticks (roughly half a °)
 
-    public static final double kTurretPositionKp = 0.0;
+    public static final double kTurretPositionKp = 0.21;
     public static final double kTurretPositionKi = 0;
     public static final double kTurretPositionKd = 0.0;
     public static final double kTurretPositionKf = 0.0;

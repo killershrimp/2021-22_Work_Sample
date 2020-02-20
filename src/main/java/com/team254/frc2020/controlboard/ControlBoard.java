@@ -51,4 +51,9 @@ public class ControlBoard implements IControlBoard {
     public boolean getMoveToZero() {
         return mButtonControlBoard.getMoveToZero();
     }
+
+    @Override
+    public CardinalDirections getTurretHint() {
+        return mButtonControlBoard.getTurretHint();
+    }
 }

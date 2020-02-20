@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.team254.frc2020.auto.AutoModeExecutor;
 import com.team254.frc2020.auto.modes.AutoModeBase;
 import com.team254.frc2020.controlboard.ControlBoard;
+import com.team254.frc2020.controlboard.IButtonControlBoard;
 import com.team254.frc2020.controlboard.IControlBoard;
 import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
@@ -218,6 +219,15 @@ public class Robot extends TimedRobot {
             mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
         }
 
+        // Hints
+        if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirections.NORTH) {
+            mSuperstructure.setTurretHint(180);
+        } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirections.WEST) {
+            mSuperstructure.setTurretHint(270);
+        } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirections.EAST) {
+            mSuperstructure.setTurretHint(90);
+        }
+
         // if (mControlBoard.getShoot()) {
         //     Shooter.getInstance().setOpenLoop(0.75);
         // } else {
@@ -227,4 +237,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {}
+
+
 }

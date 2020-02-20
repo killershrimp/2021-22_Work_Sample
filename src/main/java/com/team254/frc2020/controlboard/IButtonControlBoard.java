@@ -4,4 +4,13 @@ public interface IButtonControlBoard {
     boolean getShoot();
 
     boolean getMoveToZero();
+
+    enum CardinalDirections {
+        NORTH,
+        EAST,
+        WEST,
+        NONE
+    }
+
+    CardinalDirections getTurretHint();
 }

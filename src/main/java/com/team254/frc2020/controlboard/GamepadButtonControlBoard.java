@@ -29,4 +29,17 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     public boolean getMoveToZero() {
         return mController.getButton(XboxController.Button.BACK) && mController.getButton(XboxController.Button.START);
     }
+
+    @Override
+    public CardinalDirections getTurretHint() {
+        if (mController.getButton(XboxController.Button.Y)) {
+            return CardinalDirections.NORTH;
+        } else if (mController.getButton(XboxController.Button.X)) {
+            return CardinalDirections.WEST;
+        } else if (mController.getButton(XboxController.Button.B)) {
+            return CardinalDirections.EAST;
+        } else {
+            return CardinalDirections.NONE;
+        }
+    }
 }
