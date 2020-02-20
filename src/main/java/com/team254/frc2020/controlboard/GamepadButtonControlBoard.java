@@ -1,10 +1,17 @@
 package com.team254.frc2020.controlboard;
 
 import com.team254.frc2020.Constants;
+import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.util.DelayedBoolean;
+import edu.wpi.first.wpilibj.Timer;
 
 public class GamepadButtonControlBoard implements IButtonControlBoard {
 
     private static GamepadButtonControlBoard mInstance = null;
+
+    private final double kDPadDelay = 0.02;
+    private DelayedBoolean mDPadValid;
+    private CardinalDirection mLastCardinal;
 
     public static GamepadButtonControlBoard getInstance() {
         if (mInstance == null) {
@@ -36,15 +43,28 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
-    public CardinalDirections getTurretHint() {
-        if (mController.getButton(XboxController.Button.Y)) {
-            return CardinalDirections.NORTH;
-        } else if (mController.getButton(XboxController.Button.X)) {
-            return CardinalDirections.WEST;
-        } else if (mController.getButton(XboxController.Button.B)) {
-            return CardinalDirections.EAST;
-        } else {
-            return CardinalDirections.NONE;
+    public void reset() {
+        mLastCardinal = CardinalDirection.NONE;
+        mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);
+    }
+
+    @Override
+    public CardinalDirection getTurretHint() {
+        int dPad = mController.getDPad();
+        CardinalDirection newCardinal = dPad == -1 ? CardinalDirection.NONE : CardinalDirection.findClosest(Rotation2d.fromDegrees(-dPad));
+        if (newCardinal != CardinalDirection.NONE && CardinalDirection.isDiagonal(newCardinal)) {
+            // Latch previous direction on diagonal presses, because the D-pad sucks at diagonals.
+            newCardinal = mLastCardinal;
         }
+        boolean valid = mDPadValid.update(Timer.getFPGATimestamp(), newCardinal != CardinalDirection.NONE && (mLastCardinal == CardinalDirection.NONE || newCardinal == mLastCardinal));
+        if (valid) {
+            if (mLastCardinal == CardinalDirection.NONE) {
+                mLastCardinal = newCardinal;
+            }
+            return mLastCardinal;
+        } else {
+            mLastCardinal = newCardinal;
+        }
+        return CardinalDirection.NONE;
     }
 }

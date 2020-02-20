@@ -221,12 +221,13 @@ public class Robot extends TimedRobot {
             mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
         }
 
+        // TODO add front left, back left, ... capabilities
         // Hints
-        if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirections.NORTH) {
+        if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirection.FRONT) {
             mSuperstructure.setTurretHint(180);
-        } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirections.WEST) {
+        } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirection.LEFT) {
             mSuperstructure.setTurretHint(270);
-        } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirections.EAST) {
+        } else if (mControlBoard.getTurretHint() == IButtonControlBoard.CardinalDirection.RIGHT) {
             mSuperstructure.setTurretHint(90);
         }
 

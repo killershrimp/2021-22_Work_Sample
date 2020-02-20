@@ -58,7 +58,10 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
-    public CardinalDirections getTurretHint() {
+    public CardinalDirection getTurretHint() {
         return mButtonControlBoard.getTurretHint();
     }
+
+    @Override
+    public void reset() {}
 }
