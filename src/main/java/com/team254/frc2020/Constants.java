@@ -113,10 +113,10 @@ public class Constants {
 
     // hood gains
     public static final double kHoodDegreesPerTick = 1.0 / 2048.0 * 8.0 / 40.0 * 16.0 / 38.0 * 14.0 / 366.0 * 360.0;
-    public static final double kHoodKp = 0.0;
+    public static final double kHoodKp = 0.254;
     public static final double kHoodKi = 0.0;
     public static final double kHoodKd = 0.0;
-    public static final double kHoodKf = 0.05725746269;
+    public static final double kHoodKf = 0.0;
     public static final int kHoodCruiseVelocity = 14293; // ticks / 100ms
     public static final int kHoodAcceleration = 42880; // 3* cruise velocity ticks / 100 ms / s
     public static final int kHoodAllowableClosedloopError = 883;
@@ -124,7 +124,7 @@ public class Constants {
     // Shooter (TODO tune)
     public static final int kShooterLeftMasterId = 12;
     public static final int kShooterRightMasterId = 13;
-    public static final double kShooterKp = 0.0;
+    public static final double kShooterKp = 0.0075;
     public static final double kShooterKi = 0.0;
     public static final double kShooterKd = 0.0;
     public static final double kShooterKf = 0.05033127788;
@@ -184,7 +184,7 @@ public class Constants {
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
     // Shot tuning (TODO tune)
-    public static final double kShooterSetpointRPM = 5500;
+    public static final double kShooterSetpointRPM = 5000;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodMap = new InterpolatingTreeMap<>();
     static {
         kHoodMap.put(new InterpolatingDouble(106.2), new InterpolatingDouble(52.5));
