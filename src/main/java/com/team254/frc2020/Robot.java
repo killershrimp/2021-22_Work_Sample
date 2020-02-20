@@ -18,6 +18,7 @@ import com.team254.lib.util.OpenLoopCheesyDriveHelper;
 import com.team254.lib.util.VelocityCheesyDriveHelper;
 import com.team254.lib.wpilib.TimedRobot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Robot extends TimedRobot {
@@ -38,6 +39,7 @@ public class Robot extends TimedRobot {
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Intake mIntake = Intake.getInstance();
 
+    private Compressor mCompressor;
     private final RobotState mRobotState = RobotState.getInstance();
 
     Robot() {
@@ -60,6 +62,7 @@ public class Robot extends TimedRobot {
                 mLimelight
             );
 
+            mCompressor = new Compressor();
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
             
@@ -70,6 +73,8 @@ public class Robot extends TimedRobot {
             mDrive.setHeading(Rotation2d.identity());
 
             mAutoModeSelector.updateModeCreator();
+
+            mControlBoard.reset();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -128,7 +133,7 @@ public class Robot extends TimedRobot {
             if (mAutoModeExecutor != null) {
                 mAutoModeExecutor.stop();
             }
-
+            mCompressor.stop();
             mEnabledLooper.start();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
@@ -206,7 +211,6 @@ public class Robot extends TimedRobot {
         mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
                 mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
 
-        // TODO uncomment for superstructure
         if (mControlBoard.getShoot()) {
             mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
         } else if (mControlBoard.getAim()) {
@@ -227,15 +231,14 @@ public class Robot extends TimedRobot {
             mSuperstructure.setTurretHint(90);
         }
 
+        // todo make setpoint a constant, test stow & deploy
         if (mControlBoard.wantsIntake()) {
-//            mIntake.deploy();
-            mIntake.setOpenLoop(0.8);
+            mIntake.setOpenLoop(0.6);
         } else if (mControlBoard.wantsReverseIntake()) {
-//            mIntake.deploy();
-            mIntake.setOpenLoop(-0.8);
-        }/* else if (mControlBoard.wantsStowIntake()) {
-            mIntake.stow();
-        }*/
+            mIntake.setOpenLoop(-0.6);
+        } else {
+            mIntake.setOpenLoop(0.0);
+        }
 
         // if (mControlBoard.getShoot()) {
         //     Shooter.getInstance().setOpenLoop(0.75);

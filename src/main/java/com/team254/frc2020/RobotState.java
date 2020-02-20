@@ -311,7 +311,8 @@ public class RobotState {
     }
 
     public synchronized Pose2d getVisionTargetToGoalOffset() {
-        return Constants.kVisionTargetToGoalOffset;
+//        return Constants.kVisionTargetToGoalOffset; // TODO
+        return Pose2d.identity();
     }
 
     public synchronized void outputToSmartDashboard() {

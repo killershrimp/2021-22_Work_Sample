@@ -160,7 +160,7 @@ public class Superstructure extends Subsystem {
             case IDLE:
                 return SystemState.IDLE;
             case SHOOT:
-               // if (isOnTarget() && Shooter.getInstance().isAtSetpoint() && Hood.getInstance().isAtSetpoint()) {
+               // if (isOnTarget() && Shooter.getInstance().isAtSetpoint() && Hood.getInstance().isAtSetpoint()) { // TODO re add exit conditions
                     return SystemState.SHOOT;
                 //}
             default:
@@ -177,9 +177,9 @@ public class Superstructure extends Subsystem {
             case AIM:
                 return SystemState.AIMING;
             case SHOOT:
-                if (!isOnTarget() || !Hood.getInstance().isAtSetpoint()) {
-                    return SystemState.AIMING;
-                }
+//                if (!isOnTarget() || !Hood.getInstance().isAtSetpoint()) { // TODO re add exit conditions
+                    return SystemState.SHOOT;
+//                }
             default:
                 return SystemState.SHOOT;
         }
@@ -211,29 +211,31 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeAimingDesiredState(double timestamp) {
-        mSerializer.serialize();
+        mSerializer.stopRunning();
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();
         double ffToSet = 0;
         if (visionHasTarget()) {
             angleToSet = visionAngle;
-            ffToSet = getTurretFeedforwardVFromVision();;
+            ffToSet = getTurretFeedforwardVFromVision();
         } else if (turretHint.isPresent()) {
             angleToSet = turretHint.get();
         }
         mTurret.setPosition(angleToSet, ffToSet);
-        if (mLatestAimingParameters.isPresent()) {
-            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
-        }
+        // TODO re add hood commands
+//        if (mLatestAimingParameters.isPresent()) {
+//            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+//        }
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
     private void writeShootDesiredState(double timestamp) {
         mSerializer.feed();
         mTurret.setPosition(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
-        if (mLatestAimingParameters.isPresent()) {
-            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
-        }
+        // TODO re add hood commands
+//        if (mLatestAimingParameters.isPresent()) {
+//            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+//        }
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 

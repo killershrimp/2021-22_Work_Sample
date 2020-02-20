@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
 
-    public static final double kSpinCycleDemand = 0.15;
+    public static final double kSpinCycleDemand = 0.4;
     public static final double kLeftRollerDemand = 1.0;
     public static final double kRightRollerDemand = 1.0;
 
