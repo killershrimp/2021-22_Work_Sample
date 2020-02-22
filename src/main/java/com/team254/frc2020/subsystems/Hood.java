@@ -96,7 +96,7 @@ public class Hood extends Subsystem {
     @Override
     public void readPeriodicInputs() {
         mPeriodicIO.ticks = mMaster.getSelectedSensorPosition(0);
-        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isRevLimitSwitchClosed() == 1;
+        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isFwdLimitSwitchClosed() == 1;
     }
 
     @Override
