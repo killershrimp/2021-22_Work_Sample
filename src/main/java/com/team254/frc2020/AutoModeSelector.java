@@ -40,6 +40,15 @@ public class AutoModeSelector {
     public void updateModeCreator() {
         DesiredMode desiredMode = mModeChooser.getSelected();
         StartingPosition startingPosition = mStartPositionChooser.getSelected();
+
+        if (desiredMode == null) {
+            desiredMode = DesiredMode.DO_NOTHING;
+        }
+
+        if (startingPosition == null) {
+            startingPosition = StartingPosition.LEFT;
+        }
+
         if (mCachedDesiredMode != desiredMode || startingPosition != mCachedStartingPosition) {
             System.out.println("Auto selection changed, updating creator: desiredMode->" + desiredMode.name()
                     + ", starting position->" + startingPosition.name());
