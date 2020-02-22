@@ -49,12 +49,12 @@ public class Constants {
     public static final int kRightDriveEncoderA = 2;
     public static final int kRightDriveEncoderB = 3;
 
-    // gear ratios (TODO set)
+    // Drive ratio.
     public static final double kDriveEncoderPPR = 1000.0;
     public static final double kDriveRotationsPerTickHighGear = 1.0 / 2048.0 * 1.0 / 8.80; // ticks * kDriveRotationsPerTicksHighGear = wheel rotations
     public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 10.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
 
-    // wheels (TODO tune)
+    // Wheel parameters.
     public static final double kDriveWheelTrackWidthInches = 25.884; //todo characterize?
     public static final double kDriveWheelDiameterInches = 6.1439046227; //tuned 2/12
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
@@ -87,34 +87,26 @@ public class Constants {
     public static final double kPathLookaheadTime = 0.4; // seconds to look ahead along the path for steering
     public static final double kPathMinLookaheadDistance = 24.0; // inches
 
-    // Turret (TODO tune and set)
+    // Turret.
     public static final int kTurretMasterId = 10;
     public static final double kTurretDegreesPerTick = 1.0 / 2048.0 * 8.0 / 24.0 * 14.0 / 240.0 * 360.0;
-    public static final int kTurretForwardSoftLimitDegrees = 340; // degrees
-    public static final int kTurretReverseSoftLimitDegrees = 20; // degrees
+    public static final double kTurretForwardSoftLimitDegrees = 340.0; // degrees
+    public static final double kTurretReverseSoftLimitDegrees = 20.0; // degrees
     public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
     public static final double kTurretStartingPositionDegrees = 180; // degrees
 
     // turret gains
-    public static final double kTurretMotionMagicKp = 0.0;
-    public static final double kTurretMotionMagicKi = 0;
-    public static final double kTurretMotionMagicKd = 0.0;
-    public static final double kTurretMotionMagicKf = 0.04659318637;
-    public static final int kTurretCruiseVelocity = 17565; // ticks / 100 ms
-    public static final int kTurretAcceleration = 52694; // 3 * cruise vel (ticks / 100 ms / s)
-    public static final int kTurretMotionMagicAllowableClosedloopError = 146; // ticks (roughly half a °)
-
     public static final double kTurretPositionKp = 0.21;
     public static final double kTurretPositionKi = 0;
     public static final double kTurretPositionKd = 0.0;
     public static final double kTurretPositionKf = 0.0;
     public static final int kTurretPositionAllowableClosedloopError = 146; // ticks (roughly half a °)
 
-    // Hood (TODO tune and set)
+    // Hood
     public static final int kHoodMasterId = 11;
-    public static final double kHoodReverseSoftLimitDegrees = 45; // degrees
-    public static final double kHoodForwardSoftLimitDegrees = 70; // degrees
-    public static final double kHoodStartingPositionDegrees = 45; // degrees
+    public static final double kHoodReverseSoftLimitDegrees = 45.0; // degrees
+    public static final double kHoodForwardSoftLimitDegrees = 70.0; // degrees
+    public static final double kHoodStartingPositionDegrees = 45.0; // degrees
 
     // hood gains
     public static final double kHoodDegreesPerTick = 1.0 / 2048.0 * 8.0 / 40.0 * 16.0 / 38.0 * 14.0 / 366.0 * 360.0;
@@ -124,7 +116,7 @@ public class Constants {
     public static final double kHoodKf = 0.0;
     public static final int kHoodAllowableClosedloopError = 100;
 
-    // Shooter (TODO tune)
+    // Shooter
     public static final int kShooterLeftMasterId = 12;
     public static final int kShooterRightMasterId = 13;
     public static final double kShooterKp = 0.0075;
@@ -132,7 +124,7 @@ public class Constants {
     public static final double kShooterKd = 0.0;
     public static final double kShooterKf = 0.05033127788;
     public static final double kShooterTicksPerRevolution = 2048.0 ; // based on gear reduction between encoder and output shaft, and encoder ppr
-    public static final double kShooterAllowableErrorRPM = 100; // TODO
+    public static final double kShooterAllowableErrorRPM = 100.0; // TODO
 
     // Serializer
     public static final int kSerializerSpinCycleMasterId = 7;

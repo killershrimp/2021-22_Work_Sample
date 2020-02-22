@@ -38,12 +38,10 @@ public class Turret extends Subsystem {
 
     public enum TurretControlState {
         OPEN_LOOP,
-        MOTION_MAGIC,
         POSITION
     }
 
-    private static final int kMotionMagicProfileSlot = 0;
-    private static final int kPositionProfileSlot = 1;
+    private static final int kPositionProfileSlot = 0;
 
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private TurretControlState mControlState = TurretControlState.OPEN_LOOP;
@@ -59,22 +57,6 @@ public class Turret extends Subsystem {
         TalonUtil.checkError(mMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0,
                 Constants.kLongCANTimeoutMs), "Turret Master: Could not detect encoder: ");
         TalonUtil.checkError(mMaster.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "Turret Master: Could not set turret feedback frame: ");
-
-        // set master gains for motion magic
-        TalonUtil.checkError(mMaster.config_kP(kMotionMagicProfileSlot, Constants.kTurretMotionMagicKp, Constants.kLongCANTimeoutMs),
-            "Turret Master: could not set motion magic kP: ");
-        TalonUtil.checkError(mMaster.config_kI(kMotionMagicProfileSlot, Constants.kTurretMotionMagicKi, Constants.kLongCANTimeoutMs),
-            "Turret Master: could not set motion magic kI: ");
-        TalonUtil.checkError(mMaster.config_kD(kMotionMagicProfileSlot, Constants.kTurretMotionMagicKd, Constants.kLongCANTimeoutMs),
-            "Turret Master: could not set motion magic kD: ");
-        TalonUtil.checkError(mMaster.config_kF(kMotionMagicProfileSlot, Constants.kTurretMotionMagicKf, Constants.kLongCANTimeoutMs),
-            "Turret Master: Could not set motion magic kF: ");
-        TalonUtil.checkError(mMaster.configMotionCruiseVelocity(Constants.kTurretCruiseVelocity, Constants.kLongCANTimeoutMs),
-            "Turret Master: Could not set cruise velocity: ");
-        TalonUtil.checkError(mMaster.configMotionAcceleration(Constants.kTurretAcceleration, Constants.kLongCANTimeoutMs),
-            "Turret Master: Could not set accleration: ");
-        TalonUtil.checkError(mMaster.configAllowableClosedloopError(kMotionMagicProfileSlot, Constants.kTurretMotionMagicAllowableClosedloopError, Constants.kLongCANTimeoutMs),
-            "Turret Master: Could not set motion magic allowable closed loop error: ");
 
         // set master gains for position
         TalonUtil.checkError(mMaster.config_kP(kPositionProfileSlot, Constants.kTurretPositionKp, Constants.kLongCANTimeoutMs),
@@ -130,8 +112,6 @@ public class Turret extends Subsystem {
     public void writePeriodicOutputs() {
         if (mControlState == TurretControlState.OPEN_LOOP) {
             mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand);
-        } else if (mControlState == TurretControlState.MOTION_MAGIC) {
-            mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand, DemandType.ArbitraryFeedForward, mPeriodicIO.feedforward);
         } else if (mControlState == TurretControlState.POSITION) {
             mMaster.set(ControlMode.Position, mPeriodicIO.demand, DemandType.ArbitraryFeedForward, mPeriodicIO.feedforward);
         }
@@ -163,28 +143,6 @@ public class Turret extends Subsystem {
     /**
      * @param angle in degrees
      */
-    public synchronized void setMotionMagic(double degrees) {
-        setMotionMagic(degrees, 0.0);
-    }
-
-    /**
-     * @param angle in degrees
-     * @param feedforward_v
-     */
-    public synchronized void setMotionMagic(double degrees, double feedforward_v) {
-        if (mControlState != TurretControlState.MOTION_MAGIC) {
-            mControlState = TurretControlState.MOTION_MAGIC;
-            mMaster.selectProfileSlot(kMotionMagicProfileSlot, 0);
-        }
-
-        mPeriodicIO.demand = degreesToTicks(degrees);
-        double feedforward_ticks_per_100ms = degreesToTicks(feedforward_v) / 10.0; // deg / s to ticks / 100 ms
-        mPeriodicIO.feedforward = feedforward_ticks_per_100ms * (Constants.kTurretMotionMagicKf + Constants.kTurretMotionMagicKd / 100.0) / 1023.0;
-    }
-
-    /**
-     * @param angle in degrees
-     */
     public synchronized void setPosition(double degrees) {
         setPosition(degrees, 0.0);
     }
@@ -201,7 +159,7 @@ public class Turret extends Subsystem {
 
         mPeriodicIO.demand = degreesToTicks(degrees);
         double feedforward_ticks_per_100ms = degreesToTicks(feedforward_v) / 10.0; // deg / s to ticks / 100 ms
-        mPeriodicIO.feedforward = feedforward_ticks_per_100ms * (Constants.kTurretMotionMagicKf + Constants.kTurretMotionMagicKd / 100.0) / 1023.0;
+        mPeriodicIO.feedforward = 0.0 * feedforward_ticks_per_100ms;  // TODO tune
     }
 
     public synchronized double getAngle() {

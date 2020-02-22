@@ -241,7 +241,7 @@ public class Superstructure extends Subsystem {
 
     private void writeMoveToZeroDesiredState() {
         mSerializer.stopRunning();
-        mTurret.setMotionMagic(Constants.kTurretStartingPositionDegrees);
+        mTurret.setPosition(Constants.kTurretStartingPositionDegrees);
         mHood.setDesiredAngle(Constants.kHoodStartingPositionDegrees);
         mShooter.setOpenLoop(0.0);
     }
