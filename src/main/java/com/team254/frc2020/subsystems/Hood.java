@@ -1,10 +1,6 @@
 package com.team254.frc2020.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.loops.ILooper;
@@ -32,6 +28,7 @@ public class Hood extends Subsystem {
     public static class PeriodicIO {
         // inputs
         double ticks = 0.0; // ticks
+        boolean limit_switch = false;
 
         // outputs
         double demand = 0.0; // ticks
@@ -51,6 +48,8 @@ public class Hood extends Subsystem {
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mMaster.enableVoltageCompensation(true);
 
+        TalonUtil.checkError(mMaster.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen), "Could not config reverse limit switch hood");
+        mMaster.overrideLimitSwitchesEnable(true);
         // initialize encoder and set status frame
         TalonUtil.checkError(
                 mMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kLongCANTimeoutMs),
@@ -95,6 +94,7 @@ public class Hood extends Subsystem {
     @Override
     public void readPeriodicInputs() {
         mPeriodicIO.ticks = mMaster.getSelectedSensorPosition(0);
+        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isRevLimitSwitchClosed() == 1;
     }
 
     @Override
@@ -180,5 +180,6 @@ public class Hood extends Subsystem {
         SmartDashboard.putNumber("Hood Demand", mPeriodicIO.demand);
         SmartDashboard.putNumber("Hood Angle", getAngle());
         SmartDashboard.putBoolean("Hood At Setpoint", isAtSetpoint());
+        SmartDashboard.putBoolean("Hood Homed", mPeriodicIO.limit_switch);
     }
 }
