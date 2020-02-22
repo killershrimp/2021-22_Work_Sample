@@ -122,8 +122,6 @@ public class Constants {
     public static final double kHoodKi = 0.0;
     public static final double kHoodKd = 0.0;
     public static final double kHoodKf = 0.0;
-    public static final int kHoodCruiseVelocity = 14293; // ticks / 100ms
-    public static final int kHoodAcceleration = 42880; // 3* cruise velocity ticks / 100 ms / s
     public static final int kHoodAllowableClosedloopError = 100;
 
     // Shooter (TODO tune)

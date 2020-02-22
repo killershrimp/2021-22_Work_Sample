@@ -68,22 +68,15 @@ public class Hood extends Subsystem {
                 "Hood Master: could not set kD: ");
         TalonUtil.checkError(mMaster.config_kF(0, Constants.kHoodKf, Constants.kLongCANTimeoutMs),
                 "Hood Master: Could not set kF: ");
-        TalonUtil.checkError(
-                mMaster.configMotionCruiseVelocity(Constants.kHoodCruiseVelocity, Constants.kLongCANTimeoutMs),
-                "Hood Master: Could not set cruise velocity: ");
-        TalonUtil.checkError(mMaster.configMotionAcceleration(Constants.kHoodAcceleration, Constants.kLongCANTimeoutMs),
-                "Hood Master: Could not set acceleration: ");
         TalonUtil.checkError(mMaster.configAllowableClosedloopError(0, Constants.kHoodAllowableClosedloopError,
                 Constants.kLongCANTimeoutMs), "Hood Master: Could not set allowable closed loop error: ");
 
         // soft limits
-        TalonUtil
-                .checkError(
+        TalonUtil.checkError(
                         mMaster.configForwardSoftLimitThreshold(degreesToTicks(Constants.kHoodForwardSoftLimitDegrees),
                                 Constants.kLongCANTimeoutMs),
                         "Hood Master: Could not set forward soft limit threshold: ");
-        TalonUtil
-                .checkError(
+        TalonUtil.checkError(
                         mMaster.configReverseSoftLimitThreshold(degreesToTicks(Constants.kHoodReverseSoftLimitDegrees),
                                 Constants.kLongCANTimeoutMs),
                         "Hood Master: Could not set reverse soft limit threshold: ");
