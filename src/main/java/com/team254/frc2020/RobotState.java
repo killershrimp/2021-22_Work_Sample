@@ -224,7 +224,7 @@ public class RobotState {
         mCameraToVisionTargetPoses.clear();
 
         if (observations == null || observations.isEmpty()) {
-            vision_target_.update(timestamp, new ArrayList<>());
+            vision_target_.maybePruneTracks();
             return;
         }
 

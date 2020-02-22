@@ -118,6 +118,10 @@ public class GoalTracker {
             }
         }
 
+        maybePruneTracks();
+    }
+
+    public synchronized void maybePruneTracks() {
         mCurrentTracks.removeIf(track -> !track.isAlive());
     }
 
