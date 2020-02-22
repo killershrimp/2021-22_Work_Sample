@@ -55,6 +55,11 @@ public class XboxController {
     }
 
     private double handleDeadband(double value, double deadband) {
-        return (Math.abs(value) > Math.abs(deadband)) ? value : 0;
+        deadband = Math.abs(deadband);
+        if (deadband == 1) {
+            return 0;
+        }
+        double scaledValue = (value + (value < 0 ? deadband : -deadband) ) / (1 - deadband);
+        return (Math.abs(value) > Math.abs(deadband)) ? scaledValue : 0;
     }
 }
