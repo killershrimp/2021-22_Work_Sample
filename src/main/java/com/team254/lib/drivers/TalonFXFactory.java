@@ -84,9 +84,9 @@ public class TalonFXFactory {
 
         talon.clearStickyFaults(kTimeoutMs);
 
-        talon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+        talon.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated,
                 LimitSwitchNormal.Disabled, kTimeoutMs);
-        talon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+        talon.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated,
                 LimitSwitchNormal.Disabled, kTimeoutMs);
         talon.overrideLimitSwitchesEnable(config.ENABLE_LIMIT_SWITCH);
 
