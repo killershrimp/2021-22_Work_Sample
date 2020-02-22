@@ -71,6 +71,10 @@ public class Constants {
     public static final double kDriveLowGearKd = 0.0;
     public static final double kDriveLowGearKf = 0.0;
 
+    // deadband
+    public static final double kDriveThrottleDeadband = 0.04;
+    public static final double kDriveWheelDeadband = 0.035;
+
 
     // robot dynamics (TODO tune)
     public static final double kDriveVIntercept = 0.0; // V

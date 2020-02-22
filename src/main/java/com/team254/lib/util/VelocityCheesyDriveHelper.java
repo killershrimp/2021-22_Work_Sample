@@ -9,6 +9,8 @@ import com.team254.lib.physics.DifferentialDrive;
 import com.team254.lib.physics.DifferentialDrive.DriveDynamics;
 import com.team254.lib.physics.DifferentialDrive.WheelState;
 
+import static com.team254.lib.util.Util.handleDeadband;
+
 public class VelocityCheesyDriveHelper {
     private static VelocityCheesyDriveHelper mInstance;
 
@@ -47,8 +49,8 @@ public class VelocityCheesyDriveHelper {
     private double mLastLeftVel = 0.0, mLastRightVel = 0.0;
 
     public synchronized DriveOutput cheesyDrive(double throttle, double wheel, boolean isQuickTurn, boolean isHighGear) {
-        throttle = handleDeadband(throttle, 0.04);
-        wheel = handleDeadband(wheel, 0.035);
+        throttle = Util.handleDeadband(throttle, Constants.kDriveThrottleDeadband);
+        wheel = Util.handleDeadband(wheel, Constants.kDriveWheelDeadband);
 
         // TODO: remap throttle and wheel differently (currently just squared)
         throttle = Math.signum(throttle) * Math.pow(throttle, 2);
@@ -81,9 +83,5 @@ public class VelocityCheesyDriveHelper {
         mLastRightVel = ret_val.right_velocity;
         
         return ret_val;
-    }
-
-    private double handleDeadband(double val, double deadband) {
-        return (Math.abs(val) > Math.abs(deadband)) ? val : 0.0;
     }
 }

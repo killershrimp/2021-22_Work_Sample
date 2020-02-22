@@ -1,5 +1,6 @@
 package com.team254.lib.util;
 
+import com.team254.frc2020.Constants;
 import com.team254.frc2020.Kinematics;
 import com.team254.lib.geometry.Twist2d;
 
@@ -19,17 +20,11 @@ public class OpenLoopCheesyDriveHelper {
     private final double kWheelGain = 0.05;
     private final double kWheelNonlinearity = 0.05;
     private final double kDenominator = Math.sin(Math.PI / 2.0 * kWheelNonlinearity);
-    private final double kThrottleDeadband = 0.04;
-    private final double kWheelDeadband = 0.035;
 
     public synchronized DriveSignal cheesyDrive(double throttle, double wheel, boolean quickTurn) {
-        if (Util.epsilonEquals(throttle, 0.0, kThrottleDeadband)) {
-            throttle = 0.0;
-        }
 
-        if (Util.epsilonEquals(wheel, 0.0, kWheelDeadband)) {
-            wheel = 0.0;
-        }
+        throttle = Util.handleDeadband(throttle, Constants.kDriveThrottleDeadband);
+        wheel = Util.handleDeadband(wheel, Constants.kDriveWheelDeadband);
 
         // Apply a sin function that's scaled to make it feel better.
         if (!quickTurn) {

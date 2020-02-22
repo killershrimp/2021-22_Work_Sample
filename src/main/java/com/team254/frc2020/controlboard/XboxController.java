@@ -1,6 +1,7 @@
 package com.team254.frc2020.controlboard;
 
 import com.team254.frc2020.Constants;
+import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -35,7 +36,7 @@ public class XboxController {
         boolean left = side == Side.LEFT;
         boolean y = axis == Axis.Y;
         // multiplies by -1 if y-axis (inverted normally)
-        return handleDeadband((y ? -1 : 1) * mController.getRawAxis((left ? 0 : 4) + (y ? 1 : 0)), deadband);
+        return Util.handleDeadband((y ? -1 : 1) * mController.getRawAxis((left ? 0 : 4) + (y ? 1 : 0)), deadband);
     }
 
     boolean getTrigger(Side side) {
@@ -54,12 +55,4 @@ public class XboxController {
         mController.setRumble(RumbleType.kRightRumble, on ? 1 : 0);
     }
 
-    private double handleDeadband(double value, double deadband) {
-        deadband = Math.abs(deadband);
-        if (deadband == 1) {
-            return 0;
-        }
-        double scaledValue = (value + (value < 0 ? deadband : -deadband) ) / (1 - deadband);
-        return (Math.abs(value) > Math.abs(deadband)) ? scaledValue : 0;
-    }
 }
