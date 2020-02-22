@@ -177,9 +177,6 @@ public class Limelight extends Subsystem {
         return mPeriodicIO.pipeline;
     }
 
-    /**
-     * @return two targets that make up one hatch/port or null if less than two targets are found
-     */
     public synchronized List<TargetInfo> getTarget() {
         List<TargetInfo> targets = getRawTargetInfos();
 

@@ -19,8 +19,8 @@ public class PipelineConfiguration {
         this.crosshairX = crosshairX;
         this.crosshairY = crosshairY;
 
-        offsetX = crosshairX - 1 / (2 * zoomFactor);
-        offsetY = crosshairY - 1 / (2 * zoomFactor);
+        offsetX = crosshairX - 1.0 / (2.0 * zoomFactor);
+        offsetY = crosshairY - 1.0 / (2.0 * zoomFactor);
     }
 
     public double[] normalize(double[] point) {

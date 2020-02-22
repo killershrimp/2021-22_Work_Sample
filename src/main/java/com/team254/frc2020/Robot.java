@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
                 Shooter.getInstance(),
                 Serializer.getInstance(),
                 mIntake,
-                mSuperstructure, // TODO uncomment for superstructure
+                mSuperstructure,
                 mLimelight
             );
 

@@ -62,7 +62,7 @@ public class UndistortMap {
             int intY = (int) Util.limit(denormalizedY, 0, cameraResolution.getHeight());
             return map[intX][intY];
         } else {
-            // Return an undistorted point until this is loaded
+            // Return an un-undistorted point until this is loaded.
             double[] ret = {x, y};
             return ret;
         }
