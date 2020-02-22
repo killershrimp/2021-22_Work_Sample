@@ -28,7 +28,7 @@ public class Hood extends Subsystem {
     public static class PeriodicIO {
         // inputs
         double ticks = 0.0; // ticks
-        boolean limit_switch = false;
+        boolean limit_switch;
 
         // outputs
         double demand = 0.0; // ticks
@@ -48,7 +48,9 @@ public class Hood extends Subsystem {
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mMaster.enableVoltageCompensation(true);
 
-        TalonUtil.checkError(mMaster.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen), "Could not config reverse limit switch hood");
+        TalonUtil.checkError(mMaster.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen), "Could not config reverse limit switch hood");
+        // this is actually a reverse limit switch, top wiring team
+
         mMaster.overrideLimitSwitchesEnable(true);
         // initialize encoder and set status frame
         TalonUtil.checkError(
