@@ -26,6 +26,7 @@ import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +37,7 @@ public class Drive extends Subsystem {
     // hardware
     private final TalonFX mLeftMaster1, mRightMaster1, mLeftMaster2, mRightMaster2, mLeftMaster3, mRightMaster3;
     private final Solenoid mShifter;
+    private final Encoder mLeftEncoder, mRightEncoder;
 
     // control states
     private DriveControlState mDriveControlState;
@@ -131,6 +133,13 @@ public class Drive extends Subsystem {
 
         mMotionPlanner = new DriveMotionPlanner();
 
+        mLeftEncoder = new Encoder(Constants.kLeftDriveEncoderA, Constants.kLeftDriveEncoderB, false);
+        mRightEncoder = new Encoder(Constants.kRightDriveEncoderA, Constants.kRightDriveEncoderB, true);
+
+        mLeftEncoder.setReverseDirection(true);
+        mRightEncoder.setReverseDirection(false);
+
+
         resetEncoders();
     }
 
@@ -142,12 +151,12 @@ public class Drive extends Subsystem {
         public double timestamp;
         public double left_voltage;
         public double right_voltage;
-        public int left_position_ticks;
-        public int right_position_ticks;
+        public int left_position_ticks; // using us digital encoder
+        public int right_position_ticks; // us digital encoder
         public double left_distance;
         public double right_distance;
-        public int left_velocity_ticks_per_100ms;
-        public int right_velocity_ticks_per_100ms;
+        public int left_velocity_ticks_per_100ms; // using talonfx
+        public int right_velocity_ticks_per_100ms; // talonfx
         public double left_velocity_in_per_sec;
         public double right_velocity_in_per_sec;
         public Rotation2d gyro_heading = Rotation2d.identity();
@@ -166,20 +175,17 @@ public class Drive extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
-        double prevLeftTicks = mPeriodicIO.left_position_ticks;
-        double prevRightTicks = mPeriodicIO.right_position_ticks;
+
         mPeriodicIO.left_voltage = mLeftMaster1.getMotorOutputVoltage();
         mPeriodicIO.right_voltage = mRightMaster1.getMotorOutputVoltage();
 
-        mPeriodicIO.left_position_ticks = mLeftMaster1.getSelectedSensorPosition(0);
-        mPeriodicIO.right_position_ticks = mRightMaster1.getSelectedSensorPosition(0);
+        mPeriodicIO.left_position_ticks = mLeftEncoder.get();
+        mPeriodicIO.right_position_ticks = mRightEncoder.get();
+
         mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
-        double deltaLeftTicks = mPeriodicIO.left_position_ticks - prevLeftTicks;
-        mPeriodicIO.left_distance += rotationsToInches(deltaLeftTicks * getRotationsPerTick());
-
-        double deltaRightTicks = mPeriodicIO.right_position_ticks - prevRightTicks;
-        mPeriodicIO.right_distance += rotationsToInches(deltaRightTicks * getRotationsPerTick());
+        mPeriodicIO.left_distance += rotationsToInches(mPeriodicIO.left_position_ticks * getRotationsPerTickDistance());
+        mPeriodicIO.right_distance += rotationsToInches(mPeriodicIO.right_position_ticks * getRotationsPerTickDistance());
 
         mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster1.getSelectedSensorVelocity(0);
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster1.getSelectedSensorVelocity(0);
@@ -285,10 +291,10 @@ public class Drive extends Subsystem {
 
     /**
      * @param rad_s of the output
-     * @return ticks per 100 ms of the encoder
+     * @return ticks per 100 ms of the talonfx encoder
      */
     private double radiansPerSecondToTicksPer100ms(double rad_s) {
-        return rad_s / (Math.PI * 2.0) / getRotationsPerTick() / 10.0;
+        return rad_s / (Math.PI * 2.0) / getRotationsPerTickVelocity() / 10.0;
     }
 
     /**
@@ -446,6 +452,10 @@ public class Drive extends Subsystem {
     }
 
     public synchronized void resetEncoders() {
+
+        mLeftEncoder.reset();
+        mRightEncoder.reset();
+
         mLeftMaster1.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
         mLeftMaster2.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
         mLeftMaster3.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
@@ -470,7 +480,7 @@ public class Drive extends Subsystem {
     }
 
     public double getRightLinearVelocity() {
-        return rotationsToInches(getRightVelocityNativeUnits() * 10 * getRotationsPerTick());
+        return rotationsToInches(getRightVelocityNativeUnits() * 10 * getRotationsPerTickVelocity());
     }
 
     public double getLeftVelocityNativeUnits() {
@@ -478,7 +488,7 @@ public class Drive extends Subsystem {
     }
 
     public double getLeftLinearVelocity() {
-        return rotationsToInches(getLeftVelocityNativeUnits() * 10 * getRotationsPerTick());
+        return rotationsToInches(getLeftVelocityNativeUnits() * 10 * getRotationsPerTickVelocity());
     }
 
     public double getLinearVelocity() {
@@ -508,8 +518,12 @@ public class Drive extends Subsystem {
     /**
      * @return conversion factor where ticks * getEncoderTicksPerRotation() = wheel rotations
      */
-    public double getRotationsPerTick() {
+    public double getRotationsPerTickVelocity() { // talonfx
         return isHighGear() ? Constants.kDriveRotationsPerTickHighGear : Constants.kDriveRotationsPerTickLowGear;
+    }
+
+    public double getRotationsPerTickDistance() { // us digital encoders
+        return 1.0 / Constants.kDriveEncoderPPR;
     }
 
     public synchronized void startLogging() {

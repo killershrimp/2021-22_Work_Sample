@@ -44,8 +44,13 @@ public class Constants {
     public static final int kRightDriveMaster2Id = 5;
     public static final int kRightDriveMaster3Id = 6;
 
+    public static final int kLeftDriveEncoderA = 0;
+    public static final int kLeftDriveEncoderB = 1;
+    public static final int kRightDriveEncoderA = 2;
+    public static final int kRightDriveEncoderB = 3;
+
     // gear ratios (TODO set)
-    public static final double kDriveEncoderPPR = 2048.0;
+    public static final double kDriveEncoderPPR = 1000.0;
     public static final double kDriveRotationsPerTickHighGear = 1.0 / 2048.0 * 1.0 / 8.80; // ticks * kDriveRotationsPerTicksHighGear = wheel rotations
     public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 10.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
 
