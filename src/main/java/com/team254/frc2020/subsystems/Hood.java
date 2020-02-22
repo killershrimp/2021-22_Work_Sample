@@ -111,7 +111,7 @@ public class Hood extends Subsystem {
             mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand);
             break;
         case POSITION:
-            mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand);
+            mMaster.set(ControlMode.Position, mPeriodicIO.demand);
             break;
         default:
             mMaster.set(ControlMode.PercentOutput, 0.0);
