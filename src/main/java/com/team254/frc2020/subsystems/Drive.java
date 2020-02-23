@@ -184,8 +184,8 @@ public class Drive extends Subsystem {
 
         mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
-        mPeriodicIO.left_distance += rotationsToInches(mPeriodicIO.left_position_ticks * getRotationsPerTickDistance());
-        mPeriodicIO.right_distance += rotationsToInches(mPeriodicIO.right_position_ticks * getRotationsPerTickDistance());
+        mPeriodicIO.left_distance = rotationsToInches(mPeriodicIO.left_position_ticks * getRotationsPerTickDistance());
+        mPeriodicIO.right_distance = rotationsToInches(mPeriodicIO.right_position_ticks * getRotationsPerTickDistance());
 
         mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster1.getSelectedSensorVelocity(0);
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster1.getSelectedSensorVelocity(0);
