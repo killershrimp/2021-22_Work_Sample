@@ -27,6 +27,8 @@ public class Intake extends Subsystem {
 
     private Intake() {
         mMaster = TalonFXFactory.createDefaultTalon(Constants.kIntakeMasterId);
+        mMaster.setInverted(true);
+
         mDeploySolenoid = new Solenoid(Constants.kPCMId, Constants.kIntakeSolenoidId);
         mPeriodicIO = new PeriodicIO();
     }
