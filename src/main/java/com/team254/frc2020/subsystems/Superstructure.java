@@ -15,6 +15,7 @@ import com.team254.lib.util.Util;
 import com.team254.lib.vision.AimingParameters;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Superstructure extends Subsystem {
     private static Superstructure mInstance;
@@ -63,7 +64,8 @@ public class Superstructure extends Subsystem {
     private boolean mEnforceAutoAimMinDistance = false;
     private double mAutoAimMinDistance = 500;
 
-    private Optional<Double> turretHint = Optional.empty();
+    private Optional<Double> mTurretHint = Optional.empty();
+    private Optional<Double> mTurretJogDelta = Optional.empty();
 
     private double mTurretFeedforwardVFromVision = 0.0;
 
@@ -78,11 +80,6 @@ public class Superstructure extends Subsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Superstructure.this) {
-                    // Reset hint if needed
-                    if (turretHint.isPresent() && (isOnTarget() || visionHasTarget())) {
-                        turretHint = Optional.empty();
-                    }
-
                     SystemState newState = mSystemState;
                     double timeInState = timestamp - mCurrentStateStartTime;
             
@@ -114,7 +111,7 @@ public class Superstructure extends Subsystem {
             
                     switch (mSystemState) {
                         case IDLE:
-                            writeIdleDesiredState();
+                            writeIdleDesiredState(timestamp);
                             break;
                         case AIMING:
                             writeAimingDesiredState(timestamp);
@@ -160,9 +157,9 @@ public class Superstructure extends Subsystem {
             case IDLE:
                 return SystemState.IDLE;
             case SHOOT:
-               // if (isOnTarget() && Shooter.getInstance().isAtSetpoint() && Hood.getInstance().isAtSetpoint()) { // TODO re add exit conditions
+                if (isOnTarget() && Shooter.getInstance().isAtSetpoint() && Hood.getInstance().isAtSetpoint()) {
                     return SystemState.SHOOT;
-                //}
+                }
             default:
                 return SystemState.AIMING;
         }
@@ -177,9 +174,9 @@ public class Superstructure extends Subsystem {
             case AIM:
                 return SystemState.AIMING;
             case SHOOT:
-//                if (!isOnTarget() || !Hood.getInstance().isAtSetpoint()) { // TODO re add exit conditions
-                    return SystemState.SHOOT;
-//                }
+                if (!isOnTarget() || !Hood.getInstance().isAtSetpoint()) {
+                    return SystemState.AIMING;
+                }
             default:
                 return SystemState.SHOOT;
         }
@@ -199,9 +196,11 @@ public class Superstructure extends Subsystem {
         }
     }
     
-    private void writeIdleDesiredState() {
-        if (turretHint.isPresent()) {
-            mTurret.setPosition(turretHint.get(), 0);
+    private void writeIdleDesiredState(double timestamp) {
+        if (mTurretHint.isPresent()) {
+            mTurret.setPosition(getTurretSetpointFromFieldRelativeGoal(timestamp, mTurretHint.get()));
+        } else if (mTurretJogDelta.isPresent()) {
+            mTurret.setPosition(mTurret.getAngle() + mTurretJogDelta.get());
         } else {
             mTurret.setOpenLoop(0.0);
         }
@@ -218,24 +217,30 @@ public class Superstructure extends Subsystem {
         if (visionHasTarget()) {
             angleToSet = visionAngle;
             ffToSet = getTurretFeedforwardVFromVision();
-        } else if (turretHint.isPresent()) {
-            angleToSet = turretHint.get();
+        } else if (mTurretHint.isPresent()) {
+            angleToSet = getTurretSetpointFromFieldRelativeGoal(timestamp, mTurretHint.get());
+        } else if (mTurretJogDelta.isPresent()) {
+            mTurret.setPosition(mTurret.getAngle() + mTurretJogDelta.get());
         }
         mTurret.setPosition(angleToSet, ffToSet);
-        // TODO re add hood commands
-//        if (mLatestAimingParameters.isPresent()) {
-//            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
-//        }
+        if (mLatestAimingParameters.isPresent()) {
+            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+        }
+
+        // TODO uncommment for tuning
+        // mHood.setDesiredAngle(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
     private void writeShootDesiredState(double timestamp) {
         mSerializer.feed();
         mTurret.setPosition(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
-        // TODO re add hood commands
-//        if (mLatestAimingParameters.isPresent()) {
-//            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
-//        }
+        if (mLatestAimingParameters.isPresent()) {
+            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+        }
+
+        // TODO uncommment for tuning
+        // mHood.setDesiredAngle(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
@@ -276,10 +281,12 @@ public class Superstructure extends Subsystem {
         return mHasTarget;
     }
 
-    public double getTurretSetpointFromVision(double timestamp) {
+    public synchronized double getTurretSetpointFromVision(double timestamp) {
         mLatestAimingParameters = mRobotState.getAimingParameters(-1, Constants.kMaxGoalTrackAge);
         if (mLatestAimingParameters.isPresent()) {
             mTrackId = mLatestAimingParameters.get().getTrackId();
+
+            SmartDashboard.putNumber("Range To Target", mLatestAimingParameters.get().getRange());
 
             final double kLookaheadTime = 0.7;
             Pose2d robot_to_predicted_robot = mRobotState.getLatestFieldToVehicle().getValue().inverse()
@@ -303,13 +310,6 @@ public class Superstructure extends Subsystem {
             // Add (opposite) of tangential velocity about goal + angular velocity in local frame.
             mTurretFeedforwardVFromVision = -(angular_component + tangential_component);
 
-            // if (turret_setpoint < Constants.kTurretReverseSoftLimitDegrees) {
-            //     turret_setpoint += 360.0;
-            // }
-            // if (turret_setpoint > Constants.kTurretReverseSoftLimitDegrees) {
-            //     turret_setpoint -= 360.0;
-            // }
-
             mHasTarget = true;
 
             if (Util.epsilonEquals(turret_error.getDegrees(), 0.0, 3.0)) {
@@ -318,13 +318,26 @@ public class Superstructure extends Subsystem {
                 mOnTarget = false;
             }
 
-            return turret_setpoint;
+            return Util.limitTurret(turret_setpoint);
         } else {
             mHasTarget = false;
             mOnTarget = false;
 
             return mTurret.getAngle();
         }
+    }
+
+    /**
+     * @param field_relative_goal in degrees
+     */
+    public synchronized double getTurretSetpointFromFieldRelativeGoal(double timestamp, double field_relative_goal) {
+        final double kLookaheadTime = 0.7;
+        Rotation2d turret_error = mRobotState.getPredictedFieldToVehicle(kLookaheadTime)
+                .transformBy(mRobotState.getVehicleToTurret(timestamp)).getRotation().inverse()
+                .rotateBy(Rotation2d.fromDegrees(field_relative_goal));
+        double turret_setpoint = mTurret.getAngle() + turret_error.getDegrees();
+
+        return Util.limitTurret(turret_setpoint);
     }
 
     /**
@@ -348,8 +361,18 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized void setTurretHint(double hint) {
-        if (!visionHasTarget()) {
-            turretHint = Optional.of(hint);
-        }
+        mTurretHint = Optional.of(hint);
+    }
+
+    public synchronized void resetTurretHint() {
+        mTurretHint = Optional.empty();
+    }
+
+    public synchronized void setTurretJog(double jog_delta) {
+        mTurretJogDelta = Optional.of(jog_delta);
+    }
+
+    public synchronized void resetTurretJog() {
+        mTurretJogDelta = Optional.empty();
     }
 }

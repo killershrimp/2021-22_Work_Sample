@@ -38,4 +38,9 @@ public class GamepadDriveControlBoard implements IDriveControlBoard {
     public boolean getQuickTurn() {
         return mController.getTrigger(XboxController.Side.RIGHT);
     }
+
+    @Override
+    public boolean getShoot() {
+        return mController.getTrigger(XboxController.Side.LEFT);
+    }
 }

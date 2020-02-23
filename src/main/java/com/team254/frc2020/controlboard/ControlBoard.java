@@ -44,7 +44,7 @@ public class ControlBoard implements IControlBoard {
 
     @Override
     public boolean getShoot() {
-        return mButtonControlBoard.getShoot();
+        return mDriveControlBoard.getShoot();
     }
 
     @Override
@@ -63,22 +63,32 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
-    public boolean wantsIntake() {
-        return mButtonControlBoard.wantsIntake();
-    }
-
-    @Override
-    public boolean wantsReverseIntake() {
-        return mButtonControlBoard.wantsReverseIntake();
-    }
-
-    @Override
-    public boolean wantsStowIntake() {
-        return mButtonControlBoard.wantsStowIntake();
-    }
-
-    @Override
     public void reset() {
         mButtonControlBoard.reset();
+    }
+
+    @Override
+    public boolean getIntake() {
+        return mButtonControlBoard.getIntake();
+    }
+
+    @Override
+    public boolean getExhaust() {
+        return mButtonControlBoard.getExhaust();
+    }
+
+    @Override
+    public boolean getDeployIntake() {
+        return mButtonControlBoard.getDeployIntake();
+    }
+
+    @Override
+    public boolean getRetractIntake() {
+        return mButtonControlBoard.getRetractIntake();
+    }
+
+    @Override
+    public double getTurretJog() {
+        return mButtonControlBoard.getTurretJog();
     }
 }

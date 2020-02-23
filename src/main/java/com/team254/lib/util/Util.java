@@ -1,6 +1,6 @@
 package com.team254.lib.util;
 
-import com.team254.lib.geometry.Rotation2d;
+import com.team254.frc2020.Constants;
 
 import java.util.List;
 
@@ -73,14 +73,18 @@ public class Util {
         return result;
     }
 
-    public static double toTurretSafeAngleDegrees(Rotation2d rotation2d) {
-        double result = rotation2d.getDegrees() % 360.0;
-        if (result > 270) {
-            result -= 360;
-        } else if (result < -90) {
-            result += 360;
+    /**
+     * @param angle of turret in degrees 
+     */
+    public static double limitTurret(double turret_degrees) {
+        if (turret_degrees < Constants.kTurretReverseSoftLimitDegrees) {
+            turret_degrees += 360.0;
         }
-        return result;
+        if (turret_degrees > Constants.kTurretForwardSoftLimitDegrees) {
+            turret_degrees -= 360.0;
+        }
+
+        return Util.limit(turret_degrees, Constants.kTurretReverseSoftLimitDegrees, Constants.kTurretForwardSoftLimitDegrees);
     }
 
     public static double handleDeadband(double value, double deadband) {

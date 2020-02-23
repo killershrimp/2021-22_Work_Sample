@@ -34,6 +34,7 @@ public class Constants {
     public static final int kMainThrottleJoystickPort = 0;
     public static final int kMainTurnJoystickPort = 1;
     public static final double kJoystickThreshold = 0.2;
+    public static final double kJogTurretScalar = 4.0;
 
     // Drivebase
     // ids
@@ -97,7 +98,7 @@ public class Constants {
     public static final double kTurretForwardSoftLimitDegrees = 340.0; // degrees
     public static final double kTurretReverseSoftLimitDegrees = 20.0; // degrees
     public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
-    public static final double kTurretStartingPositionDegrees = 180; // degrees
+    public static final double kTurretStartingPositionDegrees = 180.0; // degrees
 
     // turret gains
     public static final double kTurretPositionKp = 0.21;
@@ -118,7 +119,7 @@ public class Constants {
     public static final double kHoodKi = 0.0;
     public static final double kHoodKd = 0.0;
     public static final double kHoodKf = 0.0;
-    public static final int kHoodAllowableClosedloopError = 100;
+    public static final int kHoodAllowableClosedloopError = (int) (0.5 / kHoodDegreesPerTick);
 
     // Shooter
     public static final int kShooterLeftMasterId = 12;
@@ -144,7 +145,7 @@ public class Constants {
     // Pneumatics
     public static final int kPCMId = 0;
     public static final int kShifterSolenoidId = 0;
-    public static final int kIntakeSolenoidId = 2;
+    public static final int kIntakeSolenoidId = 3; // TODO change to 2
 
     // Vision
     public static final double kHorizontalFOV = 63.709400992230975; // degrees

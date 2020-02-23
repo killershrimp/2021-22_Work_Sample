@@ -8,4 +8,6 @@ public interface IDriveControlBoard {
     boolean getQuickTurn();
 
     boolean getWantsLowGear();
+
+    boolean getShoot();
 }

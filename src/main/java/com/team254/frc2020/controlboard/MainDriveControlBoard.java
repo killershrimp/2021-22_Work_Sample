@@ -41,4 +41,9 @@ public class MainDriveControlBoard implements IDriveControlBoard {
     public boolean getWantsLowGear() {
         return mThrottleStick.getRawButton(2);
     }
+
+    @Override
+    public boolean getShoot() {
+        return mThrottleStick.getRawButton(1);
+    }
 }

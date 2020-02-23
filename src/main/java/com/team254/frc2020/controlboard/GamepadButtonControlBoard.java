@@ -28,11 +28,6 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
-    public boolean getShoot() {
-        return mController.getTrigger(XboxController.Side.RIGHT);
-    }
-
-    @Override
     public boolean getAim() {
         return mController.getTrigger(XboxController.Side.LEFT);
     }
@@ -63,18 +58,28 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
-    public boolean wantsIntake() {
+    public boolean getIntake() {
         return mController.getButton(XboxController.Button.RB);
     }
 
     @Override
-    public boolean wantsReverseIntake() {
+    public boolean getExhaust() {
         return mController.getButton(XboxController.Button.LB);
     }
 
     @Override
-    public boolean wantsStowIntake() {
-        return mController.getButton(XboxController.Button.A);
+    public boolean getDeployIntake() {
+        return mController.getButton(XboxController.Button.B);
+    }
+    
+    @Override
+    public boolean getRetractIntake() {
+        return mController.getButton(XboxController.Button.Y);
+    }
+
+    @Override
+    public double getTurretJog() {
+        return -mController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.X);
     }
 
     @Override
