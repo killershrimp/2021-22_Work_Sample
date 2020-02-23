@@ -148,8 +148,8 @@ public class Constants {
     public static final int kIntakeSolenoidId = 3; // TODO change to 2
 
     // Vision
-    public static final double kHorizontalFOV = 63.709400992230975; // degrees
-    public static final double kVerticalFOV = 49.71097153877655; // degrees
+    public static final double kHorizontalFOV = 65.00022891576718; // degrees (tuned 2/22 for LL 2+ #1)
+    public static final double kVerticalFOV = 51.06843506401144; // degrees (tuned 2/22 for LL 2+ #1)
     public static final boolean kShouldUndistort = true;
     public static final double kVPW = 2.0 * Math.tan(Math.toRadians(kHorizontalFOV / 2.0));
     public static final double kVPH = 2.0 * Math.tan(Math.toRadians(kVerticalFOV / 2.0));
@@ -166,19 +166,19 @@ public class Constants {
 
     public static final LimelightConstants kLimelightConstants = new LimelightConstants();
     static {
-        kLimelightConstants.kHeight = 26.4611;
+        kLimelightConstants.kHeight = 26.48;
         kLimelightConstants.kName = "Turret Limelight";
         kLimelightConstants.kHorizontalPlaneToLens = Rotation2d.fromDegrees(27.00);
-        kLimelightConstants.kTurretToLens = new Pose2d(-5.8448, 0, Rotation2d.identity());
+        kLimelightConstants.kTurretToLens = new Pose2d(-5.7, 0, Rotation2d.identity());
         kLimelightConstants.kTableName = "limelight";
     }
 
-    // calculated 2/16 on 960x720
-    public static final double[] kCameraDistortion = {2.35265164e-01, -6.86035030e-01, 3.10037972e-04, 8.34493852e-05, 6.41764110e-01};
+    // calculated 2/22 on 960x720 for LL 2+ #1
+    public static final double[] kCameraDistortion = {2.03204609e-01, -6.25404962e-01, -3.39277869e-03, -3.51126715e-04, 5.81122457e-01};
     public static final double[][] kCameraMatrix = {
-            {778.08226793/960, 0, 452.8538724/960},
-            {0, 777.04925262/720, 351.05573266/720},
-            {0, 0, 1.0}
+            {0.78474188, 0.0, 0.51036895},
+            {0.0, 1.04536274, 0.45914132},
+            {0.0, 0.0, 1.0}
     };
 
     public static final double kVisionTargetHeight = 98.25;
@@ -187,11 +187,19 @@ public class Constants {
     public static final PipelineConfiguration kLowRes1xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
-    // Shot tuning (TODO tune)
+    // Shot tuning (Tuned 2/22)
     public static final double kShooterSetpointRPM = 5000;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodMap = new InterpolatingTreeMap<>();
     static {
-        kHoodMap.put(new InterpolatingDouble(106.2), new InterpolatingDouble(52.5));
+        kHoodMap.put(new InterpolatingDouble(143.027941), new InterpolatingDouble(56.585284));
+        kHoodMap.put(new InterpolatingDouble(152.949931), new InterpolatingDouble(57.816814));
+        kHoodMap.put(new InterpolatingDouble(167.681659), new InterpolatingDouble(59.300313));
+        kHoodMap.put(new InterpolatingDouble(185.118049), new InterpolatingDouble(61.224898));
+        kHoodMap.put(new InterpolatingDouble(201.497294), new InterpolatingDouble(61.801877));
+        kHoodMap.put(new InterpolatingDouble(235.228295), new InterpolatingDouble(62.779174));
+        kHoodMap.put(new InterpolatingDouble(256.850766), new InterpolatingDouble(64.281924));
+        kHoodMap.put(new InterpolatingDouble(273.916349), new InterpolatingDouble(64.682242));
+        kHoodMap.put(new InterpolatingDouble(288.374133), new InterpolatingDouble(64.682242));
     }
 
     /**
