@@ -93,7 +93,7 @@ public class LimelightTest {
         double cameraHeight = 14.125;
         Rotation2d cameraPitch = Rotation2d.fromDegrees(1.6);
 
-        double acceptedError = 5.0;
+        double acceptedError = 20.0;
 
         // 15 5"
         List<double[]> topCorners1 = Limelight.extractTopCornersFromBoundingBoxes(
