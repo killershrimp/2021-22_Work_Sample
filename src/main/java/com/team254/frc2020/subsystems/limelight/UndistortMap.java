@@ -7,6 +7,8 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.opencv.core.CvType.CV_64FC1;
@@ -36,6 +38,7 @@ public class UndistortMap {
 
     private void load() {
         try {
+            double start_time = Timer.getFPGATimestamp();
             for (int i = 0; i < cameraResolution.getWidth(); i++) {
                 for (int j = 0; j < cameraResolution.getHeight(); j++) {
                     // run undistort
@@ -47,6 +50,7 @@ public class UndistortMap {
                 }
             }
             loaded.set(true);
+            System.out.println("!!!!!!!!!! Undistort Map Loaded in " + (Timer.getFPGATimestamp() - start_time) + " seconds !!!!!!!!!!");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
