@@ -41,6 +41,8 @@ public class Hood extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private HoodControlMode mControlMode = HoodControlMode.OPEN_LOOP;
 
+    private boolean mIsBrakeMode;
+
     private Hood() {
         mMaster = TalonFXFactory.createDefaultTalon(Constants.kHoodMasterId);
         mMaster.setNeutralMode(NeutralMode.Brake);
@@ -89,8 +91,23 @@ public class Hood extends Subsystem {
 
         mMaster.configGetStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.2));
 
+        mIsBrakeMode = true;
+        setBrakeMode(false);
+
         zeroSensors();
 
+    }
+
+    public boolean isBrakeMode() {
+        return mIsBrakeMode;
+    }
+
+    public synchronized void setBrakeMode(boolean shouldEnable) {
+        if (mIsBrakeMode != shouldEnable) {
+            mIsBrakeMode = shouldEnable;
+            NeutralMode mode = shouldEnable ? NeutralMode.Brake : NeutralMode.Coast;
+            mMaster.setNeutralMode(mode);
+        }
     }
 
     @Override
@@ -118,13 +135,16 @@ public class Hood extends Subsystem {
     public void registerEnabledLoops(ILooper mEnabledLooper) {
         mEnabledLooper.register(new Loop() {
             @Override
-            public void onStart(double timestamp) {}
+            public void onStart(double timestamp) {
+                setBrakeMode(true);
+            }
 
             @Override
             public void onLoop(double timestamp) {}
 
             @Override
             public void onStop(double timestamp) {
+                setBrakeMode(false);
                 stop();
             }
         });
