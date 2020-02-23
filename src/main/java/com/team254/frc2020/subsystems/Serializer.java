@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
 
-    public static final double kSpinCycleDemand = 0.375;
+    public static final double kSpinCycleDemand = 0.6;
     public static final double kRollerDemandFeed = 0.5;
-    public static final double kSpinCycleOscillationTime = 2.0; // seconds before switching dir
+    public static final double kSpinCycleOscillationTime = 0.25; // seconds before switching dir
 
     private static Serializer mInstance;
 
@@ -58,7 +58,7 @@ public class Serializer extends Subsystem {
         mSpinCycleMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerSpinCycleMasterId);
         mSpinCycleMaster.setInverted(true);
         mSpinCycleMaster.setNeutralMode(NeutralMode.Brake);
-        mSpinCycleMaster.configOpenloopRamp(0.5);
+        mSpinCycleMaster.configOpenloopRamp(0.0);
 
         mSpinCycleMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 50, 50, 0.2), Constants.kLongCANTimeoutMs);
 
@@ -100,8 +100,10 @@ public class Serializer extends Subsystem {
                             break;
                         case SERIALIZE:
                             newState = handleSerialize();
+                            break;
                         case FEED:
                             newState = handleFeed();
+                            break;
                         default:
                             System.out.println("unexpected serializer system state: " + mSystemState);
                             break;
@@ -180,8 +182,10 @@ public class Serializer extends Subsystem {
         mPeriodicIO.right_roller_demand = 0.0;
     }
 
+    private int counter = 0;
     private void setSerializeStateDemands(double timeInState) {
-        if (timeInState % 2*kSpinCycleOscillationTime > kSpinCycleOscillationTime) {
+        counter++;
+        if ((counter % 100) > 50) {
             mPeriodicIO.spin_cycle_demand = kSpinCycleDemand;
             mPeriodicIO.left_roller_demand = 0.0;
             mPeriodicIO.right_roller_demand = 0.0;
