@@ -1,7 +1,6 @@
 package com.team254.frc2020.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team254.frc2020.Constants;
@@ -12,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
 
-    public static final double kSpinCycleDemand = 0.4;
+    public static final double kSpinCycleDemand = 0.25;
     public static final double kLeftRollerDemand = 1.0;
     public static final double kRightRollerDemand = 1.0;
 
@@ -85,27 +84,18 @@ public class Serializer extends Subsystem {
         mPeriodicIO.spin_cycle_demand = kSpinCycleDemand;
         mPeriodicIO.right_roller_demand = kRightRollerDemand;
         mPeriodicIO.left_roller_demand = kLeftRollerDemand;
-
-        mRightRollerMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.2), Constants.kCANTimeoutMs);
-        mLeftRollerMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.2), Constants.kCANTimeoutMs);
     }
 
     public synchronized void reverseSerialize() {
         mPeriodicIO.spin_cycle_demand = -kSpinCycleDemand;
         mPeriodicIO.right_roller_demand = -kRightRollerDemand;
         mPeriodicIO.left_roller_demand = -kLeftRollerDemand;
-
-        mRightRollerMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.2), Constants.kCANTimeoutMs);
-        mLeftRollerMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 5, 5, 0.2), Constants.kCANTimeoutMs);
     }
 
     public synchronized void feed() {
         mPeriodicIO.spin_cycle_demand = kSpinCycleDemand;
         mPeriodicIO.right_roller_demand = -kRightRollerDemand;
         mPeriodicIO.left_roller_demand = kLeftRollerDemand;
-
-        mRightRollerMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 10, 10, 0.2), Constants.kCANTimeoutMs);
-        mLeftRollerMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 10, 10, 0.2), Constants.kCANTimeoutMs);
     }
 
     @Override
