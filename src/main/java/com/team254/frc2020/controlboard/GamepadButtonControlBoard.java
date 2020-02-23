@@ -87,4 +87,9 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
         mLastCardinal = CardinalDirection.NONE;
         mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);
     }
+
+    @Override
+    public boolean getSerialize() {
+        return mController.getTrigger(XboxController.Side.RIGHT);
+    }
 }

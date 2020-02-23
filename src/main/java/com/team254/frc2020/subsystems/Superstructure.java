@@ -14,7 +14,6 @@ import com.team254.lib.util.Units;
 import com.team254.lib.util.Util;
 import com.team254.lib.vision.AimingParameters;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Superstructure extends Subsystem {
@@ -28,7 +27,7 @@ public class Superstructure extends Subsystem {
         return mInstance;
     }
 
-    private Serializer mSerializer = Serializer.getInstance();
+    // private Serializer mSerializer = Serializer.getInstance();
     private Turret mTurret = Turret.getInstance();
     private Hood mHood = Hood.getInstance();
     private Shooter mShooter = Shooter.getInstance();
@@ -74,7 +73,9 @@ public class Superstructure extends Subsystem {
         mEnabledLooper.register(new Loop(){
             @Override
             public void onStart(double timestamp) {
-                mWantedState = WantedState.IDLE;
+                synchronized (Superstructure.this) {
+                    mWantedState = WantedState.IDLE;
+                }
             }
 
             @Override
@@ -104,7 +105,7 @@ public class Superstructure extends Subsystem {
                     if (newState != mSystemState) {
                         System.out.println(timestamp + ": Changed state: " + mSystemState + " -> " + newState);
                         mSystemState = newState;
-                        mCurrentStateStartTime = Timer.getFPGATimestamp();
+                        mCurrentStateStartTime = timestamp;
                         timeInState = 0.0;
                         
                     }
@@ -204,13 +205,13 @@ public class Superstructure extends Subsystem {
         } else {
             mTurret.setOpenLoop(0.0);
         }
-        mSerializer.stopRunning();
+        // mSerializer.stopRunning();
         mHood.setOpenLoop(0.0);
         mShooter.setOpenLoop(0.0);
     }
 
     private void writeAimingDesiredState(double timestamp) {
-        mSerializer.stopRunning();
+        // mSerializer.stopRunning();
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();
         double ffToSet = 0;
@@ -233,7 +234,6 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeShootDesiredState(double timestamp) {
-        mSerializer.feed();
         mTurret.setPosition(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
         if (mLatestAimingParameters.isPresent()) {
             mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
@@ -245,7 +245,7 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeMoveToZeroDesiredState() {
-        mSerializer.stopRunning();
+        // mSerializer.stopRunning();
         mTurret.setPosition(Constants.kTurretStartingPositionDegrees);
         mHood.setDesiredAngle(Constants.kHoodStartingPositionDegrees);
         mShooter.setOpenLoop(0.0);

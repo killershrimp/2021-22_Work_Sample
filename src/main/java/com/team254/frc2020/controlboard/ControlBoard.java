@@ -91,4 +91,9 @@ public class ControlBoard implements IControlBoard {
     public double getTurretJog() {
         return mButtonControlBoard.getTurretJog();
     }
+
+    @Override
+    public boolean getSerialize() {
+        return mButtonControlBoard.getSerialize();
+    }
 }

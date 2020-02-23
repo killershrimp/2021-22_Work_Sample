@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
     private final Limelight mLimelight = new Limelight(Constants.kLimelightConstants, Constants.kLowRes1xZoom);
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Intake mIntake = Intake.getInstance();
+    private final Serializer mSerializer = Serializer.getInstance();
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -57,7 +58,7 @@ public class Robot extends TimedRobot {
                 mTurret,
                 Hood.getInstance(),
                 Shooter.getInstance(),
-                Serializer.getInstance(),
+                mSerializer,
                 mIntake,
                 mSuperstructure,
                 mLimelight
@@ -237,12 +238,26 @@ public class Robot extends TimedRobot {
                 mIntake.stow();
             }
 
+            // TODO make serializer logic smarter
+            Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
             if (mControlBoard.getIntake()) {
                 mIntake.setOpenLoop(kIntakePower); // TODO move constant to somewhere smarter
+                serializer_wanted = Serializer.WantedState.SERIALIZE;
             } else if (mControlBoard.getExhaust()) {
                 mIntake.setOpenLoop(-kIntakePower);
             } else {
                 mIntake.setOpenLoop(0.0);
+                serializer_wanted = Serializer.WantedState.IDLE;
+            }
+
+            if (mControlBoard.getSerialize()) {
+                serializer_wanted = Serializer.WantedState.SERIALIZE;
+            }
+
+            if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
+                mSerializer.setWantedState(serializer_wanted);
+            } else {
+                mSerializer.setWantedState(Serializer.WantedState.FEED);
             }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);

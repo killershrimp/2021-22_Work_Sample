@@ -18,4 +18,6 @@ public interface IButtonControlBoard {
     boolean getRetractIntake();
 
     double getTurretJog();
+
+    boolean getSerialize();
 }
