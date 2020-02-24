@@ -37,12 +37,12 @@ public class UndistortMapFileWriterTest {
         System.out.println("Delta " + (end - start));
 
         // Write overall variable
-        String variableLine = String.format("  static double[][][] %s = new double[%d][%d][2];\n", varName, resolution.getWidth(), resolution.getHeight());
+        String variableLine = String.format("  double[][][] %s = new double[%d][%d][2];\n", varName, resolution.getWidth(), resolution.getHeight());
         sb.append(variableLine);
 
         // Write Y column loader methods
         for (int x = 0; x < resolution.getWidth(); x++) {
-            sb.append(String.format("  public static double[][] loadCol%03d() { ", x));
+            sb.append(String.format("  public double[][] loadCol%03d() { ", x));
             ArrayList<String> lineParts = new ArrayList<>();
             for (int y = 0; y < resolution.getHeight(); y++) {
                 double[] pt = map.getUndistortedPointRawPixelSpace(x, y);
@@ -56,7 +56,7 @@ public class UndistortMapFileWriterTest {
 
         // Write static loader
         sb.append("\n");
-        sb.append("  static {\n");
+        sb.append(String.format("  public %s() {\n", className));
         for (int x = 0; x < resolution.getWidth(); x++) {
             String loadLine = String.format("    map[%d] = loadCol%03d();\n", x, x);
             sb.append(loadLine);
