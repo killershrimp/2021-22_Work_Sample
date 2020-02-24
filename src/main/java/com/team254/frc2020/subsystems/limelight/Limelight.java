@@ -5,6 +5,8 @@ import com.team254.frc2020.RobotState;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.frc2020.subsystems.Subsystem;
+import com.team254.frc2020.subsystems.limelight.undistort.StaticUndistortMap320;
+import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -52,7 +54,7 @@ public class Limelight extends Subsystem {
     private final LimelightConstants mConstants;
     private PipelineConfiguration mPipelineConfig;
 
-    private final UndistortMap undistortMap = new UndistortMap(CameraResolution.F_320x240, true);
+    private final UndistortMap undistortMap = new StaticUndistortMap320();
 
     private final PeriodicIO mPeriodicIO = new PeriodicIO();
     private boolean mOutputsHaveChanged = true;

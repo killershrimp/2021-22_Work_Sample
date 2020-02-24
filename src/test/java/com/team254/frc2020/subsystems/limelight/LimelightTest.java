@@ -1,7 +1,9 @@
 package com.team254.frc2020.subsystems.limelight;
 
-import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
+import com.team254.frc2020.subsystems.limelight.undistort.OpenCVCalculatedUndistortMap;
+import com.team254.frc2020.subsystems.limelight.undistort.StaticUndistortMap320;
+import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.Util;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @RunWith(JUnit4.class)
 public class LimelightTest {
+
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
@@ -69,7 +72,7 @@ public class LimelightTest {
 
     @Test
     public void testBuildUndistortMapAsync() throws InterruptedException {
-        UndistortMap undistortMap = new UndistortMap(CameraResolution.F_320x240, true);
+        UndistortMap undistortMap = new OpenCVCalculatedUndistortMap(CameraResolution.F_320x240, true);
         Instant startLoad = Instant.now();
         while (!undistortMap.getReady()) {
             Thread.sleep(100);
@@ -88,7 +91,7 @@ public class LimelightTest {
         List<TargetInfo> targets = new ArrayList<>();
         PipelineConfiguration noZoomPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
         PipelineConfiguration zoomedPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
-        UndistortMap undistortMap = new UndistortMap(CameraResolution.F_320x240, false);
+        UndistortMap undistortMap = new StaticUndistortMap320();
 
         double cameraHeight = 14.125;
         Rotation2d cameraPitch = Rotation2d.fromDegrees(1.6);

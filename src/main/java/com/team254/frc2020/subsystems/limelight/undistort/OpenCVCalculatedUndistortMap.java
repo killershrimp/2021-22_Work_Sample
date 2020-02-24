@@ -1,20 +1,18 @@
-package com.team254.frc2020.subsystems.limelight;
+package com.team254.frc2020.subsystems.limelight.undistort;
 
 import com.team254.frc2020.Constants;
+import com.team254.frc2020.subsystems.limelight.CameraResolution;
 import com.team254.lib.util.Util;
-
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
-
-import edu.wpi.first.wpilibj.Timer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.opencv.core.CvType.CV_64FC1;
 import static org.opencv.core.CvType.CV_64FC2;
 
-public class UndistortMap {
+public class OpenCVCalculatedUndistortMap implements UndistortMap {
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -26,7 +24,7 @@ public class UndistortMap {
     private AtomicBoolean ready = new AtomicBoolean(false);
     private AtomicBoolean loaded = new AtomicBoolean(false);
 
-    public UndistortMap(CameraResolution cameraResolution, boolean loadAsync) {
+    public OpenCVCalculatedUndistortMap(CameraResolution cameraResolution, boolean loadAsync) {
         this.cameraResolution = cameraResolution;
         this.map = new double[cameraResolution.getWidth()][cameraResolution.getHeight()][2];
         if (loadAsync) {
@@ -38,7 +36,7 @@ public class UndistortMap {
 
     private void load() {
         try {
-            double start_time = Timer.getFPGATimestamp();
+            long startMillis = System.currentTimeMillis();
             for (int i = 0; i < cameraResolution.getWidth(); i++) {
                 for (int j = 0; j < cameraResolution.getHeight(); j++) {
                     // run undistort
@@ -50,7 +48,7 @@ public class UndistortMap {
                 }
             }
             loaded.set(true);
-            System.out.println("!!!!!!!!!! Undistort Map Loaded in " + (Timer.getFPGATimestamp() - start_time) + " seconds !!!!!!!!!!");
+            System.out.println("!!!!!!!!!! Undistort Map Loaded in " + ((System.currentTimeMillis() - startMillis) / 1000.0) + " seconds !!!!!!!!!!");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -58,13 +56,26 @@ public class UndistortMap {
         }
     }
 
+    @Override
     public double[] getUndistortedPoint(double x, double y) {
         if (ready.get()) {
             double denormalizedX = x * cameraResolution.getWidth();
             double denormalizedY = y * cameraResolution.getHeight();
             int intX = (int) Util.limit(denormalizedX, 0, cameraResolution.getWidth());
             int intY = (int) Util.limit(denormalizedY, 0, cameraResolution.getHeight());
-            return map[intX][intY];
+            return map[intX][intY]; // map holds normalized output values, keyed by ints
+        } else {
+            // Return an un-undistorted point until this is loaded.
+            double[] ret = {x, y};
+            return ret;
+        }
+    }
+
+    public double[] getUndistortedPointRawPixelSpace(double x, double y) {
+        if (ready.get()) {
+            int intX = (int) Util.limit(x, 0, cameraResolution.getWidth());
+            int intY = (int) Util.limit(y, 0, cameraResolution.getHeight());
+            return map[intX][intY]; // map holds normalized output values, keyed by ints
         } else {
             // Return an un-undistorted point until this is loaded.
             double[] ret = {x, y};
@@ -98,6 +109,7 @@ public class UndistortMap {
         return dst.get(0, 0);
     }
 
+    @Override
     public boolean getReady() {
         return ready.get();
     }
