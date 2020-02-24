@@ -256,7 +256,7 @@ public class Robot extends TimedRobot {
 
             if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
                 mSerializer.setWantedState(serializer_wanted);
-            } else if (mSuperstructure.getSystemState() == Superstructure.SystemState.SHOOT) {
+            } else {
                 mSerializer.setWantedState(Serializer.WantedState.FEED);
             }
         } catch (Throwable t) {
