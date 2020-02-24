@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
 
-    public static final double kSpinCycleDemand = 0.6;
+    public static final double kSpinCycleSerializeDemand = 0.6;
+    public static final double kSpinCycleFeedDemand = 0.6;
     public static final double kRollerDemandFeed = 0.5;
-    public static final double kSpinCycleOscillationTime = 0.25; // seconds before switching dir
+    public static final double kSpinCycleOscillationTime = 0.5; // seconds before switching dir
+    public static final double kTotalCycleTime = kSpinCycleOscillationTime * 2; // 2 switches in direction per cycle
 
     private static Serializer mInstance;
 
@@ -182,22 +184,21 @@ public class Serializer extends Subsystem {
         mPeriodicIO.right_roller_demand = 0.0;
     }
 
-    private int counter = 0;
     private void setSerializeStateDemands(double timeInState) {
-        counter++;
-        if ((counter % 100) > 50) {
-            mPeriodicIO.spin_cycle_demand = kSpinCycleDemand;
-            mPeriodicIO.left_roller_demand = 0.0;
-            mPeriodicIO.right_roller_demand = 0.0;
+        double timeInCycle = timeInState % kTotalCycleTime;
+
+        if (timeInCycle < kSpinCycleOscillationTime) {
+            mPeriodicIO.spin_cycle_demand = kSpinCycleSerializeDemand;
         } else {
-            mPeriodicIO.spin_cycle_demand = -kSpinCycleDemand;
-            mPeriodicIO.left_roller_demand = 0.0;
-            mPeriodicIO.right_roller_demand = 0.0;
+            mPeriodicIO.spin_cycle_demand = -kSpinCycleSerializeDemand;
         }
+
+        mPeriodicIO.left_roller_demand = 0.0;
+        mPeriodicIO.right_roller_demand = 0.0;
     }
 
     private void setFeedStateDemands() {
-        mPeriodicIO.spin_cycle_demand = kSpinCycleDemand;
+        mPeriodicIO.spin_cycle_demand = kSpinCycleFeedDemand;
         mPeriodicIO.left_roller_demand = kRollerDemandFeed;
         mPeriodicIO.right_roller_demand = -kRollerDemandFeed;
     }
