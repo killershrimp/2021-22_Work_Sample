@@ -50,8 +50,7 @@ public class Hood extends Subsystem {
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mMaster.enableVoltageCompensation(true);
 
-        TalonUtil.checkError(mMaster.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen), "Could not config reverse limit switch hood");
-        // this is actually a reverse limit switch, top wiring team
+        TalonUtil.checkError(mMaster.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen), "Could not config reverse limit switch hood");
 
         mMaster.overrideLimitSwitchesEnable(true);
         // initialize encoder and set status frame
@@ -113,7 +112,8 @@ public class Hood extends Subsystem {
     @Override
     public void readPeriodicInputs() {
         mPeriodicIO.ticks = mMaster.getSelectedSensorPosition(0);
-        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isFwdLimitSwitchClosed() == 1;
+        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isRevLimitSwitchClosed()
+                == 1;
     }
 
     @Override
