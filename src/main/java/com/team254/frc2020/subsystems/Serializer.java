@@ -2,6 +2,7 @@ package com.team254.frc2020.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team254.frc2020.Constants;
@@ -9,7 +10,7 @@ import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
@@ -17,8 +18,8 @@ public class Serializer extends Subsystem {
     public static final double kSpinCycleSerializeDemand = 0.6;
     public static final double kSpinCycleFeedDemand = 0.6;
     public static final double kRollerDemandFeed = 0.5;
-    public static final double kSpinCycleOscillationTime = 0.5; // seconds before switching dir
-    public static final double kTotalCycleTime = kSpinCycleOscillationTime * 2; // 2 switches in direction per cycle
+    public static final double kSpinCycleOscillationTime = 1.2; // seconds before switching dir
+    public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
 
     private static Serializer mInstance;
 
@@ -50,11 +51,15 @@ public class Serializer extends Subsystem {
     }
 
     private TalonFX mSpinCycleMaster, mRightRollerMaster, mLeftRollerMaster;
+    private Solenoid mSkatePark;
+    
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
     private WantedState mWantedState = WantedState.IDLE;
     private SystemState mSystemState = SystemState.IDLE;
     private double mCurrentStateStartTime = 0.0;
+
+    private boolean mIsSkateParkDeployed = false;
 
     private Serializer() {
         mSpinCycleMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerSpinCycleMasterId);
@@ -62,7 +67,8 @@ public class Serializer extends Subsystem {
         mSpinCycleMaster.setNeutralMode(NeutralMode.Brake);
         mSpinCycleMaster.configOpenloopRamp(0.0);
 
-        mSpinCycleMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 50, 50, 0.2), Constants.kLongCANTimeoutMs);
+        mSpinCycleMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, 0.2), Constants.kLongCANTimeoutMs);
+        mSpinCycleMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 50, 50, 0.2), Constants.kLongCANTimeoutMs);
 
         mRightRollerMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerRightRollerMasterId);
         mRightRollerMaster.setInverted(false);
@@ -70,7 +76,9 @@ public class Serializer extends Subsystem {
         mLeftRollerMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerLeftRollerMasterId);
         mLeftRollerMaster.setInverted(false);
 
-        // TODO 
+        mSkatePark = new Solenoid(Constants.kPCMId, Constants.kSkateParkSolenoidId);
+        mIsSkateParkDeployed = true;
+        setSkateParkDeployed(false);
     }
 
     @Override
@@ -182,6 +190,7 @@ public class Serializer extends Subsystem {
         mPeriodicIO.spin_cycle_demand = 0.0;
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
+        setSkateParkDeployed(false);
     }
 
     private void setSerializeStateDemands(double timeInState) {
@@ -195,12 +204,21 @@ public class Serializer extends Subsystem {
 
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
+        setSkateParkDeployed(false);
     }
 
     private void setFeedStateDemands() {
         mPeriodicIO.spin_cycle_demand = kSpinCycleFeedDemand;
         mPeriodicIO.left_roller_demand = kRollerDemandFeed;
         mPeriodicIO.right_roller_demand = -kRollerDemandFeed;
+        setSkateParkDeployed(true);
+    }
+
+    private void setSkateParkDeployed(boolean should_deploy) {
+        if (should_deploy != mIsSkateParkDeployed) {
+            mSkatePark.set(should_deploy);
+            mIsSkateParkDeployed = should_deploy;
+        }
     }
 
     public synchronized void setWantedState(WantedState wantedState) {

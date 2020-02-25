@@ -151,6 +151,7 @@ public class Constants {
     public static final int kPCMId = 0;
     public static final int kShifterSolenoidId = 0;
     public static final int kIntakeSolenoidId = 2;
+    public static final int kSkateParkSolenoidId = 5;
 
     // Vision
     public static final double kHorizontalFOV = 65.00022891576718; // degrees (tuned 2/22 for LL 2+ #1)
