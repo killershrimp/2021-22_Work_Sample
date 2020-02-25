@@ -199,8 +199,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {}
 
-    private static double kIntakePower = 1.0;
-
     @Override
     public void teleopPeriodic() {
         try {
@@ -241,12 +239,12 @@ public class Robot extends TimedRobot {
             // TODO make serializer logic smarter
             Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
             if (mControlBoard.getIntake()) {
-                mIntake.setOpenLoop(kIntakePower); // TODO move constant to somewhere smarter
+                mIntake.setWantedState(Intake.WantedState.INTAKE);
                 serializer_wanted = Serializer.WantedState.SERIALIZE;
             } else if (mControlBoard.getExhaust()) {
-                mIntake.setOpenLoop(-kIntakePower);
+                mIntake.setWantedState(Intake.WantedState.EXHAUST);
             } else {
-                mIntake.setOpenLoop(0.0);
+                mIntake.setWantedState(Intake.WantedState.IDLE);
                 serializer_wanted = Serializer.WantedState.IDLE;
             }
 

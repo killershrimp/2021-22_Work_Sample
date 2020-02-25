@@ -138,6 +138,11 @@ public class Constants {
 
     // Intake
     public static final int kIntakeMasterId = 14;
+    public static final double kIntakeStowTime = 0.5; // seconds, time it takes to stow intake
+    public static final double kIntakePower = 1.0;
+    public static final double kIntakeExhaustPower = -0.5;
+    public static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
+    public static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
 
     // Pigeon IMU
     public static final int kPigeonIMUId = 0;
@@ -145,7 +150,7 @@ public class Constants {
     // Pneumatics
     public static final int kPCMId = 0;
     public static final int kShifterSolenoidId = 0;
-    public static final int kIntakeSolenoidId = 3; // TODO change to 2
+    public static final int kIntakeSolenoidId = 2;
 
     // Vision
     public static final double kHorizontalFOV = 65.00022891576718; // degrees (tuned 2/22 for LL 2+ #1)
