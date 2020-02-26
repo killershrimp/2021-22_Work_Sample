@@ -199,9 +199,9 @@ public class Superstructure extends Subsystem {
     
     private void writeIdleDesiredState(double timestamp) {
         if (mTurretHint.isPresent()) {
-            mTurret.setPosition(getTurretSetpointFromFieldRelativeGoal(timestamp, mTurretHint.get()));
+            mTurret.setSetpointPositionPID(getTurretSetpointFromFieldRelativeGoal(timestamp, mTurretHint.get()));
         } else if (mTurretJogDelta.isPresent()) {
-            mTurret.setPosition(mTurret.getAngle() + mTurretJogDelta.get());
+            mTurret.setSetpointPositionPID(mTurret.getAngle() + mTurretJogDelta.get());
         } else {
             mTurret.setOpenLoop(0.0);
         }
@@ -221,33 +221,33 @@ public class Superstructure extends Subsystem {
         } else if (mTurretHint.isPresent()) {
             angleToSet = getTurretSetpointFromFieldRelativeGoal(timestamp, mTurretHint.get());
         } else if (mTurretJogDelta.isPresent()) {
-            mTurret.setPosition(mTurret.getAngle() + mTurretJogDelta.get());
+            mTurret.setSetpointPositionPID(mTurret.getAngle() + mTurretJogDelta.get());
         }
-        mTurret.setPosition(angleToSet, ffToSet);
+        mTurret.setSetpointPositionPID(angleToSet, ffToSet);
         if (mLatestAimingParameters.isPresent()) {
-            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+            mHood.setSetpointPositionPID(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
         }
 
         // TODO uncommment for tuning
-        // mHood.setDesiredAngle(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+        // mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
     private void writeShootDesiredState(double timestamp) {
-        mTurret.setPosition(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
+        mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
         if (mLatestAimingParameters.isPresent()) {
-            mHood.setDesiredAngle(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+            mHood.setSetpointPositionPID(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
         }
 
         // TODO uncommment for tuning
-        // mHood.setDesiredAngle(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+        // mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
     private void writeMoveToZeroDesiredState() {
         // mSerializer.stopRunning();
-        mTurret.setPosition(Constants.kTurretStartingPositionDegrees);
-        mHood.setDesiredAngle(Constants.kHoodStartingPositionDegrees);
+        mTurret.setPosition(Constants.kTurret.kHomePosition);
+        mHood.setSetpointPositionPID(Constants.kHoodConstants.kHomePosition);
         mShooter.setOpenLoop(0.0);
     }
 

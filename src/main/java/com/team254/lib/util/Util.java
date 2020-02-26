@@ -77,14 +77,14 @@ public class Util {
      * @param angle of turret in degrees 
      */
     public static double limitTurret(double turret_degrees) {
-        if (turret_degrees < Constants.kTurretReverseSoftLimitDegrees) {
+        if (turret_degrees < Constants.kTurretConstants.kMinUnitsLimit) {
             turret_degrees += 360.0;
         }
-        if (turret_degrees > Constants.kTurretForwardSoftLimitDegrees) {
+        if (turret_degrees > Constants.kTurretConstants.kMaxUnitsLimit) {
             turret_degrees -= 360.0;
         }
 
-        return Util.limit(turret_degrees, Constants.kTurretReverseSoftLimitDegrees, Constants.kTurretForwardSoftLimitDegrees);
+        return Util.limit(turret_degrees, Constants.kTurretConstants.kMinUnitsLimit, Constants.kTurretConstants.kMaxUnitsLimit);
     }
 
     public static double handleDeadband(double value, double deadband) {

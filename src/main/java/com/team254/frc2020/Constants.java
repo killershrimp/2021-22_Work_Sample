@@ -4,6 +4,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+import com.team254.frc2020.subsystems.ServoMotorSubsystem.ServoMotorSubsystemConstants;
 import com.team254.frc2020.subsystems.limelight.CameraResolution;
 import com.team254.frc2020.subsystems.limelight.LimelightConstants;
 import com.team254.frc2020.subsystems.limelight.PipelineConfiguration;
@@ -93,33 +94,56 @@ public class Constants {
     public static final double kPathMinLookaheadDistance = 24.0; // inches
 
     // Turret.
-    public static final int kTurretMasterId = 10;
-    public static final double kTurretDegreesPerTick = 1.0 / 2048.0 * 8.0 / 24.0 * 14.0 / 240.0 * 360.0;
-    public static final double kTurretForwardSoftLimitDegrees = 340.0; // degrees
-    public static final double kTurretReverseSoftLimitDegrees = 20.0; // degrees
-    public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
-    public static final double kTurretStartingPositionDegrees = 180.0; // degrees
+    public static final ServoMotorSubsystemConstants kTurretConstants = new ServoMotorSubsystemConstants();
+    static {
+        kTurretConstants.kName = "Turret";
 
-    // turret gains
-    public static final double kTurretPositionKp = 0.21;
-    public static final double kTurretPositionKi = 0;
-    public static final double kTurretPositionKd = 0.0;
-    public static final double kTurretPositionKf = 0.0;
-    public static final int kTurretPositionAllowableClosedloopError = 146; // ticks (roughly half a °)
+        kTurretConstants.kMasterConstants.id = 10;
+        kTurretConstants.kMasterConstants.invert_motor = false;
+
+        // Unit == Degrees
+        kTurretConstants.kHomePosition = 180.0;
+        kTurretConstants.kTicksPerUnitDistance = 1.0 / (1.0 / 2048.0 * 8.0 / 24.0 * 14.0 / 240.0 * 360.0);
+
+        kTurretConstants.kPositionKp = 0.21;
+        kTurretConstants.kPositionDeadband = (int) (0.5 * kTurretConstants.kTicksPerUnitDistance); // Ticks
+
+        kTurretConstants.kMinUnitsLimit = 20.0;
+        kTurretConstants.kMaxUnitsLimit = 340.0;
+
+        // TODO current limits, should recover position on reset?
+
+        kTurretConstants.kRecoverPositionOnReset = true;
+    }
+
+    public static final Translation2d kVehicleToTurretTranslation = new Translation2d(-6.9, 0);
 
     // Hood
-    public static final int kHoodMasterId = 11;
-    public static final double kHoodReverseSoftLimitDegrees = 45.0; // degrees
-    public static final double kHoodForwardSoftLimitDegrees = 70.0; // degrees
-    public static final double kHoodStartingPositionDegrees = 45.0; // degrees
+    public static final ServoMotorSubsystemConstants kHoodConstants = new ServoMotorSubsystemConstants();
+    static {
+        kHoodConstants.kName = "Hood";
 
-    // hood gains
-    public static final double kHoodDegreesPerTick = 1.0 / 2048.0 * 8.0 / 40.0 * 16.0 / 38.0 * 14.0 / 366.0 * 360.0;
-    public static final double kHoodKp = 0.254;
-    public static final double kHoodKi = 0.0;
-    public static final double kHoodKd = 0.0;
-    public static final double kHoodKf = 0.0;
-    public static final int kHoodAllowableClosedloopError = (int) (0.5 / kHoodDegreesPerTick);
+        kHoodConstants.kMasterConstants.id = 11;
+        kHoodConstants.kMasterConstants.invert_motor = true;
+
+        // Unit == Degrees
+        kHoodConstants.kHomePosition = 45.0;
+        kHoodConstants.kTicksPerUnitDistance = 1.0 / (1.0 / 2048.0 * 8.0 / 40.0 * 16.0 / 38.0 * 14.0 / 366.0 * 360.0);
+
+        kHoodConstants.kPositionKp = 0.254;
+        kHoodConstants.kPositionDeadband = (int) (0.5 * kHoodConstants.kTicksPerUnitDistance); // Ticks
+
+        kHoodConstants.kMinUnitsLimit = 45.0;
+        kHoodConstants.kMaxUnitsLimit = 70.0;
+
+        // TODO current limits, should recover position on reset?
+        kHoodConstants.kStatorContinuousCurrentLimit = 5;
+        kHoodConstants.kStatorPeakCurrentLimit = 5;
+        kHoodConstants.kStatorPeakCurrentDuration = 0.2;
+        kHoodConstants.kEnableStatorCurrentLimit = true;
+
+        kHoodConstants.kRecoverPositionOnReset = true;
+    }
 
     // Shooter
     public static final int kShooterLeftMasterId = 12;
