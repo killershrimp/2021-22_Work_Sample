@@ -29,7 +29,7 @@ public class Constants {
     public static final int kLongCANTimeoutMs = 100; // use for constructors
 
     // Control board
-    public static final boolean kUseDriveGamepad = false;
+    public static final boolean kUseDriveGamepad = true;
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 2;
     public static final int kMainThrottleJoystickPort = 0;
@@ -130,7 +130,7 @@ public class Constants {
         kHoodConstants.kHomePosition = 45.0;
         kHoodConstants.kTicksPerUnitDistance = 1.0 / (1.0 / 2048.0 * 8.0 / 40.0 * 16.0 / 38.0 * 14.0 / 366.0 * 360.0);
 
-        kHoodConstants.kPositionKp = 0.254;
+        kHoodConstants.kPositionKp = 0.254; // TODO (tune better)
         kHoodConstants.kPositionDeadband = (int) (0.5 * kHoodConstants.kTicksPerUnitDistance); // Ticks
 
         kHoodConstants.kMinUnitsLimit = 45.0;
@@ -217,19 +217,27 @@ public class Constants {
     public static final PipelineConfiguration kLowRes1xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
-    // Shot tuning (Tuned 2/22)
-    public static final double kShooterSetpointRPM = 5000;
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHoodMap = new InterpolatingTreeMap<>();
+    // Shot tuning
+    public static final double kShooterSetpointRPM = 5000; // TODO change?
+
+    // 2 point map (Tuned 2/22) TODO tune better and for new feeder
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();
     static {
-        kHoodMap.put(new InterpolatingDouble(143.027941), new InterpolatingDouble(56.585284));
-        kHoodMap.put(new InterpolatingDouble(152.949931), new InterpolatingDouble(57.816814));
-        kHoodMap.put(new InterpolatingDouble(167.681659), new InterpolatingDouble(59.300313));
-        kHoodMap.put(new InterpolatingDouble(185.118049), new InterpolatingDouble(61.224898));
-        kHoodMap.put(new InterpolatingDouble(201.497294), new InterpolatingDouble(61.801877));
-        kHoodMap.put(new InterpolatingDouble(235.228295), new InterpolatingDouble(62.779174));
-        kHoodMap.put(new InterpolatingDouble(256.850766), new InterpolatingDouble(64.281924));
-        kHoodMap.put(new InterpolatingDouble(273.916349), new InterpolatingDouble(64.682242));
-        kHoodMap.put(new InterpolatingDouble(288.374133), new InterpolatingDouble(64.682242));
+        kCoarseHoodMap.put(new InterpolatingDouble(143.027941), new InterpolatingDouble(56.585284));
+        kCoarseHoodMap.put(new InterpolatingDouble(152.949931), new InterpolatingDouble(57.816814));
+        kCoarseHoodMap.put(new InterpolatingDouble(167.681659), new InterpolatingDouble(59.300313));
+        kCoarseHoodMap.put(new InterpolatingDouble(185.118049), new InterpolatingDouble(61.224898));
+        kCoarseHoodMap.put(new InterpolatingDouble(201.497294), new InterpolatingDouble(61.801877));
+        kCoarseHoodMap.put(new InterpolatingDouble(235.228295), new InterpolatingDouble(62.779174));
+        kCoarseHoodMap.put(new InterpolatingDouble(256.850766), new InterpolatingDouble(64.281924));
+        kCoarseHoodMap.put(new InterpolatingDouble(273.916349), new InterpolatingDouble(64.682242));
+        kCoarseHoodMap.put(new InterpolatingDouble(288.374133), new InterpolatingDouble(64.682242));
+    }
+
+    // 3 point map (TODO tune)
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFineHoodMap = new InterpolatingTreeMap<>();
+    static {
+        kFineHoodMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(45.0));
     }
 
     /**

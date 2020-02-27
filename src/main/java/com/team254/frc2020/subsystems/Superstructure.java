@@ -65,6 +65,7 @@ public class Superstructure extends Subsystem {
 
     private Optional<Double> mTurretHint = Optional.empty();
     private Optional<Double> mTurretJogDelta = Optional.empty();
+    private boolean mShouldAimFine = false; // fine aim is 3 pt, coarse aim is 2 pt
 
     private double mTurretFeedforwardVFromVision = 0.0;
 
@@ -139,13 +140,12 @@ public class Superstructure extends Subsystem {
 
     private SystemState handleIdle(WantedState wantedState) {
         switch (wantedState) {
-            case SHOOT:
-                return SystemState.AIMING;
             case AIM:
                 return SystemState.AIMING;
             case MOVE_TO_ZERO:
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
+            case SHOOT:
             default:
                 return SystemState.IDLE;
         }
@@ -225,10 +225,17 @@ public class Superstructure extends Subsystem {
         }
         mTurret.setSetpointPositionPID(angleToSet, ffToSet);
         if (mLatestAimingParameters.isPresent()) {
-            mHood.setSetpointPositionPID(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+            double setpoint;
+            if (mShouldAimFine) {
+                setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+            } else {
+                setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+            }
+
+            mHood.setSetpointPositionPID(setpoint);
         }
 
-        // TODO uncommment for tuning
+        // TODO uncomment for tuning
         // mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
@@ -236,17 +243,24 @@ public class Superstructure extends Subsystem {
     private void writeShootDesiredState(double timestamp) {
         mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
         if (mLatestAimingParameters.isPresent()) {
-            mHood.setSetpointPositionPID(Constants.kHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+            double setpoint;
+            if (mShouldAimFine) {
+                setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+            } else {
+                setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+            }
+
+            mHood.setSetpointPositionPID(setpoint);
         }
 
-        // TODO uncommment for tuning
+        // TODO uncomment for tuning
         // mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
     private void writeMoveToZeroDesiredState() {
         // mSerializer.stopRunning();
-        mTurret.setPosition(Constants.kTurret.kHomePosition);
+        mTurret.setSetpointPositionPID(Constants.kTurretConstants.kHomePosition);
         mHood.setSetpointPositionPID(Constants.kHoodConstants.kHomePosition);
         mShooter.setOpenLoop(0.0);
     }
@@ -282,7 +296,7 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized double getTurretSetpointFromVision(double timestamp) {
-        mLatestAimingParameters = mRobotState.getAimingParameters(-1, Constants.kMaxGoalTrackAge);
+        mLatestAimingParameters = mRobotState.getAimingParameters(-1, Constants.kMaxGoalTrackAge, mShouldAimFine);
         if (mLatestAimingParameters.isPresent()) {
             mTrackId = mLatestAimingParameters.get().getTrackId();
 
@@ -374,5 +388,9 @@ public class Superstructure extends Subsystem {
 
     public synchronized void resetTurretJog() {
         mTurretJogDelta = Optional.empty();
+    }
+
+    public synchronized void setShouldAimFine(boolean should_aim_fine) {
+        mShouldAimFine = should_aim_fine;
     }
 }

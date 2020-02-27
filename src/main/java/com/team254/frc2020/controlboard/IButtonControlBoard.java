@@ -1,7 +1,9 @@
 package com.team254.frc2020.controlboard;
 
 public interface IButtonControlBoard {
-    boolean getAim();
+    boolean getAimCoarse(); // 2 pt
+
+    boolean getAimFine(); // 3 pt
 
     boolean getMoveToZero();
 
@@ -18,6 +20,4 @@ public interface IButtonControlBoard {
     boolean getRetractIntake();
 
     double getTurretJog();
-
-    boolean getSerialize();
 }

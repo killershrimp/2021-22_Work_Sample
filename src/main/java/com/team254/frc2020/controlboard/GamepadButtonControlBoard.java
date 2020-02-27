@@ -28,8 +28,13 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
-    public boolean getAim() {
+    public boolean getAimCoarse() {
         return mController.getTrigger(XboxController.Side.LEFT);
+    }
+
+    @Override
+    public boolean getAimFine() {
+        return mController.getTrigger(XboxController.Side.RIGHT);
     }
 
     @Override
@@ -86,10 +91,5 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     public void reset() {
         mLastCardinal = CardinalDirection.NONE;
         mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);
-    }
-
-    @Override
-    public boolean getSerialize() {
-        return mController.getTrigger(XboxController.Side.RIGHT);
     }
 }

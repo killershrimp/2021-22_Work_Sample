@@ -48,8 +48,13 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
-    public boolean getAim() {
-        return mButtonControlBoard.getAim();
+    public boolean getAimCoarse() {
+        return mButtonControlBoard.getAimCoarse();
+    }
+
+    @Override
+    public boolean getAimFine() {
+        return mButtonControlBoard.getAimFine();
     }
 
     @Override
@@ -90,10 +95,5 @@ public class ControlBoard implements IControlBoard {
     @Override
     public double getTurretJog() {
         return mButtonControlBoard.getTurretJog();
-    }
-
-    @Override
-    public boolean getSerialize() {
-        return mButtonControlBoard.getSerialize();
     }
 }

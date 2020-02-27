@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
             mTrajectoryGenerator.generateTrajectories();
 
             // Robot starts backwards, turret starts backwards (in robot frame)
-            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretStartingPositionDegrees)));
+            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretConstants.kHomePosition)));
             mDrive.setHeading(Rotation2d.fromDegrees(180));
 
             mAutoModeSelector.updateModeCreator();
@@ -117,7 +117,7 @@ public class Robot extends TimedRobot {
             mDisabledLooper.stop();
 
             // Robot starts backwards, turret starts backwards (in robot frame)
-            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretStartingPositionDegrees)));
+            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretConstants.kHomePosition)));
             mDrive.setHeading(Rotation2d.fromDegrees(180));
 
             mAutoModeExecutor.start();
@@ -210,7 +210,8 @@ public class Robot extends TimedRobot {
     
             if (mControlBoard.getShoot()) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
-            } else if (mControlBoard.getAim()) {
+            } else if (mControlBoard.getAimCoarse() || mControlBoard.getAimFine()) {
+                mSuperstructure.setShouldAimFine(mControlBoard.getAimFine());
                 mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
             } else if (mControlBoard.getMoveToZero()) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.MOVE_TO_ZERO);
@@ -246,10 +247,6 @@ public class Robot extends TimedRobot {
             } else {
                 mIntake.setWantedState(Intake.WantedState.IDLE);
                 serializer_wanted = Serializer.WantedState.IDLE;
-            }
-
-            if (mControlBoard.getSerialize()) {
-                serializer_wanted = Serializer.WantedState.SERIALIZE;
             }
 
             if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
