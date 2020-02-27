@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Intake mIntake = Intake.getInstance();
     private final Serializer mSerializer = Serializer.getInstance();
+    private final Hood mHood = Hood.getInstance();
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -56,7 +57,7 @@ public class Robot extends TimedRobot {
                 RobotStateEstimator.getInstance(),
                 mDrive,
                 mTurret,
-                Hood.getInstance(),
+                mHood,
                 Shooter.getInstance(),
                 mSerializer,
                 mIntake,
@@ -78,6 +79,7 @@ public class Robot extends TimedRobot {
             mControlBoard.reset();
 
             mTurret.zeroSensors();
+            mHood.resetIfAtLimit();
 
             SmartDashboard.putNumber("HoodAngleToSet", 50.0);
         } catch (Throwable t) {
