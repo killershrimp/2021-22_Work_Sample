@@ -137,11 +137,6 @@ public class Constants {
         kHoodConstants.kMaxUnitsLimit = 70.0;
 
         // TODO current limits, should recover position on reset?
-        kHoodConstants.kStatorContinuousCurrentLimit = 5;
-        kHoodConstants.kStatorPeakCurrentLimit = 5;
-        kHoodConstants.kStatorPeakCurrentDuration = 0.2;
-        kHoodConstants.kEnableStatorCurrentLimit = true;
-
         kHoodConstants.kRecoverPositionOnReset = true;
     }
 
