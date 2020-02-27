@@ -1,6 +1,6 @@
 package com.team254.frc2020;
 
-import com.team254.frc2020.subsystems.limelight.Limelight;
+import com.team254.frc2020.subsystems.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;

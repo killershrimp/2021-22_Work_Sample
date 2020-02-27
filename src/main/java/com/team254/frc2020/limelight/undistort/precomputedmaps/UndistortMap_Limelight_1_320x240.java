@@ -1,6 +1,6 @@
-package com.team254.frc2020.subsystems.limelight.undistort.precomputedmaps;
+package com.team254.frc2020.limelight.undistort.precomputedmaps;
 
-import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;
+import com.team254.frc2020.limelight.undistort.UndistortMap;
 
 public class UndistortMap_Limelight_1_320x240 implements UndistortMap {
   double[][][] map = new double[320][240][2];

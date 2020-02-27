@@ -1,6 +1,8 @@
-package com.team254.frc2020.subsystems.limelight;
+package com.team254.frc2020.limelight;
 
-import com.team254.frc2020.subsystems.limelight.undistort.OpenCVCalculatedUndistortMap;
+import com.team254.frc2020.limelight.constants.LimelightConstants;
+import com.team254.frc2020.limelight.constants.LimelightConstantsFactory;
+import com.team254.frc2020.limelight.undistort.OpenCVCalculatedUndistortMap;
 import org.junit.Test;
 
 import java.io.BufferedWriter;
@@ -17,25 +19,28 @@ public class UndistortMapFileWriterTest {
         if (!DO_WRITE_UNDISTORT_MAP) {
             return;
         }
+
+        // SET THESE 2 things
+        int limelightId = 1;
         CameraResolution resolution = K_UNDISTORT_MAP_WRITER_RES;
 
-        int limelightId = 1;
 
+        // Don't edit below this
+        LimelightConstants constants = LimelightConstantsFactory.getConstantsForId(limelightId);
         String varName = "map";
-
         StringBuilder sb = new StringBuilder();
 
         String className = String.format("UndistortMap_Limelight_%d_%dx%d", limelightId, resolution.getWidth(), resolution.getHeight());
         // Header
-        sb.append("package com.team254.frc2020.subsystems.limelight.undistort.precomputedmaps;\n" +
+        sb.append("package com.team254.frc2020.limelight.undistort.precomputedmaps;\n" +
                 "\n" +
-                "import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;\n\n" +
+                "import com.team254.frc2020.limelight.undistort.UndistortMap;\n\n" +
                 String.format("public class %s implements UndistortMap {\n", className));
 
 
 
         long start = System.currentTimeMillis();
-        OpenCVCalculatedUndistortMap map = new OpenCVCalculatedUndistortMap(resolution, false);
+        OpenCVCalculatedUndistortMap map = new OpenCVCalculatedUndistortMap(constants.getUndistortConstants(), resolution, false);
         long end = System.currentTimeMillis();
         System.out.println("Delta " + (end - start));
 

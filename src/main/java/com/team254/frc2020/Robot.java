@@ -7,15 +7,15 @@ import com.team254.frc2020.auto.modes.AutoModeBase;
 import com.team254.frc2020.controlboard.CardinalDirection;
 import com.team254.frc2020.controlboard.ControlBoard;
 import com.team254.frc2020.controlboard.IControlBoard;
+import com.team254.frc2020.limelight.constants.LimelightConstantsFactory;
 import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
 import com.team254.frc2020.subsystems.*;
-import com.team254.frc2020.subsystems.limelight.Limelight;
+import com.team254.frc2020.subsystems.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
 import com.team254.lib.util.OpenLoopCheesyDriveHelper;
-import com.team254.lib.util.VelocityCheesyDriveHelper;
 import com.team254.lib.wpilib.TimedRobot;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
     // subsystems
     private final Drive mDrive = Drive.getInstance();
     private final Turret mTurret = Turret.getInstance();
-    private final Limelight mLimelight = new Limelight(Constants.kLimelightConstants, Constants.kLowRes1xZoom);
+    private final Limelight mLimelight = new Limelight(LimelightConstantsFactory.getConstantsForId(Constants.kDefaultLimelightId), Constants.kLowRes1xZoom);
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Intake mIntake = Intake.getInstance();
     private final Serializer mSerializer = Serializer.getInstance();

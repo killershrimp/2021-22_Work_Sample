@@ -1,7 +1,6 @@
-package com.team254.frc2020.subsystems.limelight.undistort;
+package com.team254.frc2020.limelight.undistort;
 
-import com.team254.frc2020.Constants;
-import com.team254.frc2020.subsystems.limelight.CameraResolution;
+import com.team254.frc2020.limelight.CameraResolution;
 import com.team254.lib.util.Util;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -19,13 +18,15 @@ public class OpenCVCalculatedUndistortMap implements UndistortMap {
     }
 
     private CameraResolution cameraResolution;
+    private UndistortConstants undistortConstants;
     double[][][] map;
 
     private AtomicBoolean ready = new AtomicBoolean(false);
     private AtomicBoolean loaded = new AtomicBoolean(false);
 
-    public OpenCVCalculatedUndistortMap(CameraResolution cameraResolution, boolean loadAsync) {
+    public OpenCVCalculatedUndistortMap(UndistortConstants undistortConstants, CameraResolution cameraResolution, boolean loadAsync) {
         this.cameraResolution = cameraResolution;
+        this.undistortConstants = undistortConstants;
         this.map = new double[cameraResolution.getWidth()][cameraResolution.getHeight()][2];
         if (loadAsync) {
             new Thread(this::load).start();
@@ -40,7 +41,8 @@ public class OpenCVCalculatedUndistortMap implements UndistortMap {
             for (int i = 0; i < cameraResolution.getWidth(); i++) {
                 for (int j = 0; j < cameraResolution.getHeight(); j++) {
                     // run undistort
-                    double[] undistorted = undistortFromOpenCV(new double[]{i * 1.0 / cameraResolution.getWidth() * 1.0, j * 1.0 / cameraResolution.getHeight() * 1.0});
+                    double[] point = new double[]{i * 1.0 / cameraResolution.getWidth() * 1.0, j * 1.0 / cameraResolution.getHeight() * 1.0};
+                    double[] undistorted = undistortFromOpenCV(undistortConstants, point);
                     // output undistorted x and y
                     for (int k = 0; k < 2; k++) {
                         map[i][j][k] = (float) undistorted[k];
@@ -86,20 +88,20 @@ public class OpenCVCalculatedUndistortMap implements UndistortMap {
     /**
      * Undoes radial and tangential distortion using opencv
      */
-    private static double[] undistortFromOpenCV(double[] point) {
+    private static double[] undistortFromOpenCV(UndistortConstants undistortConstants, double[] point) {
         Mat coord = new Mat(1, 1, CV_64FC2);
         coord.put(0, 0, point);
 
         Mat camMtx = new Mat(3, 3, CV_64FC1);
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                camMtx.put(i, j, Constants.kCameraMatrix[i][j]);
+                camMtx.put(i, j, undistortConstants.getCameraMatrix()[i][j]);
             }
         }
 
         Mat distortion = new Mat(1, 5, CV_64FC1);
         for (int i = 0; i < 5; i++) {
-            distortion.put(0, i, Constants.kCameraDistortion[i]);
+            distortion.put(0, i, undistortConstants.getCameraDistortion()[i]);
         }
 
         Mat dst = new Mat(1, 1, CV_64FC2);

@@ -5,9 +5,9 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 import com.team254.frc2020.subsystems.ServoMotorSubsystem.ServoMotorSubsystemConstants;
-import com.team254.frc2020.subsystems.limelight.CameraResolution;
-import com.team254.frc2020.subsystems.limelight.LimelightConstants;
-import com.team254.frc2020.subsystems.limelight.PipelineConfiguration;
+import com.team254.frc2020.limelight.CameraResolution;
+import com.team254.frc2020.limelight.constants.LimelightConstants;
+import com.team254.frc2020.limelight.PipelineConfiguration;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -189,22 +189,7 @@ public class Constants {
     public static final double kTrackAgeWeight = 10.0;
     public static final double kTrackSwitchingWeight = 100.0;
 
-    public static final LimelightConstants kLimelightConstants = new LimelightConstants();
-    static {
-        kLimelightConstants.kHeight = 26.48;
-        kLimelightConstants.kName = "Turret Limelight";
-        kLimelightConstants.kHorizontalPlaneToLens = Rotation2d.fromDegrees(27.00);
-        kLimelightConstants.kTurretToLens = new Pose2d(-5.7, 0, Rotation2d.fromDegrees(1.5)); // TODO tune yaw fudge factor to fix bias
-        kLimelightConstants.kTableName = "limelight";
-    }
-
-    // calculated 2/22 on 960x720 for LL 2+ #1
-    public static final double[] kCameraDistortion = {2.03204609e-01, -6.25404962e-01, -3.39277869e-03, -3.51126715e-04, 5.81122457e-01};
-    public static final double[][] kCameraMatrix = {
-            {0.78474188, 0.0, 0.51036895},
-            {0.0, 1.04536274, 0.45914132},
-            {0.0, 0.0, 1.0}
-    };
+    public static final int kDefaultLimelightId = 1;
 
     public static final double kVisionTargetHeight = 98.25;
     public static final Pose2d kVisionTargetToGoalOffset = new Pose2d(29.25, 0, Rotation2d.fromDegrees(0));

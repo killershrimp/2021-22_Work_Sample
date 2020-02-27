@@ -1,4 +1,4 @@
-package com.team254.frc2020.subsystems.limelight;
+package com.team254.frc2020.limelight;
 
 public enum CameraResolution {
     F_320x240(320, 240),

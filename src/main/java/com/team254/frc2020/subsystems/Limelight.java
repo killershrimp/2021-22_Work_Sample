@@ -1,12 +1,12 @@
-package com.team254.frc2020.subsystems.limelight;
+package com.team254.frc2020.subsystems;
 
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
+import com.team254.frc2020.limelight.PipelineConfiguration;
+import com.team254.frc2020.limelight.constants.LimelightConstants;
+import com.team254.frc2020.limelight.undistort.UndistortMap;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
-import com.team254.frc2020.subsystems.Subsystem;
-import com.team254.frc2020.subsystems.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
-import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -31,7 +31,7 @@ public class Limelight extends Subsystem {
     public Limelight(LimelightConstants constants, PipelineConfiguration pipelineConfig) {
         mConstants = constants;
         setPipelineConfig(pipelineConfig);
-        mNetworkTable = NetworkTableInstance.getDefault().getTable(constants.kTableName);
+        mNetworkTable = NetworkTableInstance.getDefault().getTable(constants.getTableName());
     }
 
     public static class PeriodicIO {
@@ -51,10 +51,8 @@ public class Limelight extends Subsystem {
         public int snapshot = 0; // 0 - stop snapshots, 1 - 2 Hz
     }
 
-    private final LimelightConstants mConstants;
+    private LimelightConstants mConstants;
     private PipelineConfiguration mPipelineConfig;
-
-    private final UndistortMap undistortMap = new UndistortMap_Limelight_1_320x240();
 
     private final PeriodicIO mPeriodicIO = new PeriodicIO();
     private boolean mOutputsHaveChanged = true;
@@ -63,15 +61,15 @@ public class Limelight extends Subsystem {
     private boolean mSeesTarget = false;
 
     public Pose2d getTurretToLens() {
-        return mConstants.kTurretToLens;
+        return mConstants.getTurretToLens();
     }
 
     public double getLensHeight() {
-        return mConstants.kHeight;
+        return mConstants.getHeight();
     }
 
     public Rotation2d getHorizontalPlaneToLens() {
-        return mConstants.kHorizontalPlaneToLens;
+        return mConstants.getHorizontalPlaneToLens();
     }
 
     public void setPipelineConfig(PipelineConfiguration pipelineConfig) {
@@ -146,8 +144,8 @@ public class Limelight extends Subsystem {
 
     @Override
     public synchronized void outputTelemetry() {
-        SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
-        SmartDashboard.putNumber(mConstants.kName + ": Pipeline Latency (ms)", mPeriodicIO.latency);
+        SmartDashboard.putBoolean(mConstants.getName() + ": Has Target", mSeesTarget);
+        SmartDashboard.putNumber(mConstants.getName() + ": Pipeline Latency (ms)", mPeriodicIO.latency);
     }
 
     public enum LedMode {
@@ -190,7 +188,7 @@ public class Limelight extends Subsystem {
     }
 
     public synchronized List<TargetInfo> getRawTargetInfos() {
-        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets, undistortMap);
+        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets, mConstants.getUndistortMap());
     }
 
     public static List<TargetInfo> getRawTargetInfos(List<double[]> corners, PipelineConfiguration pipeline, List<TargetInfo> targets, UndistortMap undistortMap) {
@@ -302,7 +300,12 @@ public class Limelight extends Subsystem {
         return mPeriodicIO.latency;
     }
 
-    public UndistortMap getUndistortMap() {
-        return undistortMap;
+    public LimelightConstants getConstants() {
+        return mConstants;
     }
+
+    public void setConstants(LimelightConstants mConstants) {
+        this.mConstants = mConstants;
+    }
+
 }

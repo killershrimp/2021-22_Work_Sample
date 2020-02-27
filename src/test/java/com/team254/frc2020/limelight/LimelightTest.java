@@ -1,9 +1,12 @@
-package com.team254.frc2020.subsystems.limelight;
+package com.team254.frc2020.limelight;
 
 import com.team254.frc2020.RobotState;
-import com.team254.frc2020.subsystems.limelight.undistort.OpenCVCalculatedUndistortMap;
-import com.team254.frc2020.subsystems.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
-import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;
+import com.team254.frc2020.limelight.constants.LimelightConstants;
+import com.team254.frc2020.limelight.constants.LimelightConstantsFactory;
+import com.team254.frc2020.limelight.undistort.OpenCVCalculatedUndistortMap;
+import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
+import com.team254.frc2020.limelight.undistort.UndistortMap;
+import com.team254.frc2020.subsystems.Limelight;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.Util;
@@ -72,7 +75,7 @@ public class LimelightTest {
 
     @Test
     public void testBuildUndistortMapAsync() throws InterruptedException {
-        UndistortMap undistortMap = new OpenCVCalculatedUndistortMap(CameraResolution.F_320x240, true);
+        UndistortMap undistortMap = new OpenCVCalculatedUndistortMap(LimelightConstantsFactory.getConstantsForId(1).getUndistortConstants(), CameraResolution.F_320x240, true);
         Instant startLoad = Instant.now();
         while (!undistortMap.getReady()) {
             Thread.sleep(100);
