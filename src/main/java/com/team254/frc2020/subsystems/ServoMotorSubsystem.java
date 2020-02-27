@@ -547,6 +547,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
     @Override
     public void stop() {
         setOpenLoop(0.0);
+        mMaster.set(ControlMode.PercentOutput, 0.0);
     }
 
     public int estimateSensorPositionFromAbsolute() {
