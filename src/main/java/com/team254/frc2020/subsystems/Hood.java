@@ -1,6 +1,9 @@
 package com.team254.frc2020.subsystems;
 
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.team254.frc2020.Constants;
+import com.team254.lib.drivers.TalonUtil;
 import com.team254.lib.util.Util;
 
 public class Hood extends ServoMotorSubsystem {
@@ -17,7 +20,10 @@ public class Hood extends ServoMotorSubsystem {
     private Hood(final ServoMotorSubsystemConstants constants) {
         super(constants);
 
-        // TODO limit switch
+        TalonUtil.checkError(
+                mMaster.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen),
+                mConstants.kName + ": Could not set reverse limit switch: ");
+        mMaster.overrideLimitSwitchesEnable(true);
     }
 
     // Syntactic sugar.
@@ -27,6 +33,11 @@ public class Hood extends ServoMotorSubsystem {
 
     public synchronized boolean isAtSetpoint() {
         return Util.epsilonEquals(mPeriodicIO.position_ticks, mPeriodicIO.demand, mConstants.kPositionDeadband);
+    }
+
+    @Override
+    public boolean atHomingLocation() {
+        return mMaster.getSensorCollection().isRevLimitSwitchClosed() == 1;
     }
 
     @Override
