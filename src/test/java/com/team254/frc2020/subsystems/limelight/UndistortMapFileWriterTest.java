@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class UndistortMapFileWriterTest {
-    private static final boolean DO_WRITE_UNDISTORT_MAP = false;
+    private static final boolean DO_WRITE_UNDISTORT_MAP = true;
     private static final CameraResolution K_UNDISTORT_MAP_WRITER_RES = CameraResolution.F_320x240;
 
     @Test
@@ -19,14 +19,17 @@ public class UndistortMapFileWriterTest {
         }
         CameraResolution resolution = K_UNDISTORT_MAP_WRITER_RES;
 
+        int limelightId = 1;
+
         String varName = "map";
 
         StringBuilder sb = new StringBuilder();
 
-        String className = String.format("StaticUndistortMap%d", resolution.getWidth());
+        String className = String.format("UndistortMap_Limelight_%d_%dx%d", limelightId, resolution.getWidth(), resolution.getHeight());
         // Header
-        sb.append("package com.team254.frc2020.subsystems.limelight.undistort;\n" +
+        sb.append("package com.team254.frc2020.subsystems.limelight.undistort.precomputedmaps;\n" +
                 "\n" +
+                "import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;\n\n" +
                 String.format("public class %s implements UndistortMap {\n", className));
 
 

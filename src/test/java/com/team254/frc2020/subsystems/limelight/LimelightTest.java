@@ -2,7 +2,7 @@ package com.team254.frc2020.subsystems.limelight;
 
 import com.team254.frc2020.RobotState;
 import com.team254.frc2020.subsystems.limelight.undistort.OpenCVCalculatedUndistortMap;
-import com.team254.frc2020.subsystems.limelight.undistort.StaticUndistortMap320;
+import com.team254.frc2020.subsystems.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
 import com.team254.frc2020.subsystems.limelight.undistort.UndistortMap;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -91,7 +91,7 @@ public class LimelightTest {
         List<TargetInfo> targets = new ArrayList<>();
         PipelineConfiguration noZoomPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
         PipelineConfiguration zoomedPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
-        UndistortMap undistortMap = new StaticUndistortMap320();
+        UndistortMap undistortMap = new UndistortMap_Limelight_1_320x240();
 
         double cameraHeight = 14.125;
         Rotation2d cameraPitch = Rotation2d.fromDegrees(1.6);
