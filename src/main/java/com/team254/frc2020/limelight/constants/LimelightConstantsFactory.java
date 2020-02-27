@@ -32,7 +32,7 @@ public class LimelightConstantsFactory {
             case 2:
                 // Not calibrated TODO: fill in correct calibration values
                 return new LimelightConstants(
-                        1, // label id
+                        2, // label id
                         LimelightConstants.Type.Shooter,
                         "Turret Limelight #2", // name
                         "limelight", // table name
