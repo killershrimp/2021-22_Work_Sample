@@ -194,7 +194,7 @@ public class Constants {
         kLimelightConstants.kHeight = 26.48;
         kLimelightConstants.kName = "Turret Limelight";
         kLimelightConstants.kHorizontalPlaneToLens = Rotation2d.fromDegrees(27.00);
-        kLimelightConstants.kTurretToLens = new Pose2d(-5.7, 0, Rotation2d.fromDegrees(1.7)); // TODO tune yaw fudge factor to fix bias
+        kLimelightConstants.kTurretToLens = new Pose2d(-5.7, 0, Rotation2d.fromDegrees(1.5)); // TODO tune yaw fudge factor to fix bias
         kLimelightConstants.kTableName = "limelight";
     }
 
@@ -218,15 +218,17 @@ public class Constants {
     // 2 point map (Tuned 2/22) TODO tune better and for new feeder
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();
     static {
-        kCoarseHoodMap.put(new InterpolatingDouble(143.027941), new InterpolatingDouble(56.585284));
-        kCoarseHoodMap.put(new InterpolatingDouble(152.949931), new InterpolatingDouble(57.816814));
-        kCoarseHoodMap.put(new InterpolatingDouble(167.681659), new InterpolatingDouble(59.300313));
-        kCoarseHoodMap.put(new InterpolatingDouble(185.118049), new InterpolatingDouble(61.224898));
-        kCoarseHoodMap.put(new InterpolatingDouble(201.497294), new InterpolatingDouble(61.801877));
-        kCoarseHoodMap.put(new InterpolatingDouble(235.228295), new InterpolatingDouble(62.779174));
-        kCoarseHoodMap.put(new InterpolatingDouble(256.850766), new InterpolatingDouble(64.281924));
-        kCoarseHoodMap.put(new InterpolatingDouble(273.916349), new InterpolatingDouble(64.682242));
-        kCoarseHoodMap.put(new InterpolatingDouble(288.374133), new InterpolatingDouble(64.682242));
+        kCoarseHoodMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(46.0));
+        kCoarseHoodMap.put(new InterpolatingDouble(111.), new InterpolatingDouble(51.));
+        kCoarseHoodMap.put(new InterpolatingDouble(134.), new InterpolatingDouble(55.));
+        kCoarseHoodMap.put(new InterpolatingDouble(168.), new InterpolatingDouble(58.));
+        kCoarseHoodMap.put(new InterpolatingDouble(194.), new InterpolatingDouble(59.5));
+        kCoarseHoodMap.put(new InterpolatingDouble(234.), new InterpolatingDouble(61.0));
+        kCoarseHoodMap.put(new InterpolatingDouble(250.0), new InterpolatingDouble(62.0));
+        kCoarseHoodMap.put(new InterpolatingDouble(258.0), new InterpolatingDouble(62.0));
+        kCoarseHoodMap.put(new InterpolatingDouble(268.0), new InterpolatingDouble(63.5));
+        kCoarseHoodMap.put(new InterpolatingDouble(301.0), new InterpolatingDouble(63.5));
+        kCoarseHoodMap.put(new InterpolatingDouble(346.0), new InterpolatingDouble(64.5));
     }
 
     // 3 point map (TODO tune)
