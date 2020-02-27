@@ -29,7 +29,7 @@ public class Constants {
     public static final int kLongCANTimeoutMs = 100; // use for constructors
 
     // Control board
-    public static final boolean kUseDriveGamepad = true;
+    public static final boolean kUseDriveGamepad = false;
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 2;
     public static final int kMainThrottleJoystickPort = 0;
@@ -148,7 +148,7 @@ public class Constants {
     public static final double kShooterKd = 0.0;
     public static final double kShooterKf = 0.05033127788;
     public static final double kShooterTicksPerRevolution = 2048.0 ; // based on gear reduction between encoder and output shaft, and encoder ppr
-    public static final double kShooterAllowableErrorRPM = 100.0; // TODO
+    public static final double kShooterAllowableErrorRPM = 250.0; // TODO
 
     // Serializer
     public static final int kSerializerSpinCycleMasterId = 7;
@@ -194,7 +194,7 @@ public class Constants {
         kLimelightConstants.kHeight = 26.48;
         kLimelightConstants.kName = "Turret Limelight";
         kLimelightConstants.kHorizontalPlaneToLens = Rotation2d.fromDegrees(27.00);
-        kLimelightConstants.kTurretToLens = new Pose2d(-5.7, 0, Rotation2d.identity());
+        kLimelightConstants.kTurretToLens = new Pose2d(-5.7, 0, Rotation2d.fromDegrees(1.7)); // TODO tune yaw fudge factor to fix bias
         kLimelightConstants.kTableName = "limelight";
     }
 
@@ -213,7 +213,7 @@ public class Constants {
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
     // Shot tuning
-    public static final double kShooterSetpointRPM = 5000; // TODO change?
+    public static final double kShooterSetpointRPM = 4700; // TODO change?
 
     // 2 point map (Tuned 2/22) TODO tune better and for new feeder
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();

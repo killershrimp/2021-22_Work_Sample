@@ -221,37 +221,50 @@ public class Superstructure extends Subsystem {
             mTurret.setSetpointPositionPID(mTurret.getAngle() + mTurretJogDelta.get());
         }
         mTurret.setSetpointPositionPID(angleToSet, ffToSet);
-        if (mLatestAimingParameters.isPresent()) {
-            double setpoint;
-            if (mShouldAimFine) {
-                setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
-            } else {
-                setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
-            }
 
-            mHood.setSetpointPositionPID(setpoint);
-        }
+        // TODO uncomment for actual use
+        // START
+        // if (mLatestAimingParameters.isPresent()) {
+        //     double setpoint;
+        //     if (mShouldAimFine) {
+        //         setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+        //     } else {
+        //         setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+        //     }
+
+        //     mHood.setSetpointPositionPID(setpoint);
+        // }
+        // END
 
         // TODO uncomment for tuning
-        // mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+        // START
+        mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+        // END
+
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
     private void writeShootDesiredState(double timestamp) {
         mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
-        if (mLatestAimingParameters.isPresent()) {
-            double setpoint;
-            if (mShouldAimFine) {
-                setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
-            } else {
-                setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
-            }
+        
+        // TODO uncomment for actual use
+        // START
+        // if (mLatestAimingParameters.isPresent()) {
+        //     double setpoint;
+        //     if (mShouldAimFine) {
+        //         setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+        //     } else {
+        //         setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+        //     }
 
-            mHood.setSetpointPositionPID(setpoint);
-        }
+        //     mHood.setSetpointPositionPID(setpoint);
+        // }
 
         // TODO uncomment for tuning
-        // mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+        // START
+        mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+        // END
+
         mShooter.setRPM(Constants.kShooterSetpointRPM);
     }
 
