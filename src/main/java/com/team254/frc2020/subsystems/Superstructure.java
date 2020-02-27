@@ -27,7 +27,6 @@ public class Superstructure extends Subsystem {
         return mInstance;
     }
 
-    // private Serializer mSerializer = Serializer.getInstance();
     private Turret mTurret = Turret.getInstance();
     private Hood mHood = Hood.getInstance();
     private Shooter mShooter = Shooter.getInstance();
@@ -203,15 +202,13 @@ public class Superstructure extends Subsystem {
         } else if (mTurretJogDelta.isPresent()) {
             mTurret.setSetpointPositionPID(mTurret.getAngle() + mTurretJogDelta.get());
         } else {
-            mTurret.setOpenLoop(0.0);
+            mTurret.setSetpointPositionPID(mTurret.getAngle());
         }
-        // mSerializer.stopRunning();
-        mHood.setOpenLoop(0.0);
+        mHood.setSetpointPositionPID(mHood.getAngle());
         mShooter.setOpenLoop(0.0);
     }
 
     private void writeAimingDesiredState(double timestamp) {
-        // mSerializer.stopRunning();
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();
         double ffToSet = 0;
@@ -259,7 +256,6 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeMoveToZeroDesiredState() {
-        // mSerializer.stopRunning();
         mTurret.setSetpointPositionPID(Constants.kTurretConstants.kHomePosition);
         mHood.setSetpointPositionPID(Constants.kHoodConstants.kHomePosition);
         mShooter.setOpenLoop(0.0);
