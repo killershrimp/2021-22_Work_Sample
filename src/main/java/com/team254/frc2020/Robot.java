@@ -82,6 +82,8 @@ public class Robot extends TimedRobot {
             mHood.resetIfAtLimit();
 
             SmartDashboard.putNumber("HoodAngleToSet", 50.0);
+
+            mSubsystemManager.stop();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -140,6 +142,8 @@ public class Robot extends TimedRobot {
             if (mAutoModeExecutor != null) {
                 mAutoModeExecutor.stop();
             }
+
+            mSubsystemManager.stop();
 
             mEnabledLooper.start();
         } catch (Throwable t) {
