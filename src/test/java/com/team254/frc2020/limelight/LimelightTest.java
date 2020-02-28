@@ -4,6 +4,7 @@ import com.team254.frc2020.RobotState;
 import com.team254.frc2020.limelight.constants.LimelightConstants;
 import com.team254.frc2020.limelight.constants.LimelightConstantsFactory;
 import com.team254.frc2020.limelight.undistort.OpenCVCalculatedUndistortMap;
+import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_0_320x240;
 import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
 import com.team254.frc2020.limelight.undistort.UndistortMap;
 import com.team254.frc2020.subsystems.Limelight;
@@ -94,11 +95,11 @@ public class LimelightTest {
         List<TargetInfo> targets = new ArrayList<>();
         PipelineConfiguration noZoomPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
         PipelineConfiguration zoomedPipeline = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
-        UndistortMap undistortMap = new UndistortMap_Limelight_1_320x240();
+        UndistortMap undistortMap = new UndistortMap_Limelight_0_320x240();
         Limelight unzoomedLimelight = new Limelight(LimelightConstantsFactory.getConstantsForId(0), noZoomPipeline);
         Limelight zoomedLimelight = new Limelight(LimelightConstantsFactory.getConstantsForId(0), zoomedPipeline);
 
-        double acceptedError = 5.0;
+        double acceptedError = 6.0;
 
         // 15 5"
         List<double[]> topCorners1 = Limelight.extractTopCornersFromBoundingBoxes(

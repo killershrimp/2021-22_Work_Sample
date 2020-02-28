@@ -1,6 +1,7 @@
 package com.team254.frc2020.limelight.constants;
 
 import com.team254.frc2020.limelight.undistort.UndistortConstants;
+import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_0_320x240;
 import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
@@ -19,7 +20,7 @@ public class LimelightConstantsFactory {
                         14.125,
                         Pose2d.identity(),
                         Rotation2d.fromDegrees(1.6),
-                        null/*new UndistortMap_Limelight_0_320x240()*/,
+                        new UndistortMap_Limelight_0_320x240(),
                         new UndistortConstants(
                                 new double[]{2.35265164e-01, -6.86035030e-01, 3.10037972e-04, 8.34493852e-05, 6.41764110e-01},
                                 new double[][]{
