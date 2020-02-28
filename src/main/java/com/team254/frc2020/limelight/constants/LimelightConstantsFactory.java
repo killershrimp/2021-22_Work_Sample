@@ -9,6 +9,29 @@ public class LimelightConstantsFactory {
     public static LimelightConstants getConstantsForId(int id) {
         switch (id) {
             default: // Intentional fall through
+            case 0:
+                // Limelight used to procure target coordinates used in unit test
+                return new LimelightConstants(
+                        0,
+                        null,
+                        "",
+                        "",
+                        14.125,
+                        Pose2d.identity(),
+                        Rotation2d.fromDegrees(1.6),
+                        null/*new UndistortMap_Limelight_0_320x240()*/,
+                        new UndistortConstants(
+                                new double[]{2.35265164e-01, -6.86035030e-01, 3.10037972e-04, 8.34493852e-05, 6.41764110e-01},
+                                new double[][]{
+                                        {778.08226793/960, 0, 452.8538724/960},
+                                        {0, 777.04925262/720, 351.05573266/720},
+                                        {0, 0, 1.0}
+                                }
+                        ),
+                        63.709400992230975,
+                        49.71097153877655
+
+                );
             case 1:
                 // Undistort constants calculated 2/22 on 960x720 for LL 2+ #1
                 return new LimelightConstants(
@@ -26,7 +49,9 @@ public class LimelightConstantsFactory {
                                         {0.78474188, 0.0, 0.51036895},
                                         {0.0, 1.04536274, 0.45914132},
                                         {0.0, 0.0, 1.0}
-                                })
+                                }),
+                        65.00022891576718,
+                        51.06843506401144
                 );
 
             case 2:
@@ -46,7 +71,9 @@ public class LimelightConstantsFactory {
                                         {0.78474188, 0.0, 0.51036895},
                                         {0.0, 1.04536274, 0.45914132},
                                         {0.0, 0.0, 1.0}
-                                })
+                                }),
+                        65.00022891576718,
+                        51.06843506401144
                 );
         }
     }

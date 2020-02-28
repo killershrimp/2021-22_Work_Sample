@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class UndistortMapFileWriterTest {
-    private static final boolean DO_WRITE_UNDISTORT_MAP = true;
+    private static final boolean DO_WRITE_UNDISTORT_MAP = false;
     private static final CameraResolution K_UNDISTORT_MAP_WRITER_RES = CameraResolution.F_320x240;
 
     @Test

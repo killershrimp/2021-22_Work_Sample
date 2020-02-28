@@ -173,11 +173,7 @@ public class Constants {
     public static final int kSkateParkSolenoidId = 5;
 
     // Vision
-    public static final double kHorizontalFOV = 65.00022891576718; // degrees (tuned 2/22 for LL 2+ #1)
-    public static final double kVerticalFOV = 51.06843506401144; // degrees (tuned 2/22 for LL 2+ #1)
     public static final boolean kShouldUndistort = true;
-    public static final double kVPW = 2.0 * Math.tan(Math.toRadians(kHorizontalFOV / 2.0));
-    public static final double kVPH = 2.0 * Math.tan(Math.toRadians(kVerticalFOV / 2.0));
     public static final double kImageCaptureLatency = 11.0 / 1000.0; // seconds
 
     public static final double kMaxTrackerDistance = 9.0;

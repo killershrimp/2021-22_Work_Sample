@@ -17,13 +17,15 @@ public class LimelightConstants {
     private UndistortMap undistortMap;
     private UndistortConstants undistortConstants;
     private Type type;
+    private double horizontalFOV;
+    private double verticalFOV;
 
     public enum Type {
         Shooter,
         StationAlignment,
     }
 
-    public LimelightConstants(int id, Type type, String name, String tableName, double height, Pose2d turretToLens, Rotation2d horizontalPlaneToLens, UndistortMap undistortMap, UndistortConstants undistortConstants) {
+    public LimelightConstants(int id, Type type, String name, String tableName, double height, Pose2d turretToLens, Rotation2d horizontalPlaneToLens, UndistortMap undistortMap, UndistortConstants undistortConstants, double horizontalFOV, double verticalFOV) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -36,6 +38,8 @@ public class LimelightConstants {
         if (this.undistortMap == null) {
             this.undistortMap = new OpenCVCalculatedUndistortMap(undistortConstants, CameraResolution.F_320x240, false);
         }
+        this.horizontalFOV = horizontalFOV;
+        this.verticalFOV = verticalFOV;
     }
 
     public int getId() {
@@ -72,5 +76,13 @@ public class LimelightConstants {
 
     public Type getType() {
         return type;
+    }
+
+    public double getHorizontalFOV() {
+        return horizontalFOV;
+    }
+
+    public double getVerticalFOV() {
+        return verticalFOV;
     }
 }

@@ -188,10 +188,11 @@ public class Limelight extends Subsystem {
     }
 
     public synchronized List<TargetInfo> getRawTargetInfos() {
-        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets, mConstants.getUndistortMap());
+        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets, mConstants.getUndistortMap(), mConstants.getHorizontalFOV(), mConstants.getVerticalFOV());
     }
 
-    public static List<TargetInfo> getRawTargetInfos(List<double[]> corners, PipelineConfiguration pipeline, List<TargetInfo> targets, UndistortMap undistortMap) {
+    public static List<TargetInfo> getRawTargetInfos(List<double[]> corners, PipelineConfiguration pipeline, List<TargetInfo> targets,
+                                                     UndistortMap undistortMap, double kHorizontalFOV, double kVerticalFOV) {
         if (corners == null) {
             return null;
         }
@@ -215,6 +216,9 @@ public class Limelight extends Subsystem {
         }
 
         targets.clear();
+
+        double VPW = 2.0 * Math.tan(Math.toRadians(kHorizontalFOV / 2.0));
+        double VPH = 2.0 * Math.tan(Math.toRadians(kVerticalFOV / 2.0));
         for (int i = 0; i < 2; ++i) {
             // Average of y and z;
             double y_pixels = transformedCorners.get(i)[0];
@@ -224,8 +228,8 @@ public class Limelight extends Subsystem {
             double nY = -(y_pixels * 2 - 1);
             double nZ = -(z_pixels * 2 - 1);
 
-            double y = Constants.kVPW / 2 * nY;
-            double z = Constants.kVPH / 2 * nZ;
+            double y = VPW / 2 * nY;
+            double z = VPH / 2 * nZ;
 
             TargetInfo target = new TargetInfo(y, z);
             target.setSkew(slope);
