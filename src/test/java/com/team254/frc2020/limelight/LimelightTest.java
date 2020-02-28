@@ -75,7 +75,7 @@ public class LimelightTest {
 
     @Test
     public void testBuildUndistortMapAsync() throws InterruptedException {
-        UndistortMap undistortMap = new OpenCVCalculatedUndistortMap(LimelightConstantsFactory.getConstantsForId(1).getUndistortConstants(), CameraResolution.F_320x240, true);
+        UndistortMap undistortMap = new OpenCVCalculatedUndistortMap(LimelightConstantsFactory.getConstantsForId(0).getUndistortConstants(), CameraResolution.F_320x240, true);
         Instant startLoad = Instant.now();
         while (!undistortMap.getReady()) {
             Thread.sleep(100);
