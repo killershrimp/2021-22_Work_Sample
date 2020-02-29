@@ -174,9 +174,6 @@ public class Superstructure extends Subsystem {
             case AIM:
                 return SystemState.AIMING;
             case SHOOT:
-                if (!isOnTarget() || !Hood.getInstance().isAtSetpoint()) {
-                    return SystemState.AIMING;
-                }
             default:
                 return SystemState.SHOOT;
         }
