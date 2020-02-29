@@ -3,7 +3,6 @@ package com.team254.frc2020.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -13,6 +12,7 @@ import com.team254.frc2020.RobotState;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.frc2020.planners.DriveMotionPlanner;
+import com.team254.frc2020.subsystems.utils.DriveWithPTOSide;
 import com.team254.lib.drivers.TalonFXFactory;
 import com.team254.lib.drivers.TalonUtil;
 import com.team254.lib.geometry.Pose2d;
@@ -24,20 +24,26 @@ import com.team254.lib.util.DriveOutput;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class Drive extends Subsystem {
+
     private static Drive mInstance;
+    private AtomicBoolean mIsPTOEngaged = new AtomicBoolean(false);
 
     // hardware
     private final TalonFX mLeftMaster1, mRightMaster1, mLeftMaster2, mRightMaster2, mLeftMaster3, mRightMaster3;
     private final Solenoid mShifter;
+    private final Solenoid mPTO;
     private final Encoder mLeftEncoder, mRightEncoder;
+    private final DriveWithPTOSide mLeftSide;
+    private final DriveWithPTOSide mRightSide;
 
     // control states
     private DriveControlState mDriveControlState;
@@ -116,7 +122,13 @@ public class Drive extends Subsystem {
         mRightMaster3 = TalonFXFactory.createDefaultTalon(Constants.kRightDriveMaster3Id);
         configureTalon(mRightMaster3, false, false);
 
+        // left and right master 1 are PTO talons, 2 in middle, 3 in back
+        mLeftSide = new DriveWithPTOSide(mLeftMaster1, mLeftMaster2, mLeftMaster3);
+        mRightSide = new DriveWithPTOSide(mRightMaster1, mRightMaster2, mRightMaster3);
+
         mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
+
+        mPTO = new Solenoid(Constants.kPCMId, Constants.kPTOSolenoidId);
 
         mPigeon = new PigeonIMU(Constants.kPigeonIMUId);
         mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10, 10);
@@ -176,8 +188,8 @@ public class Drive extends Subsystem {
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
 
-        mPeriodicIO.left_voltage = mLeftMaster1.getMotorOutputVoltage();
-        mPeriodicIO.right_voltage = mRightMaster1.getMotorOutputVoltage();
+        mPeriodicIO.left_voltage = mLeftSide.getPrimaryDriveTalonFX().getMotorOutputVoltage();
+        mPeriodicIO.right_voltage = mRightSide.getPrimaryDriveTalonFX().getMotorOutputVoltage();
 
         mPeriodicIO.left_position_ticks = mLeftEncoder.get();
         mPeriodicIO.right_position_ticks = mRightEncoder.get();
@@ -187,8 +199,8 @@ public class Drive extends Subsystem {
         mPeriodicIO.left_distance = rotationsToInches(mPeriodicIO.left_position_ticks * getRotationsPerTickDistance());
         mPeriodicIO.right_distance = rotationsToInches(mPeriodicIO.right_position_ticks * getRotationsPerTickDistance());
 
-        mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster1.getSelectedSensorVelocity(0);
-        mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster1.getSelectedSensorVelocity(0);
+        mPeriodicIO.left_velocity_ticks_per_100ms = mLeftSide.getPrimaryDriveTalonFX().getSelectedSensorVelocity(0);
+        mPeriodicIO.right_velocity_ticks_per_100ms = mRightSide.getPrimaryDriveTalonFX().getSelectedSensorVelocity(0);
 
         mPeriodicIO.left_velocity_in_per_sec = getLeftLinearVelocity();
         mPeriodicIO.right_velocity_in_per_sec = getRightLinearVelocity();
@@ -201,29 +213,14 @@ public class Drive extends Subsystem {
     @Override
     public synchronized void writePeriodicOutputs() {
         if (mDriveControlState == DriveControlState.OPEN_LOOP) {
-            mLeftMaster1.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
-            mLeftMaster2.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
-            mLeftMaster3.set(ControlMode.PercentOutput, mPeriodicIO.left_demand);
-
-            mRightMaster1.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
-            mRightMaster2.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
-            mRightMaster3.set(ControlMode.PercentOutput, mPeriodicIO.right_demand);
+            mLeftSide.getDriveTalons().forEach(t -> t.set(ControlMode.PercentOutput, mPeriodicIO.left_demand));
+            mRightSide.getDriveTalons().forEach(t -> t.set(ControlMode.PercentOutput, mPeriodicIO.right_demand));
         } else if (mDriveControlState == DriveControlState.VELOCITY || mDriveControlState == DriveControlState.PATH_FOLLOWING) {
             double kd = isHighGear() ? Constants.kDriveHighGearKd : Constants.kDriveLowGearKd;
-
-            mLeftMaster1.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0);
-            mLeftMaster2.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0);
-            mLeftMaster3.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0);
-
-            mRightMaster1.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0);
-            mRightMaster2.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0);
-            mRightMaster3.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0);
+            mLeftSide.getDriveTalons().forEach(t -> t.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
+                    mPeriodicIO.left_feedforward + kd * mPeriodicIO.left_accel / 1023.0));
+            mRightSide.getDriveTalons().forEach(t -> t.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
+                    mPeriodicIO.right_feedforward + kd * mPeriodicIO.right_accel / 1023.0));
         }
     }
 
@@ -401,13 +398,8 @@ public class Drive extends Subsystem {
     public synchronized void configureTalonPIDSlot() {
         int desired_slot_idx = isHighGear() ? kHighGearPIDSlot : kLowGearPIDSlot;
 
-        mLeftMaster1.selectProfileSlot(desired_slot_idx, 0);
-        mLeftMaster2.selectProfileSlot(desired_slot_idx, 0);
-        mLeftMaster3.selectProfileSlot(desired_slot_idx, 0);
-
-        mRightMaster1.selectProfileSlot(desired_slot_idx, 0);
-        mRightMaster2.selectProfileSlot(desired_slot_idx, 0);
-        mRightMaster3.selectProfileSlot(desired_slot_idx, 0);
+        mLeftSide.getDriveTalons().forEach(t -> t.selectProfileSlot(desired_slot_idx, 0));
+        mRightSide.getDriveTalons().forEach(t -> t.selectProfileSlot(desired_slot_idx, 0));
     }
 
     public synchronized void setHighGear(boolean wantsHighGear) {
@@ -419,6 +411,12 @@ public class Drive extends Subsystem {
         }
     }
 
+    public synchronized void setPTOEngaged(boolean wantsEngage) {
+        mIsPTOEngaged.set(wantsEngage);
+        mLeftSide.setPTOEngaged(wantsEngage);
+        mRightSide.setPTOEngaged(wantsEngage);
+    }
+
     public boolean isBrakeMode() {
         return mIsBrakeMode;
     }
@@ -428,13 +426,8 @@ public class Drive extends Subsystem {
             mIsBrakeMode = shouldEnable;
             NeutralMode mode = shouldEnable ? NeutralMode.Brake : NeutralMode.Coast;
 
-            mLeftMaster1.setNeutralMode(mode);
-            mLeftMaster2.setNeutralMode(mode);
-            mLeftMaster3.setNeutralMode(mode);
-
-            mRightMaster1.setNeutralMode(mode);
-            mRightMaster2.setNeutralMode(mode);
-            mRightMaster3.setNeutralMode(mode);
+            mLeftSide.getAllMotors().forEach(t -> t.setNeutralMode(mode));
+            mRightSide.getAllMotors().forEach(t -> t.setNeutralMode(mode));
         }
     }
 
@@ -456,13 +449,8 @@ public class Drive extends Subsystem {
         mLeftEncoder.reset();
         mRightEncoder.reset();
 
-        mLeftMaster1.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
-        mLeftMaster2.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
-        mLeftMaster3.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
-
-        mRightMaster1.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
-        mRightMaster2.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
-        mRightMaster3.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+        mLeftSide.getAllMotors().forEach(t -> t.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs));
+        mRightSide.getAllMotors().forEach(t -> t.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs));
 
         mPeriodicIO = new PeriodicIO();
     }
@@ -548,6 +536,13 @@ public class Drive extends Subsystem {
     public enum ShifterState {
         FORCE_LOW_GEAR, FORCE_HIGH_GEAR
     }
+
+    public synchronized void setPTOMotorsOpenLoop(double signal) {
+        // TODO: Figure out if right is negative
+//        mLeftSide.getPTOMotors().forEach(t -> t.set(ControlMode.PercentOutput, signal));
+//        mRightSide.getPTOMotors().forEach(t -> t.set(ControlMode.PercentOutput, signal));
+    }
+
 
     @Override
     public void zeroSensors() {
