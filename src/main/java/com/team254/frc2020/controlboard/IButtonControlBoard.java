@@ -19,5 +19,17 @@ public interface IButtonControlBoard {
 
     boolean getRetractIntake();
 
+    boolean getHumanPlayerIntake();
+
     double getTurretJog();
+
+    double getHoodJog();
+
+    double getStir();
+
+    boolean getFnKey();
+
+    boolean getToggleWOFMode();
+
+    boolean getToggleHangMode();
 }

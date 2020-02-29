@@ -250,6 +250,8 @@ public class Robot extends TimedRobot {
                 serializer_wanted = Serializer.WantedState.SERIALIZE;
             } else if (mControlBoard.getExhaust()) {
                 mIntake.setWantedState(Intake.WantedState.EXHAUST);
+            } else if (mControlBoard.getHumanPlayerIntake()) {
+                serializer_wanted = Serializer.WantedState.SERIALIZE;
             } else {
                 mIntake.setWantedState(Intake.WantedState.IDLE);
                 serializer_wanted = Serializer.WantedState.IDLE;

@@ -93,7 +93,38 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
+    public boolean getHumanPlayerIntake() {
+        return mButtonControlBoard.getHumanPlayerIntake();
+    }
+
+    @Override
     public double getTurretJog() {
         return mButtonControlBoard.getTurretJog();
     }
+
+    @Override
+    public double getHoodJog() {
+        return mButtonControlBoard.getHoodJog();
+    }
+
+    @Override
+    public double getStir() {
+        return mButtonControlBoard.getStir();
+    }
+
+    @Override
+    public boolean getFnKey() {
+        return mButtonControlBoard.getFnKey();
+    }
+
+    @Override
+    public boolean getToggleWOFMode() {
+        return mButtonControlBoard.getToggleWOFMode();
+    }
+
+    @Override
+    public boolean getToggleHangMode() {
+        return mButtonControlBoard.getToggleHangMode();
+    }
+
 }

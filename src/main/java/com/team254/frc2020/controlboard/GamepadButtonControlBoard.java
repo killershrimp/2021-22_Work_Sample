@@ -39,7 +39,7 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
 
     @Override
     public boolean getMoveToZero() {
-        return mController.getButton(XboxController.Button.BACK) && mController.getButton(XboxController.Button.START);
+        return mController.getButton(XboxController.Button.A) && getFnKey();
     }
 
     @Override
@@ -83,8 +83,23 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
+    public boolean getHumanPlayerIntake() {
+        return mController.getButton(XboxController.Button.A) && !getFnKey();
+    }
+
+    @Override
     public double getTurretJog() {
         return -mController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.X);
+    }
+
+    @Override
+    public double getHoodJog() {
+        return mController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.Y);
+    }
+
+    @Override
+    public double getStir() {
+        return -mController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
     }
 
     @Override
@@ -92,4 +107,21 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
         mLastCardinal = CardinalDirection.NONE;
         mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);
     }
+
+    @Override
+    public boolean getFnKey() {
+        return mController.getButton(XboxController.Button.BACK);
+    }
+
+    @Override
+    public boolean getToggleWOFMode() {
+        return mController.getButton(XboxController.Button.X) && getFnKey();
+    }
+
+    @Override
+    public boolean getToggleHangMode() {
+        return mController.getButton(XboxController.Button.START) && getFnKey();
+    }
+
+
 }
