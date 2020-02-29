@@ -13,6 +13,8 @@ import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.frc2020.planners.DriveMotionPlanner;
 import com.team254.frc2020.subsystems.utils.DriveWithPTOSide;
+import com.team254.lib.drivers.MotorChecker;
+import com.team254.lib.drivers.TalonFXChecker;
 import com.team254.lib.drivers.TalonFXFactory;
 import com.team254.lib.drivers.TalonUtil;
 import com.team254.lib.geometry.Pose2d;
@@ -31,6 +33,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
 
 public class Drive extends Subsystem {
 
@@ -299,7 +302,7 @@ public class Drive extends Subsystem {
      */
     public synchronized void setOpenLoop(DriveSignal signal) {
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
-            setBrakeMode(true);
+            setBrakeMode(false);
             System.out.println("switching to open loop");
             System.out.println(signal);
             mDriveControlState = DriveControlState.OPEN_LOOP;
@@ -557,47 +560,49 @@ public class Drive extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        // setBrakeMode(false);
-        // setHighGear(true);
+        setHighGear(true);
 
-        // boolean leftSide = SparkMaxChecker.checkMotors(this,
-        //     new ArrayList<MotorChecker.MotorConfig<CANSparkMax>>() {
-        //         private static final long serialVersionUID = 3643247888353037677L;
+        // Trigger write to TalonFXs.
+        stop();
+        writePeriodicOutputs();
 
-        //         {
-        //             add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster));
-        //             add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlave));
-        //         }
-        //     }, new MotorChecker.CheckerConfig() {
-        //         {
-        //             mCurrentFloor = 3;
-        //             mRPMFloor = 90;
-        //             mCurrentEpsilon = 2.0;
-        //             mRPMEpsilon = 200;
-        //             mRPMSupplier = mLeftEncoder::getRate;
-        //         }
-        //     });
-        // boolean rightSide = SparkMaxChecker.checkMotors(this,
-        //     new ArrayList<MotorChecker.MotorConfig<CANSparkMax>>() {
-        //         private static final long serialVersionUID = -1212959188716158751L;
+        setBrakeMode(false);
 
-        //         {
-        //             add(new MotorChecker.MotorConfig<>("right_master", mRightMaster));
-        //             add(new MotorChecker.MotorConfig<>("right_slave", mRightSlave));
-        //         }
-        //     }, new MotorChecker.CheckerConfig() {
-        //         {
-        //             mCurrentFloor = 5;
-        //             mRPMFloor = 90;
-        //             mCurrentEpsilon = 2.0;
-        //             mRPMEpsilon = 20;
-        //             mRPMSupplier = mRightEncoder::getRate;
-        //         }
-        //     });
+        boolean leftSide = TalonFXChecker.checkMotors(this,
+                new ArrayList<>() {
+                    {
+                        add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster1));
+                        add(new MotorChecker.MotorConfig<>("left_master_2", mLeftMaster2));
+                        add(new MotorChecker.MotorConfig<>("left_master_3", mLeftMaster3));
+                    }
+                }, new MotorChecker.CheckerConfig() {
+                    {
+                        mCurrentFloor = 5;
+                        mRPMFloor = 90;
+                        mCurrentEpsilon = 2.0;
+                        mRPMEpsilon = 200;
+                        mRPMSupplier = mLeftEncoder::getRate;
+                    }
+                });
+        boolean rightSide = TalonFXChecker.checkMotors(this,
+                new ArrayList<>() {
+                    {
+                        add(new MotorChecker.MotorConfig<>("right_master", mRightMaster1));
+                        add(new MotorChecker.MotorConfig<>("right_master_2", mRightMaster2));
+                        add(new MotorChecker.MotorConfig<>("right_master_3", mRightMaster3));
 
-        // return leftSide && rightSide;
+                    }
+                }, new MotorChecker.CheckerConfig() {
+                    {
+                        mCurrentFloor = 5;
+                        mRPMFloor = 90;
+                        mCurrentEpsilon = 2.0;
+                        mRPMEpsilon = 200;
+                        mRPMSupplier = mRightEncoder::getRate;
+                    }
+                });
 
-        return false;
+        return leftSide && rightSide;
     }
 
     @Override

@@ -161,7 +161,7 @@ public class Robot extends TimedRobot {
             mDisabledLooper.stop();
             mEnabledLooper.stop();
 
-            if (mSubsystemManager.checkSubsystems()) {
+            if (mDrive.checkSystem()) {
                 System.out.println("ALL SYSTEMS PASSED");
             } else {
                 System.out.println("CHECK ABOVE OUTPUT SOME SYSTEMS FAILED!!!");
