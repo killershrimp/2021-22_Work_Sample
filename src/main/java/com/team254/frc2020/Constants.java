@@ -154,7 +154,7 @@ public class Constants {
     public static final int kSerializerSpinCycleMasterId = 7;
     public static final int kSerializerLeftRollerMasterId = 8;
     public static final int kSerializerRightRollerMasterId = 9;
-    
+
     public static final double kSerializerStirDeadband = 0.3;
     public static final double kSerializerStirScalar = 0.5;
 
@@ -168,7 +168,7 @@ public class Constants {
     // Intake
     public static final int kIntakeMasterId = 14;
     public static final double kIntakeStowTime = 0.5; // seconds, time it takes to stow intake
-    public static final double kIntakePower = 1.0;
+    public static final double kIntakePower = 0.75;
     public static final double kIntakeExhaustPower = -0.5;
     public static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
     public static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing

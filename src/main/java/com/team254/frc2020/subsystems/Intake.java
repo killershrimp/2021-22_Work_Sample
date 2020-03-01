@@ -6,6 +6,7 @@ import com.team254.frc2020.Constants;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
+import com.team254.lib.drivers.TalonUtil;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,8 +31,13 @@ public class Intake extends Subsystem {
         mMaster = TalonFXFactory.createDefaultTalon(Constants.kIntakeMasterId);
         mMaster.setInverted(true);
 
+        TalonUtil.checkError(mMaster.configVoltageCompSaturation(12, Constants.kLongCANTimeoutMs), "Could not set intake voltage comp");
+        mMaster.enableVoltageCompensation(true);
+
         mDeploySolenoid = new Solenoid(Constants.kPCMId, Constants.kIntakeSolenoidId);
         mPeriodicIO = new PeriodicIO();
+
+        isStowed = true;
     }
 
     public enum WantedState {
