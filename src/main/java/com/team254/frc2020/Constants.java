@@ -6,13 +6,13 @@ import java.util.Enumeration;
 
 import com.team254.frc2020.subsystems.ServoMotorSubsystem.ServoMotorSubsystemConstants;
 import com.team254.frc2020.limelight.CameraResolution;
-import com.team254.frc2020.limelight.constants.LimelightConstants;
 import com.team254.frc2020.limelight.PipelineConfiguration;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
+import com.team254.lib.util.ShootingParameters;
 
 /**
  * A list of constants used by the rest of the robot code. This includes physics
@@ -207,11 +207,10 @@ public class Constants {
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
     // Shot tuning
-    public static final double kShooterSetpointRPM = 4700; // TODO change?
 
-    // 2 point map (Tuned 2/22) TODO tune better and for new feeder
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();
     static {
+        // 2 point map (Tuned 2/22) TODO tune better and for new feeder
         kCoarseHoodMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(46.0));
         kCoarseHoodMap.put(new InterpolatingDouble(111.), new InterpolatingDouble(51.));
         kCoarseHoodMap.put(new InterpolatingDouble(134.), new InterpolatingDouble(55.));
@@ -225,11 +224,40 @@ public class Constants {
         kCoarseHoodMap.put(new InterpolatingDouble(346.0), new InterpolatingDouble(64.5));
     }
 
+    public static final ShootingParameters kCoarseShootingParams = new ShootingParameters(
+            kCoarseHoodMap,
+            Pose2d.identity(),
+            4700, // shooter setpoint (rpm)
+            100, // shooter allowable error (rpm)
+            0.5, // turret allowable error (°)
+            0.5 // turret allowable error (°)
+    );
+
     // 3 point map (TODO tune)
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFineHoodMap = new InterpolatingTreeMap<>();
     static {
-        kFineHoodMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(45.0));
+        // same as above TODO tune better and for new feeder
+        kFineHoodMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(46.0));
+        kFineHoodMap.put(new InterpolatingDouble(111.), new InterpolatingDouble(51.));
+        kFineHoodMap.put(new InterpolatingDouble(134.), new InterpolatingDouble(55.));
+        kFineHoodMap.put(new InterpolatingDouble(168.), new InterpolatingDouble(58.));
+        kFineHoodMap.put(new InterpolatingDouble(194.), new InterpolatingDouble(59.5));
+        kFineHoodMap.put(new InterpolatingDouble(234.), new InterpolatingDouble(61.0));
+        kFineHoodMap.put(new InterpolatingDouble(250.0), new InterpolatingDouble(62.0));
+        kFineHoodMap.put(new InterpolatingDouble(258.0), new InterpolatingDouble(62.0));
+        kFineHoodMap.put(new InterpolatingDouble(268.0), new InterpolatingDouble(63.5));
+        kFineHoodMap.put(new InterpolatingDouble(301.0), new InterpolatingDouble(63.5));
+        kFineHoodMap.put(new InterpolatingDouble(346.0), new InterpolatingDouble(64.5));
     }
+
+    public static final ShootingParameters kFineShootingParams = new ShootingParameters(
+            kFineHoodMap,
+            Constants.kVisionTargetToGoalOffset,
+            4700, // shooter setpoint (rpm)
+            100, // shooter allowable error (rpm)
+            0.5, // turret allowable error (°)
+            0.5 // turret allowable error (°)
+    );
 
     /**
      * @return the MAC address of the robot

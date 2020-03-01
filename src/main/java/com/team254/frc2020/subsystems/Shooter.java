@@ -164,6 +164,10 @@ public class Shooter extends Subsystem {
         return mPeriodicIO.left_velocity_ticks_per_100_ms;
     }
 
+    public synchronized double getAverageRPM() {
+        return (getRightRPM() + getLeftRPM()) / 2.0;
+    }
+
     /**
      * @param ticks per 100 ms
      * @return rpm

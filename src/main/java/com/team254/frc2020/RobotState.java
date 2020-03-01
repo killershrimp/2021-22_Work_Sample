@@ -269,7 +269,7 @@ public class RobotState {
         return getFieldToVehicle(timestamp).inverse().transformBy(fieldToVisionTarget);
     }
 
-    public synchronized Optional<AimingParameters> getAimingParameters(int prev_track_id, double max_track_age, boolean aim_for_3pt) {
+    public synchronized Optional<AimingParameters> getAimingParameters(int prev_track_id, double max_track_age) {
         GoalTracker tracker = vision_target_;
         List<GoalTracker.TrackReport> reports = tracker.getTracks();
 
@@ -298,12 +298,7 @@ public class RobotState {
             return Optional.empty();
         }
 
-        Pose2d vehicleToGoal;
-        if (aim_for_3pt) {
-            vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target).transformBy(getVisionTargetToGoalOffset());
-        } else {
-            vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target);
-        }
+        Pose2d vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target);
 
         AimingParameters params = new AimingParameters(vehicleToGoal,
                 report.field_to_target,
@@ -314,10 +309,6 @@ public class RobotState {
 
     public Pose2d getRobot() {
         return new Pose2d();
-    }
-
-    public synchronized Pose2d getVisionTargetToGoalOffset() {
-        return Constants.kVisionTargetToGoalOffset;
     }
 
     public synchronized void outputToSmartDashboard() {

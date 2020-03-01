@@ -425,6 +425,12 @@ public abstract class ServoMotorSubsystem extends Subsystem {
                 ticksToUnits(mPeriodicIO.demand) : Double.NaN;
     }
 
+    public synchronized double getSetpointHomed() {
+        return (mControlState == ControlState.MOTION_MAGIC ||
+                mControlState == ControlState.POSITION_PID) ?
+                ticksToHomedUnits(mPeriodicIO.demand) : Double.NaN;
+    }
+
     public synchronized void setSetpointMotionMagic(double units, double feedforward_v) {
         mPeriodicIO.demand = constrainTicks(homeAwareUnitsToTicks(units));
         mPeriodicIO.feedforward = unitsPerSecondToTicksPer100ms(feedforward_v) * (mConstants.kKf + mConstants.kKd / 100.0) / 1023.0;

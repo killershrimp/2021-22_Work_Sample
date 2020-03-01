@@ -80,7 +80,6 @@ public class Robot extends TimedRobot {
             mControlBoard.reset();
 
             mTurret.zeroSensors();
-            SmartDashboard.putNumber("HoodAngleToSet", 50.0);
 
             mSubsystemManager.stop();
         } catch (Throwable t) {
@@ -222,8 +221,8 @@ public class Robot extends TimedRobot {
 
             if (mControlBoard.getShoot()) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
-            } else if (wants_aim) {
-                mSuperstructure.setShouldAimFine(mControlBoard.getAimFine());
+            } else if (mControlBoard.getAimCoarse() || mControlBoard.getAimFine()) {
+                mSuperstructure.setShootingParams(mControlBoard.getAimFine() ? Constants.kFineShootingParams : Constants.kCoarseShootingParams);
                 mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
             } else if (mControlBoard.getMoveToZero()) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.MOVE_TO_ZERO);
