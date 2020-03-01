@@ -38,6 +38,7 @@ public class Hood extends ServoMotorSubsystem {
         mHoming = true;
         mHomingStartTime = Timer.getFPGATimestamp();
         mHomingLimitStartTime = Double.NaN;
+        mHasBeenZeroed = false;
 
         mMaster.overrideLimitSwitchesEnable(false);
         TalonUtil.checkError(mMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
