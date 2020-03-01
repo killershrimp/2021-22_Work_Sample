@@ -154,6 +154,7 @@ public class Constants {
     public static final int kSerializerSpinCycleMasterId = 7;
     public static final int kSerializerLeftRollerMasterId = 8;
     public static final int kSerializerRightRollerMasterId = 9;
+    public static final int kSerializerBreakBeamSensorChannel = 9;
 
     public static final double kSerializerStirDeadband = 0.3;
     public static final double kSerializerStirScalar = 0.5;

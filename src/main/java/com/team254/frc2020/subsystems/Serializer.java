@@ -8,12 +8,14 @@ import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 
 import com.team254.lib.drivers.TalonUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
 
-    public static final double kSpinCycleSerializeDemand = 0.6;
+    public static final double kSpinCycleSerializeDemand = 0.45;
     public static final double kSpinCycleRebalancingDemand = 0.75;
     public static final double kSpinCycleFeedDemand = 0.75;
     public static final double kRollerDemandFeed = 14000; // ticks/100ms
@@ -21,6 +23,7 @@ public class Serializer extends Subsystem {
     public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
 
     public static final double kRebalacingTime = 0.5; // seconds
+    public static final double kBeamBreakSerializeTime = 0.25; // seconds, time it serializes after ball left beam break
 
     private boolean mStirOverride = false;
 
@@ -35,18 +38,20 @@ public class Serializer extends Subsystem {
     }
 
     public static class PeriodicIO {
+        // inputs
+        double right_roller_velocity = 0.0;
+        double left_roller_velocity = 0.0;
+        boolean break_beam_triggered = false; //is there a ball between the sensor and tape
         // outputs
         double spin_cycle_demand = 0.0;
         double right_roller_demand = 0.0;
         double left_roller_demand = 0.0;
-
-        double right_roller_velocity = 0.0;
-        double left_roller_velocity = 0.0;
     }
 
     public static enum WantedState {
         IDLE,
         SERIALIZE,
+        PREPARE_TO_SHOOT,
         FEED
     }
 
@@ -58,6 +63,7 @@ public class Serializer extends Subsystem {
     }
 
     private TalonFX mSpinCycleMaster, mRightRollerMaster, mLeftRollerMaster;
+    private DigitalInput mBreakBeamSensor;
     private Solenoid mSkatePark;
     private Solenoid mChock;
 
@@ -66,6 +72,7 @@ public class Serializer extends Subsystem {
     private WantedState mWantedState = WantedState.IDLE;
     private SystemState mSystemState = SystemState.IDLE;
     private double mCurrentStateStartTime = 0.0;
+    private double mLastBreakBreakTriggerTime = 0.0;
 
     private boolean mIsSkateParkDeployed = false;
     private boolean mIsChockDeployed = false;
@@ -131,6 +138,8 @@ public class Serializer extends Subsystem {
         TalonUtil.checkError(mLeftRollerMaster.configAllowableClosedloopError(0, Constants.kFeederAllowableError),
                 "Left Feeder Roller: Could not set closed loop allowable error");
 
+        mBreakBeamSensor = new DigitalInput(Constants.kSerializerBreakBeamSensorChannel);
+
         mSkatePark = new Solenoid(Constants.kPCMId, Constants.kSkateParkSolenoidId);
         mIsSkateParkDeployed = true;
         setSkateParkDeployed(false);
@@ -144,6 +153,10 @@ public class Serializer extends Subsystem {
     public void readPeriodicInputs() {
         mPeriodicIO.right_roller_velocity = mRightRollerMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.left_roller_velocity = mLeftRollerMaster.getSelectedSensorVelocity(0);
+        mPeriodicIO.break_beam_triggered = mBreakBeamSensor.get();
+        if (mPeriodicIO.break_beam_triggered) {
+            mLastBreakBreakTriggerTime = Timer.getFPGATimestamp();
+        }
     }
 
     @Override
@@ -171,10 +184,10 @@ public class Serializer extends Subsystem {
             
                     switch (mSystemState) {
                         case IDLE:
-                            newState = handleIdle();
+                            newState = handleIdle(timestamp);
                             break;
                         case SERIALIZE:
-                            newState = handleSerialize();
+                            newState = handleSerialize(timestamp);
                             break;
                         case FEED:
                             newState = handleFeed();
@@ -205,7 +218,7 @@ public class Serializer extends Subsystem {
                             setFeedStateDemands();
                             break;
                         case REBALANCING:
-                            setRebalancingStateDemands();
+                            setRebalancingStateDemands(timeInState);
                             break;
                         default:
                             System.out.println("Unexpected serializer system state: " + mSystemState);
@@ -221,22 +234,32 @@ public class Serializer extends Subsystem {
         });
     }
 
-    private SystemState handleIdle() {
+    private SystemState handleIdle(double timestamp) {
         switch (mWantedState) {
+            case PREPARE_TO_SHOOT:
+                return SystemState.REBALANCING;
             case SERIALIZE:
                 return SystemState.SERIALIZE;
             case FEED:
-                return SystemState.FEED;
+                return SystemState.REBALANCING;
             case IDLE:
             default:
+                if (mPeriodicIO.break_beam_triggered) {
+                    return SystemState.SERIALIZE;
+                }
                 return SystemState.IDLE;
         }
     }
 
-    private SystemState handleSerialize() {
+    private SystemState handleSerialize(double timestamp) {
         switch (mWantedState) {
-            case IDLE:
+            case PREPARE_TO_SHOOT:
                 return SystemState.REBALANCING;
+            case IDLE:
+                if (timestamp - mLastBreakBreakTriggerTime < kBeamBreakSerializeTime) {
+                    return SystemState.SERIALIZE;
+                }
+                return SystemState.IDLE;
             case FEED:
                 return SystemState.FEED;
             case SERIALIZE:
@@ -247,6 +270,8 @@ public class Serializer extends Subsystem {
 
     private SystemState handleFeed() {
         switch (mWantedState) {
+            case PREPARE_TO_SHOOT:
+                return SystemState.REBALANCING;
             case IDLE:
                 return SystemState.IDLE;
             case SERIALIZE:
@@ -258,12 +283,16 @@ public class Serializer extends Subsystem {
     }
 
     private SystemState handleRebalancing(double timeInState) {
+
+        if (timeInState < kRebalacingTime) {
+            return SystemState.REBALANCING;
+        }
+
         switch (mWantedState) {
-            case IDLE:
-                if (timeInState > kRebalacingTime) {
-                    return SystemState.IDLE;
-                }
+            case PREPARE_TO_SHOOT:
                 return SystemState.REBALANCING;
+            case IDLE:
+                return SystemState.IDLE;
             case SERIALIZE:
                 return SystemState.SERIALIZE;
             case FEED:
@@ -281,7 +310,7 @@ public class Serializer extends Subsystem {
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
-        setChockDeployed(false);
+        setChockDeployed(true);
     }
 
     private void setSerializeStateDemands(double timeInState) {
@@ -307,8 +336,12 @@ public class Serializer extends Subsystem {
         setChockDeployed(false);
     }
 
-    private void setRebalancingStateDemands() {
-        mPeriodicIO.spin_cycle_demand = kSpinCycleRebalancingDemand;
+    private void setRebalancingStateDemands(double timeInState) {
+        if (timeInState <  kRebalacingTime) {
+            mPeriodicIO.spin_cycle_demand = kSpinCycleRebalancingDemand;
+        } else {
+            mPeriodicIO.spin_cycle_demand = 0.0;
+        }
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
@@ -370,5 +403,7 @@ public class Serializer extends Subsystem {
 
         SmartDashboard.putNumber("Serializer Right Roller Speed RPM", nativeUnitsToRpm(mPeriodicIO.right_roller_demand));
         SmartDashboard.putNumber("Serializer Left Roller Speed RPM", nativeUnitsToRpm(mPeriodicIO.left_roller_demand));
+
+        SmartDashboard.putBoolean("Is Break Beam Sensor Triggered", mPeriodicIO.break_beam_triggered);
     }
 }

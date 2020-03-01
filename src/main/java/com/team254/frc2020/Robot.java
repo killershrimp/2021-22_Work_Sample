@@ -217,10 +217,12 @@ public class Robot extends TimedRobot {
             //         -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
             mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
                     mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
-    
+
+            boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
+
             if (mControlBoard.getShoot()) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
-            } else if (mControlBoard.getAimCoarse() || mControlBoard.getAimFine()) {
+            } else if (wants_aim) {
                 mSuperstructure.setShouldAimFine(mControlBoard.getAimFine());
                 mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
             } else if (mControlBoard.getMoveToZero()) {
@@ -255,6 +257,7 @@ public class Robot extends TimedRobot {
                 mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),
                  Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
             } else {
+
                 mSerializer.setStirOverriding(false);
                 Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
                 if (mControlBoard.getExhaust()) {
@@ -267,6 +270,10 @@ public class Robot extends TimedRobot {
                 } else {
                     mIntake.setWantedState(Intake.WantedState.IDLE);
                     serializer_wanted = Serializer.WantedState.IDLE;
+                }
+
+                if (wants_aim) {
+                    serializer_wanted = Serializer.WantedState.PREPARE_TO_SHOOT;
                 }
 
                 if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
