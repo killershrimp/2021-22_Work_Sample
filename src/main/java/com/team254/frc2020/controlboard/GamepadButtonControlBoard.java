@@ -99,7 +99,7 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
 
     @Override
     public double getStir() {
-        return -mController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
+        return mController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
     }
 
     @Override

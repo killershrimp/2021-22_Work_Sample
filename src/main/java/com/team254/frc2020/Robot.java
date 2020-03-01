@@ -16,6 +16,7 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
 import com.team254.lib.util.OpenLoopCheesyDriveHelper;
+import com.team254.lib.util.Util;
 import com.team254.lib.wpilib.TimedRobot;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -248,24 +249,33 @@ public class Robot extends TimedRobot {
 
             // TODO make serializer logic smarter
             // check getExhaust first so can exh while intake is down by pressing both r/l bumpers
-            Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
+            if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband) {
+                mSerializer.setWantedState(Serializer.WantedState.IDLE);
+                mSerializer.setStirOverriding(true);
+                mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),
+                 Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
+            } else {
+                mSerializer.setStirOverriding(false);
+                Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
                 if (mControlBoard.getExhaust()) {
                     mIntake.setWantedState(Intake.WantedState.EXHAUST);
                 } else if (mControlBoard.getIntake()) {
-                mIntake.setWantedState(Intake.WantedState.INTAKE);
-                serializer_wanted = Serializer.WantedState.SERIALIZE;
-            } else if (mControlBoard.getHumanPlayerIntake()) {
-                serializer_wanted = Serializer.WantedState.SERIALIZE;
-            } else {
-                mIntake.setWantedState(Intake.WantedState.IDLE);
-                serializer_wanted = Serializer.WantedState.IDLE;
+                    mIntake.setWantedState(Intake.WantedState.INTAKE);
+                    serializer_wanted = Serializer.WantedState.SERIALIZE;
+                } else if (mControlBoard.getHumanPlayerIntake()) {
+                    serializer_wanted = Serializer.WantedState.SERIALIZE;
+                } else {
+                    mIntake.setWantedState(Intake.WantedState.IDLE);
+                    serializer_wanted = Serializer.WantedState.IDLE;
+                }
+
+                if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
+                    mSerializer.setWantedState(serializer_wanted);
+                } else {
+                    mSerializer.setWantedState(Serializer.WantedState.FEED);
+                }
             }
 
-            if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
-                mSerializer.setWantedState(serializer_wanted);
-            } else {
-                mSerializer.setWantedState(Serializer.WantedState.FEED);
-            }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;

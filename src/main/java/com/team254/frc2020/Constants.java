@@ -155,6 +155,9 @@ public class Constants {
     public static final int kSerializerLeftRollerMasterId = 8;
     public static final int kSerializerRightRollerMasterId = 9;
     
+    public static final double kSerializerStirDeadband = 0.3;
+    public static final double kSerializerStirScalar = 0.5;
+
     public static final double kFeederRollersKp = 0.075;
     public static final double kFeederRollersKi = 0.0;
     public static final double kFeederRollersKd = 0.2;

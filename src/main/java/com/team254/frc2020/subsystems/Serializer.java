@@ -22,6 +22,7 @@ public class Serializer extends Subsystem {
 
     public static final double kRebalacingTime = 0.5; // seconds
 
+    private boolean mStirOverride = false;
 
     private static Serializer mInstance;
 
@@ -273,7 +274,10 @@ public class Serializer extends Subsystem {
     }
 
     private void setIdleStateDemands() {
-        mPeriodicIO.spin_cycle_demand = 0.0;
+        if (!mStirOverride) {
+            mPeriodicIO.spin_cycle_demand = 0.0;
+        }
+
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
@@ -331,6 +335,14 @@ public class Serializer extends Subsystem {
             mChock.set(should_deploy);
             mIsChockDeployed = should_deploy;
         }
+    }
+
+    public void setOpenLoop(double demand) {
+        mPeriodicIO.spin_cycle_demand = demand;
+    }
+
+    public void setStirOverriding(boolean override) {
+        mStirOverride = override;
     }
 
 
