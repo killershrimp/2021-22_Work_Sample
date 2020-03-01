@@ -179,6 +179,7 @@ public class Constants {
     public static final int kPTOSolenoidId = 1;
     public static final int kIntakeSolenoidId = 2;
     public static final int kSkateParkSolenoidId = 5;
+    public static final int kChockSolenoidId = 3;
 
     // Vision
     public static final boolean kShouldUndistort = true;

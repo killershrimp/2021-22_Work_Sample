@@ -13,11 +13,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Serializer extends Subsystem {
 
-    public static final double kSpinCycleSerializeDemand = 0.75;
+    public static final double kSpinCycleSerializeDemand = 0.6;
+    public static final double kSpinCycleRebalancingDemand = 0.75;
     public static final double kSpinCycleFeedDemand = 0.75;
     public static final double kRollerDemandFeed = 14000; // ticks/100ms
     public static final double kSpinCycleOscillationTime = 1.2; // seconds before switching dir
     public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
+
+    public static final double kRebalacingTime = 0.5; // seconds
+
 
     private static Serializer mInstance;
 
@@ -48,12 +52,14 @@ public class Serializer extends Subsystem {
     public static enum SystemState {
         IDLE,
         SERIALIZE,
-        FEED
+        FEED,
+        REBALANCING,
     }
 
     private TalonFX mSpinCycleMaster, mRightRollerMaster, mLeftRollerMaster;
     private Solenoid mSkatePark;
-    
+    private Solenoid mChock;
+
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
     private WantedState mWantedState = WantedState.IDLE;
@@ -61,12 +67,16 @@ public class Serializer extends Subsystem {
     private double mCurrentStateStartTime = 0.0;
 
     private boolean mIsSkateParkDeployed = false;
+    private boolean mIsChockDeployed = false;
 
     private Serializer() {
         mSpinCycleMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerSpinCycleMasterId);
         mSpinCycleMaster.setInverted(true);
         mSpinCycleMaster.setNeutralMode(NeutralMode.Brake);
         mSpinCycleMaster.configOpenloopRamp(0.0);
+
+        mSpinCycleMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
+        mSpinCycleMaster.enableVoltageCompensation(true);
 
         mSpinCycleMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, 0.2), Constants.kLongCANTimeoutMs);
         mSpinCycleMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 50, 50, 0.2), Constants.kLongCANTimeoutMs);
@@ -123,6 +133,10 @@ public class Serializer extends Subsystem {
         mSkatePark = new Solenoid(Constants.kPCMId, Constants.kSkateParkSolenoidId);
         mIsSkateParkDeployed = true;
         setSkateParkDeployed(false);
+
+        mChock = new Solenoid(Constants.kPCMId, Constants.kChockSolenoidId);
+        mIsChockDeployed = true;
+        setChockDeployed(false);
     }
 
     @Override
@@ -164,6 +178,9 @@ public class Serializer extends Subsystem {
                         case FEED:
                             newState = handleFeed();
                             break;
+                        case REBALANCING:
+                            newState = handleRebalancing(timeInState);
+                            break;
                         default:
                             System.out.println("unexpected serializer system state: " + mSystemState);
                             break;
@@ -185,6 +202,9 @@ public class Serializer extends Subsystem {
                             break;
                         case FEED:
                             setFeedStateDemands();
+                            break;
+                        case REBALANCING:
+                            setRebalancingStateDemands();
                             break;
                         default:
                             System.out.println("Unexpected serializer system state: " + mSystemState);
@@ -215,7 +235,7 @@ public class Serializer extends Subsystem {
     private SystemState handleSerialize() {
         switch (mWantedState) {
             case IDLE:
-                return SystemState.IDLE;
+                return SystemState.REBALANCING;
             case FEED:
                 return SystemState.FEED;
             case SERIALIZE:
@@ -236,11 +256,28 @@ public class Serializer extends Subsystem {
         }
     }
 
+    private SystemState handleRebalancing(double timeInState) {
+        switch (mWantedState) {
+            case IDLE:
+                if (timeInState > kRebalacingTime) {
+                    return SystemState.IDLE;
+                }
+                return SystemState.REBALANCING;
+            case SERIALIZE:
+                return SystemState.SERIALIZE;
+            case FEED:
+                return SystemState.FEED;
+            default:
+                return SystemState.REBALANCING;
+        }
+    }
+
     private void setIdleStateDemands() {
         mPeriodicIO.spin_cycle_demand = 0.0;
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
+        setChockDeployed(false);
     }
 
     private void setSerializeStateDemands(double timeInState) {
@@ -255,6 +292,7 @@ public class Serializer extends Subsystem {
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
+        setChockDeployed(true);
     }
 
     private void setFeedStateDemands() {
@@ -262,6 +300,15 @@ public class Serializer extends Subsystem {
         mPeriodicIO.left_roller_demand = kRollerDemandFeed;
         mPeriodicIO.right_roller_demand = -kRollerDemandFeed;
         setSkateParkDeployed(true);
+        setChockDeployed(false);
+    }
+
+    private void setRebalancingStateDemands() {
+        mPeriodicIO.spin_cycle_demand = kSpinCycleRebalancingDemand;
+        mPeriodicIO.left_roller_demand = 0.0;
+        mPeriodicIO.right_roller_demand = 0.0;
+        setSkateParkDeployed(false);
+        setChockDeployed(false);
     }
 
     private void setSkateParkDeployed(boolean should_deploy) {
@@ -278,6 +325,14 @@ public class Serializer extends Subsystem {
     public static double nativeUnitsToRpm(double native_units) {
         return native_units * 60.0 * 10.0 / Constants.kFeederRollersTicksPerRevolutions;
     }
+
+    private void setChockDeployed(boolean should_deploy) {
+        if (should_deploy != mIsChockDeployed) {
+            mChock.set(should_deploy);
+            mIsChockDeployed = should_deploy;
+        }
+    }
+
 
     public synchronized void setWantedState(WantedState wantedState) {
         mWantedState = wantedState;
