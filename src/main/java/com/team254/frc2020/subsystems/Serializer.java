@@ -1,15 +1,13 @@
 package com.team254.frc2020.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 
+import com.team254.lib.drivers.TalonUtil;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -17,7 +15,7 @@ public class Serializer extends Subsystem {
 
     public static final double kSpinCycleSerializeDemand = 0.75;
     public static final double kSpinCycleFeedDemand = 0.75;
-    public static final double kRollerDemandFeed = 0.5;
+    public static final double kRollerDemandFeed = 14000; // ticks/100ms
     public static final double kSpinCycleOscillationTime = 1.2; // seconds before switching dir
     public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
 
@@ -36,6 +34,9 @@ public class Serializer extends Subsystem {
         double spin_cycle_demand = 0.0;
         double right_roller_demand = 0.0;
         double left_roller_demand = 0.0;
+
+        double right_roller_velocity = 0.0;
+        double left_roller_velocity = 0.0;
     }
 
     public static enum WantedState {
@@ -72,9 +73,52 @@ public class Serializer extends Subsystem {
 
         mRightRollerMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerRightRollerMasterId);
         mRightRollerMaster.setInverted(false);
+        mRightRollerMaster.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, Constants.kLongCANTimeoutMs);
+        mRightRollerMaster.configVelocityMeasurementWindow(16, Constants.kLongCANTimeoutMs);
+
+        mRightRollerMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
+        mRightRollerMaster.enableVoltageCompensation(true);
+
 
         mLeftRollerMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerLeftRollerMasterId);
         mLeftRollerMaster.setInverted(false);
+        mLeftRollerMaster.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, Constants.kLongCANTimeoutMs);
+        mLeftRollerMaster.configVelocityMeasurementWindow(16, Constants.kLongCANTimeoutMs);
+
+
+        mLeftRollerMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0,
+                10, Constants.kLongCANTimeoutMs);
+        mLeftRollerMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
+        mLeftRollerMaster.enableVoltageCompensation(true);
+
+        // initialize encoders and set status frames
+        TalonUtil.checkError(mRightRollerMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0,
+                Constants.kLongCANTimeoutMs), "Right Feeder Roller: Could not detect encoder: ");
+
+        TalonUtil.checkError(mRightRollerMaster.config_kP(0, Constants.kFeederRollersKp, Constants.kLongCANTimeoutMs),
+                "Right Feeder Roller: could not set kP: ");
+        TalonUtil.checkError(mRightRollerMaster.config_kI(0, Constants.kFeederRollersKi, Constants.kLongCANTimeoutMs),
+                "Right Feeder Roller: could not set kI: ");
+        TalonUtil.checkError(mRightRollerMaster.config_kD(0, Constants.kFeederRollersKd, Constants.kLongCANTimeoutMs),
+                "Right Feeder Roller: could not set kD: ");
+        TalonUtil.checkError(mRightRollerMaster.config_kF(0, Constants.kFeederRollersKf, Constants.kLongCANTimeoutMs),
+                "Right Feeder Roller: Could not set kF: ");
+        TalonUtil.checkError(mRightRollerMaster.configAllowableClosedloopError(0, Constants.kFeederAllowableError),
+                "Right Feeder Roller: Could not set closed loop allowable error");
+
+
+        TalonUtil.checkError(mLeftRollerMaster.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0,
+                Constants.kLongCANTimeoutMs), "Left Feeder Roller: Could not detect encoder: ");
+        TalonUtil.checkError(mLeftRollerMaster.config_kP(0, Constants.kFeederRollersKp, Constants.kLongCANTimeoutMs),
+                "Left Feeder Roller: could not set kP: ");
+        TalonUtil.checkError(mLeftRollerMaster.config_kI(0, Constants.kFeederRollersKi, Constants.kLongCANTimeoutMs),
+                "Left Feeder Roller: could not set kI: ");
+        TalonUtil.checkError(mLeftRollerMaster.config_kD(0, Constants.kFeederRollersKd, Constants.kLongCANTimeoutMs),
+                "Left Feeder Roller: could not set kD: ");
+        TalonUtil.checkError(mLeftRollerMaster.config_kF(0, Constants.kFeederRollersKf, Constants.kLongCANTimeoutMs),
+                "Left Feeder Roller: Could not set kF: ");
+        TalonUtil.checkError(mLeftRollerMaster.configAllowableClosedloopError(0, Constants.kFeederAllowableError),
+                "Left Feeder Roller: Could not set closed loop allowable error");
 
         mSkatePark = new Solenoid(Constants.kPCMId, Constants.kSkateParkSolenoidId);
         mIsSkateParkDeployed = true;
@@ -82,10 +126,16 @@ public class Serializer extends Subsystem {
     }
 
     @Override
+    public void readPeriodicInputs() {
+        mPeriodicIO.right_roller_velocity = mRightRollerMaster.getSelectedSensorVelocity(0);
+        mPeriodicIO.left_roller_velocity = mLeftRollerMaster.getSelectedSensorVelocity(0);
+    }
+
+    @Override
     public void writePeriodicOutputs() {
         mSpinCycleMaster.set(ControlMode.PercentOutput, mPeriodicIO.spin_cycle_demand);
-        mRightRollerMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_roller_demand);
-        mLeftRollerMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_roller_demand);
+        mRightRollerMaster.set(ControlMode.Velocity, mPeriodicIO.right_roller_demand);
+        mLeftRollerMaster.set(ControlMode.Velocity, mPeriodicIO.left_roller_demand);
     }
 
     @Override
@@ -221,6 +271,14 @@ public class Serializer extends Subsystem {
         }
     }
 
+    public static double rpmToNativeUnits(double rpm) {
+        return rpm / 60.0 / 10.0 * Constants.kFeederRollersTicksPerRevolutions;
+    }
+
+    public static double nativeUnitsToRpm(double native_units) {
+        return native_units * 60.0 * 10.0 / Constants.kFeederRollersTicksPerRevolutions;
+    }
+
     public synchronized void setWantedState(WantedState wantedState) {
         mWantedState = wantedState;
     }
@@ -240,7 +298,10 @@ public class Serializer extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Serializer Spin Cycle Demand", mPeriodicIO.spin_cycle_demand);
-        SmartDashboard.putNumber("Serializer Right Roller Demand", mPeriodicIO.right_roller_demand);
-        SmartDashboard.putNumber("Serializer Left Roller Demand", mPeriodicIO.left_roller_demand);
+        SmartDashboard.putNumber("Serializer Right Roller Demand RPM", nativeUnitsToRpm(mPeriodicIO.right_roller_demand));
+        SmartDashboard.putNumber("Serializer Left Roller Demand RPM", nativeUnitsToRpm(mPeriodicIO.left_roller_demand));
+
+        SmartDashboard.putNumber("Serializer Right Roller Speed RPM", nativeUnitsToRpm(mPeriodicIO.right_roller_demand));
+        SmartDashboard.putNumber("Serializer Left Roller Speed RPM", nativeUnitsToRpm(mPeriodicIO.left_roller_demand));
     }
 }

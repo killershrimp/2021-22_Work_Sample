@@ -154,6 +154,13 @@ public class Constants {
     public static final int kSerializerSpinCycleMasterId = 7;
     public static final int kSerializerLeftRollerMasterId = 8;
     public static final int kSerializerRightRollerMasterId = 9;
+    
+    public static final double kFeederRollersKp = 0.075;
+    public static final double kFeederRollersKi = 0.0;
+    public static final double kFeederRollersKd = 0.2;
+    public static final double kFeederRollersKf = 0.04795003;
+    public static final double kFeederRollersTicksPerRevolutions = 2048.0 * 1.0/36.0 * 16.0;
+    public static final int kFeederAllowableError = 50;
 
     // Intake
     public static final int kIntakeMasterId = 14;
