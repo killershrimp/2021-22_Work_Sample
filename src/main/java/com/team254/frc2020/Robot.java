@@ -240,19 +240,20 @@ public class Robot extends TimedRobot {
             }
     
             // Intake
-            if (mControlBoard.getDeployIntake()) {
+            if (mControlBoard.getIntake()) {
                 mIntake.deploy();
-            } else if (mControlBoard.getRetractIntake()) {
+            } else {
                 mIntake.stow();
             }
 
             // TODO make serializer logic smarter
+            // check getExhaust first so can exh while intake is down by pressing both r/l bumpers
             Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
-            if (mControlBoard.getIntake()) {
+                if (mControlBoard.getExhaust()) {
+                    mIntake.setWantedState(Intake.WantedState.EXHAUST);
+                } else if (mControlBoard.getIntake()) {
                 mIntake.setWantedState(Intake.WantedState.INTAKE);
                 serializer_wanted = Serializer.WantedState.SERIALIZE;
-            } else if (mControlBoard.getExhaust()) {
-                mIntake.setWantedState(Intake.WantedState.EXHAUST);
             } else if (mControlBoard.getHumanPlayerIntake()) {
                 serializer_wanted = Serializer.WantedState.SERIALIZE;
             } else {
