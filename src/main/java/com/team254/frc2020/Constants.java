@@ -229,7 +229,7 @@ public class Constants {
             Pose2d.identity(),
             4700, // shooter setpoint (rpm)
             100, // shooter allowable error (rpm)
-            0.5, // turret allowable error (°)
+            1.0, // turret allowable error (°)
             0.5 // turret allowable error (°)
     );
 
@@ -255,7 +255,7 @@ public class Constants {
             Constants.kVisionTargetToGoalOffset,
             4700, // shooter setpoint (rpm)
             100, // shooter allowable error (rpm)
-            0.5, // turret allowable error (°)
+            1.0, // turret allowable error (°)
             0.5 // turret allowable error (°)
     );
 
