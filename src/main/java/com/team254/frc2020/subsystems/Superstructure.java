@@ -72,6 +72,7 @@ public class Superstructure extends Subsystem {
     private double mCorrectedRangeToTarget = 0.0;
     private boolean mEnforceAutoAimMinDistance = false;
     private double mAutoAimMinDistance = 500;
+    private double mLastShootingParamsPrintTime = 0.0;
 
     private Optional<Double> mTurretHint = Optional.empty();
     private Optional<Double> mTurretJogDelta = Optional.empty();
@@ -256,17 +257,30 @@ public class Superstructure extends Subsystem {
 
     private void writeShootDesiredState(double timestamp) {
         mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
-        
+
+        double hoodAngle = Double.NaN;
+        double range = Double.NaN;
         if (kIsHoodTuning) {
-            mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+            hoodAngle = SmartDashboard.getNumber("HoodAngleToSet", 50.0);
         } else {
             if (mLatestAimingParameters.isPresent()) {
-                mHood.setSetpointPositionPID(
-                        mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+                range = mLatestAimingParameters.get().getRange();
+                hoodAngle = mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(range)).value;
+            } else {
+                hoodAngle = mHood.getAngle();
+                range = -1;
+                System.out.println("Lost target while shooting! Maintaining: " + hoodAngle);
             }
         }
+        mHood.setSetpointPositionPID(hoodAngle);
 
-        mShooter.setRPM(mShootingParameters.getShooterSetpointRPM());
+        double shooterRpm = mShootingParameters.getShooterSetpointRPM();
+        mShooter.setRPM(shooterRpm);
+
+        if ((timestamp - mLastShootingParamsPrintTime) > 0.5) {
+            mLastShootingParamsPrintTime = timestamp;
+            System.out.println("Making shot, range: " + range + " hood: " + hoodAngle + " rpm: " + mShooter.getAverageRPM());
+        }
     }
 
     private void writeMoveToZeroDesiredState() {
