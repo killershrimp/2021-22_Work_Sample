@@ -1,13 +1,19 @@
 package com.team254.frc2020.subsystems;
 
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
+import com.ctre.phoenix.motorcontrol.*;
 import com.team254.frc2020.Constants;
 import com.team254.lib.drivers.TalonUtil;
+import com.team254.lib.util.LatchedBoolean;
 import com.team254.lib.util.Util;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Hood extends ServoMotorSubsystem {
     private static Hood mInstance;
+    private LatchedBoolean mWasHoming = new LatchedBoolean();
+    private double mHomingTimeStart = Double.NaN;
+    private boolean mHoming = false;
+
+    private static final double kMaxHomingTime = 5.0;
 
     public synchronized static Hood getInstance() {
         if (mInstance == null) {
@@ -24,6 +30,47 @@ public class Hood extends ServoMotorSubsystem {
                 mMaster.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen),
                 mConstants.kName + ": Could not set reverse limit switch: ");
         mMaster.overrideLimitSwitchesEnable(true);
+    }
+
+    @Override
+    public synchronized void writePeriodicOutputs() {
+        if (mWasHoming.update(!hasBeenZeroed())) {
+            mHoming = true;
+            mHomingTimeStart = Timer.getFPGATimestamp();
+
+            TalonUtil.checkError(mMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
+                            true,
+                            5,
+                            10,
+                            mConstants.kStatorPeakCurrentDuration)),
+                    mConstants.kName + ": Could not set stator current limit.");
+            System.out.println("Hood needs homing! Entering homing mode.");
+        }
+
+        if (mHoming) {
+            if ((Timer.getFPGATimestamp() - mHomingTimeStart) > kMaxHomingTime) {
+                System.out.println("Timeout on hood homing! Zeroing!");
+                zeroSensors();
+            }
+
+            mMaster.set(ControlMode.PercentOutput, -0.05,
+                    DemandType.ArbitraryFeedForward, 0.0);
+            resetIfAtLimit();
+
+            if (hasBeenZeroed()) {
+                System.out.println("Hood homed successfully!");
+                TalonUtil.checkError(mMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
+                                mConstants.kEnableStatorCurrentLimit,
+                                mConstants.kStatorContinuousCurrentLimit,
+                                mConstants.kStatorPeakCurrentLimit,
+                                mConstants.kStatorPeakCurrentDuration)),
+                        mConstants.kName + ": Could not set stator current limit.");
+
+                mHoming = false;
+            }
+        } else {
+            super.writePeriodicOutputs();
+        }
     }
 
     // Syntactic sugar.

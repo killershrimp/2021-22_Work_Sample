@@ -79,8 +79,6 @@ public class Robot extends TimedRobot {
             mControlBoard.reset();
 
             mTurret.zeroSensors();
-            mHood.resetIfAtLimit();
-
             SmartDashboard.putNumber("HoodAngleToSet", 50.0);
 
             mSubsystemManager.stop();
@@ -190,6 +188,11 @@ public class Robot extends TimedRobot {
         try {
             // Update auto modes
             mAutoModeSelector.updateModeCreator();
+
+
+            if (!mHood.hasBeenZeroed()) {
+                mHood.resetIfAtLimit();
+            }
 
             Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
             if (autoMode.isPresent() && autoMode.get() != mAutoModeExecutor.getAutoMode()) {
