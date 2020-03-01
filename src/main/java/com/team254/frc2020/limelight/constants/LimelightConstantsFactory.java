@@ -41,7 +41,7 @@ public class LimelightConstantsFactory {
                         "Turret Limelight #1", // name
                         "limelight", // table name
                         26.48, // height
-                        new Pose2d(-5.7, 0, Rotation2d.fromDegrees(1.5)), // turret to lens
+                        new Pose2d(-5.7, 0, Rotation2d.fromDegrees(1.0)), // turret to lens
                         Rotation2d.fromDegrees(27.00), // horizontalPlaneToLens,
                         new UndistortMap_Limelight_1_320x240(), //undistort map
                         new UndistortConstants( // undistort constants
