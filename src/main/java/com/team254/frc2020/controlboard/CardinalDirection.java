@@ -5,18 +5,24 @@ import com.team254.lib.geometry.Rotation2d;
 public enum CardinalDirection {
     BACK(180),
     FRONT(0),
-    LEFT(90),
-    RIGHT(-90),
+    LEFT(45, 90),
+    RIGHT(-45, -90),
     NONE(0),
-    FRONT_LEFT(45),
-    FRONT_RIGHT(-45),
-    BACK_LEFT(135),
-    BACK_RIGHT(235);
+    FRONT_LEFT(45, 45),
+    FRONT_RIGHT(-45, -45),
+    BACK_LEFT(-45, 135),
+    BACK_RIGHT(45, 235);
 
-    private final Rotation2d rotation;
+    public final Rotation2d rotation;
+    private final Rotation2d inputDirection;
 
     CardinalDirection(double degrees) {
+        this(degrees, degrees);
+    }
+
+    CardinalDirection(double degrees, double inputDirectionDegrees) {
         rotation = Rotation2d.fromDegrees(degrees);
+        inputDirection = Rotation2d.fromDegrees(inputDirectionDegrees);
     }
 
     public static CardinalDirection findClosest(double xAxis, double yAxis) {
@@ -30,7 +36,7 @@ public enum CardinalDirection {
         double closestDistance = Double.MAX_VALUE;
         for (int i = 0; i < values.length; i++) {
             var checkDirection = values[i];
-            var distance = Math.abs(stickDirection.distance(checkDirection.rotation));
+            var distance = Math.abs(stickDirection.distance(checkDirection.inputDirection));
             if (distance < closestDistance) {
                 closestDistance = distance;
                 closest = checkDirection;
