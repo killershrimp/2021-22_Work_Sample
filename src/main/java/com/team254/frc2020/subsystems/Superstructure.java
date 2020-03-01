@@ -35,6 +35,9 @@ public class Superstructure extends Subsystem {
 
     private Superstructure() {}
 
+    private double kCoarseHoodMapBias = -1.0;
+    private double kFineHoodMapBias = 0.0;
+
     public enum WantedState {
         IDLE,
         AIM,
@@ -224,9 +227,11 @@ public class Superstructure extends Subsystem {
          if (mLatestAimingParameters.isPresent()) {
              double setpoint;
              if (mShouldAimFine) {
-                 setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+                 setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value
+                         + kFineHoodMapBias;
              } else {
-                 setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+                 setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value
+                         + kCoarseHoodMapBias;
              }
 
              mHood.setSetpointPositionPID(setpoint);
@@ -249,9 +254,11 @@ public class Superstructure extends Subsystem {
          if (mLatestAimingParameters.isPresent()) {
              double setpoint;
              if (mShouldAimFine) {
-                 setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+                 setpoint = Constants.kFineHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value
+                         + kFineHoodMapBias;
              } else {
-                 setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value;
+                 setpoint = Constants.kCoarseHoodMap.getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value
+                         + kCoarseHoodMapBias;
              }
 
              mHood.setSetpointPositionPID(setpoint);
