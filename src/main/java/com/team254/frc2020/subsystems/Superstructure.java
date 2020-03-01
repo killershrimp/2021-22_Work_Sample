@@ -154,6 +154,7 @@ public class Superstructure extends Subsystem {
             case AIM:
                 return SystemState.AIMING;
             case MOVE_TO_ZERO:
+                mHood.setHoming();
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
             case SHOOT:
@@ -165,6 +166,7 @@ public class Superstructure extends Subsystem {
     private SystemState handleAiming(WantedState wantedState) {
         switch (wantedState) {
             case MOVE_TO_ZERO:
+                mHood.setHoming();
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
                 return SystemState.IDLE;
@@ -186,6 +188,7 @@ public class Superstructure extends Subsystem {
     private SystemState handleShoot(WantedState wantedState) {
         switch (wantedState) {
             case MOVE_TO_ZERO:
+                mHood.setHoming();
                 return SystemState.MOVE_TO_ZERO;
             case IDLE:
                 return SystemState.IDLE;
