@@ -29,7 +29,7 @@ public class Constants {
     public static final int kLongCANTimeoutMs = 100; // use for constructors
 
     // Control board
-    public static final boolean kUseDriveGamepad = true;
+    public static final boolean kUseDriveGamepad = false;
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 2;
     public static final int kMainThrottleJoystickPort = 0;
