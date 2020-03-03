@@ -1,5 +1,6 @@
 package com.team254.frc2020.subsystems;
 
+import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team254.frc2020.Constants;
@@ -8,7 +9,6 @@ import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 
 import com.team254.lib.drivers.TalonUtil;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,14 +48,14 @@ public class Serializer extends Subsystem {
         double left_roller_demand = 0.0;
     }
 
-    public static enum WantedState {
+    public enum WantedState {
         IDLE,
         SERIALIZE,
         PREPARE_TO_SHOOT,
         FEED
     }
 
-    public static enum SystemState {
+    public enum SystemState {
         IDLE,
         SERIALIZE,
         FEED,
@@ -63,9 +63,9 @@ public class Serializer extends Subsystem {
     }
 
     private TalonFX mSpinCycleMaster, mRightRollerMaster, mLeftRollerMaster;
-    private DigitalInput mBreakBeamSensor;
     private Solenoid mSkatePark;
     private Solenoid mChock;
+    private Canifier mCanifier;
 
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
@@ -138,8 +138,6 @@ public class Serializer extends Subsystem {
         TalonUtil.checkError(mLeftRollerMaster.configAllowableClosedloopError(0, Constants.kFeederAllowableError),
                 "Left Feeder Roller: Could not set closed loop allowable error");
 
-        mBreakBeamSensor = new DigitalInput(Constants.kSerializerBreakBeamSensorChannel);
-
         mSkatePark = new Solenoid(Constants.kPCMId, Constants.kSkateParkSolenoidId);
         mIsSkateParkDeployed = true;
         setSkateParkDeployed(false);
@@ -147,13 +145,15 @@ public class Serializer extends Subsystem {
         mChock = new Solenoid(Constants.kPCMId, Constants.kChockSolenoidId);
         mIsChockDeployed = true;
         setChockDeployed(false);
+
+        mCanifier = Canifier.getInstance();
     }
 
     @Override
     public void readPeriodicInputs() {
         mPeriodicIO.right_roller_velocity = mRightRollerMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.left_roller_velocity = mLeftRollerMaster.getSelectedSensorVelocity(0);
-        mPeriodicIO.break_beam_triggered = mBreakBeamSensor.get();
+        mPeriodicIO.break_beam_triggered = mCanifier.isBreamBeamSensorTriggered();
         if (mPeriodicIO.break_beam_triggered) {
             mLastBreakBreakTriggerTime = Timer.getFPGATimestamp();
         }

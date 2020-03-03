@@ -42,6 +42,7 @@ public class Robot extends TimedRobot {
     private final Intake mIntake = Intake.getInstance();
     private final Serializer mSerializer = Serializer.getInstance();
     private final Hood mHood = Hood.getInstance();
+    private final Canifier mCanifier = Canifier.getInstance();
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -63,7 +64,8 @@ public class Robot extends TimedRobot {
                 mSerializer,
                 mIntake,
                 mSuperstructure,
-                mLimelight
+                mLimelight,
+                mCanifier
             );
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);

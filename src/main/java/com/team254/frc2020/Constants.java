@@ -174,6 +174,9 @@ public class Constants {
     public static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
     public static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
 
+    // Canifier
+    public static final int kCanifierId = 16;
+
     // Pigeon IMU
     public static final int kPigeonIMUId = 0;
 
