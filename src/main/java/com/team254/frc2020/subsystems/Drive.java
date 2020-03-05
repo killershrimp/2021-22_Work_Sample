@@ -1,9 +1,6 @@
 package com.team254.frc2020.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
@@ -87,7 +84,9 @@ public class Drive extends Subsystem {
         TalonUtil.checkError(talon.config_kI(kLowGearPIDSlot, Constants.kDriveLowGearKi, Constants.kLongCANTimeoutMs), "Could not set low gear ki");
         TalonUtil.checkError(talon.config_kD(kLowGearPIDSlot, Constants.kDriveLowGearKd, Constants.kLongCANTimeoutMs), "Could not set low gear kd");
         TalonUtil.checkError(talon.config_kF(kLowGearPIDSlot, Constants.kDriveLowGearKf, Constants.kLongCANTimeoutMs), "Could not set low gear kf");
-        
+
+        TalonUtil.checkError(talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 70, 70, 0.2), Constants.kLongCANTimeoutMs), "Could not set stator drive current limits");
+
         // voltage comp
         TalonUtil.checkError(talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "could not config drive voltage comp saturation");
         talon.enableVoltageCompensation(true);
@@ -186,6 +185,7 @@ public class Drive extends Subsystem {
         public double right_feedforward;
         public TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<Pose2dWithCurvature>(Pose2dWithCurvature.identity());
     }
+
 
     @Override
     public synchronized void readPeriodicInputs() {
@@ -415,6 +415,7 @@ public class Drive extends Subsystem {
     }
 
     public synchronized void setPTOEngaged(boolean wantsEngage) {
+        mPTO.set(wantsEngage);
         mIsPTOEngaged.set(wantsEngage);
         mLeftSide.setPTOEngaged(wantsEngage);
         mRightSide.setPTOEngaged(wantsEngage);
@@ -613,6 +614,13 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Left Drive Distance", mPeriodicIO.left_distance);
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
+
+        SmartDashboard.putNumber("Left Drive 1 Current", mLeftMaster1.getStatorCurrent());
+        SmartDashboard.putNumber("Left Drive 2 Current", mLeftMaster2.getStatorCurrent());
+        SmartDashboard.putNumber("Left Drive 3 Current", mLeftMaster3.getStatorCurrent());
+        SmartDashboard.putNumber("Right Drive 1 Current", mRightMaster1.getStatorCurrent());
+        SmartDashboard.putNumber("Right Drive 2 Current", mRightMaster2.getStatorCurrent());
+        SmartDashboard.putNumber("Right Drive 3 Current", mRightMaster3.getStatorCurrent());
 
         SmartDashboard.putNumber("Left Drive Demand", mPeriodicIO.left_demand);
         SmartDashboard.putNumber("Right Drive Demand", mPeriodicIO.right_demand);
