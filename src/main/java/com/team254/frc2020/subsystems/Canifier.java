@@ -46,9 +46,7 @@ public class Canifier extends Subsystem {
     }
 
     @Override
-    public void outputTelemetry() {
-        SmartDashboard.putBoolean("CANIFIER - Is Break Beam Sensor Triggered", mPeriodicIO.break_beam_triggered);
-    }
+    public void outputTelemetry() {}
 
     public synchronized boolean isBreamBeamSensorTriggered() {
         return mPeriodicIO.break_beam_triggered;
