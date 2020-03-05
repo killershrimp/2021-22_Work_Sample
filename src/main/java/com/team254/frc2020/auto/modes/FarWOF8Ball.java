@@ -8,16 +8,17 @@ import com.team254.lib.geometry.Rotation2d;
 
 import java.util.List;
 
-public class BlueWOFAutoMode extends AutoModeBase {
+// zero -> far wof -> shooting point
+public class FarWOF8Ball extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         runAction(new AutoAimAction(Rotation2d.fromDegrees(30)));
         runAction(new ShootAction(Constants.kCoarseShootingParams, 2));
         runAction(new DeployIntakeAction(true));
         runAction(new RunIntakeAction());
-        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().trajBlueWOF));
+        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().startToFarWOF1));
         runAction(new ParallelAction(List.of(
-                new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().trajBlueWOFBack),
+                new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().farWOF1ToShoot),
                 new AutoAimAction(Rotation2d.fromDegrees(0)),
                 new SeriesAction(
                         new WaitAction(.5),

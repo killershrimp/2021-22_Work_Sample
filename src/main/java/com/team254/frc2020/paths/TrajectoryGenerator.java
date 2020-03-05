@@ -69,32 +69,27 @@ public class TrajectoryGenerator {
     public class TrajectorySet {
         public final Trajectory<TimedState<Pose2dWithCurvature>> testTrajectory;
         public final Trajectory<TimedState<Pose2dWithCurvature>> testTrajectoryBack;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> trajBlueWOF;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> trajBlueWOFBack;
 
+        public final Trajectory<TimedState<Pose2dWithCurvature>> startToFarWOF1; // TODO consolidate startToFarWOF1 and startToFarWOF2 into a single constant waypoint
+        public final Trajectory<TimedState<Pose2dWithCurvature>> farWOF1ToShoot;
 
-        public final Trajectory<TimedState<Pose2dWithCurvature>> startingToPickup;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> startingToPickup; // balls on bar by hangers
         public final Trajectory<TimedState<Pose2dWithCurvature>> pickupToTurningPoint;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> turningPointToWOF;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> WOFtoshootingPoint;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> turningPointToFarWOF2;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> farWOF2ToShootingPoint;
 
-
-
-//        public final Trajectory<TimedState<Pose2dWithCurvature>> turnInPlace;
 
         private TrajectorySet() {
             testTrajectory = getTestTrajectory();
             testTrajectoryBack = getTestTrajectoryBack();
-            trajBlueWOF = trajBlueWOF();
-            trajBlueWOFBack = trajBlueWOFBack();
 
+            startToFarWOF1 = getStartingToFarWOF();
+            farWOF1ToShoot = getFarWOFToShoot();
 
-            startingToPickup = traj8();
-            pickupToTurningPoint = traj5();
-            turningPointToWOF = traj6();
-            WOFtoshootingPoint = traj7();
-
-//            turnInPlace = getTurnInPlace();
+            startingToPickup = getStartToPickup();
+            pickupToTurningPoint = getPickupToTurningPoint();
+            turningPointToFarWOF2 = getTurningPointToFarWOF2();
+            farWOF2ToShootingPoint = getFarWOF2ToShoot();
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getTestTrajectory() {
@@ -105,7 +100,6 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-
         private Trajectory<TimedState<Pose2dWithCurvature>> getTestTrajectoryBack() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(-120, 120, Rotation2d.fromDegrees(90)));
@@ -114,7 +108,7 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-        private Trajectory<TimedState<Pose2dWithCurvature>> trajBlueWOF() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getStartingToFarWOF() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-234, 0, Rotation2d.fromDegrees(180)));
@@ -122,35 +116,16 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-        private Trajectory<TimedState<Pose2dWithCurvature>> trajBlueWOFBack() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFarWOFToShoot() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(-234, 0, Rotation2d.fromDegrees(180)));
-//            waypoints.add(new Pose2d(-168, 0, Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-96, 68, Rotation2d.fromDegrees(202.5)));
             return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
 
-// go
-        private Trajectory<TimedState<Pose2dWithCurvature>> traj3() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(180)));
-            waypoints.add(new Pose2d(-240, 0, Rotation2d.fromDegrees(180)));
-            return generateTrajectory(false, waypoints, Arrays.asList(),
-                    kMaxVel, kMaxAccel, kMaxVoltage);
-        }
-
-        private Trajectory<TimedState<Pose2dWithCurvature>> traj4() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(new Pose2d(-240, 0, Rotation2d.fromDegrees(180)));
-            waypoints.add(new Pose2d(-96, 68, Rotation2d.fromDegrees(202.5)));
-            return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-                    kMaxVel, kMaxAccel, kMaxVoltage);
-        }
-
-        // starting to pickup
-        private Trajectory<TimedState<Pose2dWithCurvature>> traj8() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getStartToPickup() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-87, 83, Rotation2d.fromDegrees(113.59)));
@@ -159,8 +134,7 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-        // pickup to turning piint
-        private Trajectory<TimedState<Pose2dWithCurvature>> traj5() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getPickupToTurningPoint() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(-87, 83, Rotation2d.fromDegrees(113.59)));
             waypoints.add(new Pose2d(-41, 4, Rotation2d.fromDegrees(180)));
@@ -169,8 +143,7 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-        // turniing poiint to WOF
-        private Trajectory<TimedState<Pose2dWithCurvature>> traj6() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getTurningPointToFarWOF2() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(60, 4, Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-240, 0, Rotation2d.fromDegrees(180)));
@@ -178,8 +151,7 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-        // WOF point to shooting point
-        private Trajectory<TimedState<Pose2dWithCurvature>> traj7() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFarWOF2ToShoot() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(-240, 0, Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-96, 68, Rotation2d.fromDegrees(202.5)));
@@ -187,14 +159,5 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-//        private Trajectory<TimedState<Pose2dWithCurvature>> getTurnInPlace() {
-//            List<Pose2d> waypoints = new ArrayList<>();
-//            waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(180)));
-//            waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(0)));
-//            return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-//                    kMaxVel, kMaxAccel, kMaxVoltage);
-//        }
-
-        // at balls, 10 inches bumpbner  to wall
     }
 }

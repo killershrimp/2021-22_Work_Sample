@@ -8,7 +8,8 @@ import com.team254.lib.geometry.Rotation2d;
 
 import java.util.List;
 
-public class WOF2Mode extends AutoModeBase {
+// zero -> steel bars by rendezvous point -> back to zeroish -> far wof -> shooting point
+public class FarWOF10Ball extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         runAction(new DeployIntakeAction(true));
@@ -31,10 +32,10 @@ public class WOF2Mode extends AutoModeBase {
         runAction(new DeployIntakeAction(true));
         runAction(new RunIntakeAction());
 
-        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().turningPointToWOF));
+        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().turningPointToFarWOF2));
 
         runAction(new ParallelAction(List.of(
-                new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().WOFtoshootingPoint),
+                new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().farWOF2ToShootingPoint),
                 new AutoAimAction(Rotation2d.fromDegrees(0)),
                 new SeriesAction(
                         new WaitAction(1),

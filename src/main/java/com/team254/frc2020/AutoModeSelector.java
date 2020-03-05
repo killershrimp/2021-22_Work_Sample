@@ -13,7 +13,8 @@ public class AutoModeSelector {
     }
 
     enum DesiredMode {
-        DO_NOTHING, TEST_TRAJECTORY, BLUE_WOF, Ball_10
+        DO_NOTHING, TEST_TRAJECTORY,
+        FAR_WOF_8_BALL, FAR_WOF_10_BALL
     }
 
     private DesiredMode mCachedDesiredMode = null;
@@ -35,9 +36,8 @@ public class AutoModeSelector {
         mModeChooser = new SendableChooser<>();
         mModeChooser.setDefaultOption("Do Nothing", DesiredMode.DO_NOTHING);
         mModeChooser.addOption("Test Trajectory", DesiredMode.TEST_TRAJECTORY);
-        mModeChooser.addOption("Blue WOF", DesiredMode.BLUE_WOF);
-        mModeChooser.addOption("10 ball thing", DesiredMode.Ball_10);
-//        mModeChooser.addOption("Turn In place (180 deg)", DesiredMode.TURN_IN_PLACE);
+        mModeChooser.addOption("Far WOF 8 Ball", DesiredMode.FAR_WOF_8_BALL);
+        mModeChooser.addOption("Far WOF 10 Ball", DesiredMode.FAR_WOF_10_BALL);
         SmartDashboard.putData("Auto mode", mModeChooser);
     }
 
@@ -72,10 +72,10 @@ public class AutoModeSelector {
                 return Optional.of(new DoNothingAutoMode());
             case TEST_TRAJECTORY:
                 return Optional.of(new TestTrajectoryFollowingMode());
-            case BLUE_WOF:
-                return Optional.of(new BlueWOFAutoMode());
-            case Ball_10:
-                return Optional.of(new WOF2Mode());
+            case FAR_WOF_8_BALL:
+                return Optional.of(new FarWOF8Ball());
+            case FAR_WOF_10_BALL:
+                return Optional.of(new FarWOF10Ball());
             default:
                 break;
         }
