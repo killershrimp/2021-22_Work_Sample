@@ -30,7 +30,7 @@ public class DriveMotionPlanner implements CSVWritable {
         FEEDFORWARD_ONLY,
         PURE_PURSUIT,
         PID,
-        NONLINEAR_FEEDBACK
+        RAMSETE
     }
 
     FollowerType mFollowerType = FollowerType.FEEDFORWARD_ONLY;
@@ -222,7 +222,7 @@ public class DriveMotionPlanner implements CSVWritable {
                 .left, dynamics.wheel_acceleration.right, dynamics.voltage.left, dynamics.voltage.right);
     }
 
-    protected DriveOutput updateNonlinearFeedback(DifferentialDrive.DriveDynamics dynamics, Pose2d current_state) {
+    protected DriveOutput updateRamsete(DifferentialDrive.DriveDynamics dynamics, Pose2d current_state) {
         // Implements eqn. 5.12 from https://www.dis.uniroma1.it/~labrob/pub/papers/Ramsete01.pdf
         final double kBeta = 2.0;  // >0.
         final double kZeta = 0.7;  // Damping coefficient, [0, 1].
@@ -293,8 +293,8 @@ public class DriveMotionPlanner implements CSVWritable {
                 mOutput = updatePurePursuit(dynamics, current_state);
             } else if (mFollowerType == FollowerType.PID) {
                 mOutput = updatePID(dynamics, current_state);
-            } else if (mFollowerType == FollowerType.NONLINEAR_FEEDBACK) {
-                mOutput = updateNonlinearFeedback(dynamics, current_state);
+            } else if (mFollowerType == FollowerType.RAMSETE) {
+                mOutput = updateRamsete(dynamics, current_state);
             }
         } else {
             // TODO Possibly switch to a pose stabilizing controller?

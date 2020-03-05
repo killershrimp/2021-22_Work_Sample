@@ -105,6 +105,7 @@ public class Constants {
         kTurretConstants.kHomePosition = 180.0;
         kTurretConstants.kTicksPerUnitDistance = 1.0 / (1.0 / 2048.0 * 8.0 / 24.0 * 14.0 / 240.0 * 360.0);
 
+        kTurretConstants.kKf = 1023.0 * 0.25 / 4650.0; // Tuned 3/4
         kTurretConstants.kPositionKp = 0.21;
         kTurretConstants.kPositionDeadband = (int) (0.5 * kTurretConstants.kTicksPerUnitDistance); // Ticks
 

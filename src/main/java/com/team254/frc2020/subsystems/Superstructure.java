@@ -337,7 +337,8 @@ public class Superstructure extends Subsystem {
                 SmartDashboard.putNumber("Range To Target", mLatestAimingParameters.get().getRange());
             }
 
-            final double kLookaheadTime = 0.7;
+            // TODO eliminate lookahead
+            final double kLookaheadTime = 0.0;
             Pose2d robot_to_predicted_robot = mRobotState.getLatestFieldToVehicle().getValue().inverse()
                     .transformBy(mRobotState.getPredictedFieldToVehicle(kLookaheadTime));
             Pose2d predicted_robot_to_goal = robot_to_predicted_robot.inverse()
@@ -382,7 +383,7 @@ public class Superstructure extends Subsystem {
      * @param field_relative_goal in degrees
      */
     public synchronized double getTurretSetpointFromFieldRelativeGoal(double timestamp, double field_relative_goal) {
-        final double kLookaheadTime = 0.7;
+        final double kLookaheadTime = 0.0; // TODO eliminate
         Rotation2d turret_error = mRobotState.getPredictedFieldToVehicle(kLookaheadTime)
                 .transformBy(mRobotState.getVehicleToTurret(timestamp)).getRotation().inverse()
                 .rotateBy(Rotation2d.fromDegrees(field_relative_goal));
