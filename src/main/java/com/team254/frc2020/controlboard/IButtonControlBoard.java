@@ -32,4 +32,6 @@ public interface IButtonControlBoard {
     boolean getToggleWOFMode();
 
     boolean getToggleHangMode();
+
+    boolean getZeroGyro();
 }

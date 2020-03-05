@@ -213,7 +213,12 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         try {
-            mDrive.setHighGear(!mControlBoard.getWantsLowGear());
+
+           if (mControlBoard.getZeroGyro()) {
+               mDrive.setHeading(Rotation2d.fromDegrees(180));
+           }
+
+           mDrive.setHighGear(!mControlBoard.getWantsLowGear());
             // mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
             //         -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
             mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
