@@ -57,8 +57,8 @@ public class Constants {
     public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 10.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
 
     // Wheel parameters.
-    public static final double kDriveWheelTrackWidthInches = 25.884; //todo characterize?
-    public static final double kDriveWheelDiameterInches = 6.1439046227; //tuned 2/12
+    public static final double kDriveWheelTrackWidthInches = 30.0; //tuned 3/2
+    public static final double kDriveWheelDiameterInches = 5.9067052758; //tuned 3/2
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kDriveWheelTrackRadiusWidthMeters = kDriveWheelTrackWidthInches / 2.0 * 0.0254;
     public static final double kTrackScrubFactor = 1.0;
@@ -79,11 +79,11 @@ public class Constants {
 
 
     // robot dynamics (TODO tune)
-    public static final double kDriveVIntercept = 0.0; // V
-    public static final double kDriveLinearKv = 0.0; // V / rad/s
-    public static final double kDriveLinearKa = 0.0; // V / rad/s^2
-    public static final double kDriveAngularKa = 0.0; // V per rad/s^2
-    public static final double kRobotLinearInertia = 0.0; // kg
+    public static final double kDriveVIntercept = 0.235; // V
+    public static final double kDriveLinearKv = 0.0488; // V / rad/s
+    public static final double kDriveLinearKa = 0.00597; // V / rad/s^2
+    public static final double kDriveAngularKa = 0.00517; // V per rad/s^2
+    public static final double kRobotLinearInertia = 0.0; // kg // TODO
     public static final double kRobotAngularInertia = kDriveAngularKa / kDriveLinearKa *
             kDriveWheelTrackRadiusWidthMeters * kDriveWheelTrackRadiusWidthMeters * kRobotLinearInertia;  // kg m^2
     public static final double kRobotAngularDrag = 0.0; // N*m / (rad/sec)
@@ -165,7 +165,6 @@ public class Constants {
     public static final double kFeederRollersKf = 0.04795003;
     public static final double kFeederRollersTicksPerRevolutions = 2048.0 * 1.0/36.0 * 16.0;
     public static final int kFeederAllowableError = 50;
-
     // Intake
     public static final int kIntakeMasterId = 14;
     public static final double kIntakeStowTime = 0.5; // seconds, time it takes to stow intake
