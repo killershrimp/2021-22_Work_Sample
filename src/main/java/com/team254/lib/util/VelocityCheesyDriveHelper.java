@@ -8,6 +8,7 @@ import com.team254.lib.physics.DCMotorTransmission;
 import com.team254.lib.physics.DifferentialDrive;
 import com.team254.lib.physics.DifferentialDrive.DriveDynamics;
 import com.team254.lib.physics.DifferentialDrive.WheelState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static com.team254.lib.util.Util.handleDeadband;
 
@@ -67,12 +68,16 @@ public class VelocityCheesyDriveHelper {
         ret_val.left_velocity = velocity.getLeft();
         ret_val.right_velocity = velocity.getRight();
 
+        SmartDashboard.putNumber("L demanded velocity", Drive.radiansToInches(ret_val.left_velocity));
+        SmartDashboard.putNumber("R demanded velocity", Drive.radiansToInches(ret_val.right_velocity));
+
         WheelState wheel_velocity = new WheelState(ret_val.left_velocity, ret_val.right_velocity);
 
         ret_val.left_accel = Util.limit((ret_val.left_velocity - mLastLeftVel) / kDt, kMaxHighGearAcceleration);
         ret_val.right_accel = Util.limit((ret_val.right_velocity - mLastRightVel) / kDt, kMaxHighGearAcceleration);
         
-        WheelState wheel_acceleration = new WheelState(ret_val.left_accel, ret_val.right_accel);
+//        WheelState wheel_acceleration = new WheelState(ret_val.left_accel, ret_val.right_accel); TODO
+        WheelState wheel_acceleration = new WheelState(0., 0.);
 
         // TODO add support for low gear
         DriveDynamics dynamics = mModel.solveInverseDynamics(wheel_velocity, wheel_acceleration);
@@ -83,5 +88,23 @@ public class VelocityCheesyDriveHelper {
         mLastRightVel = ret_val.right_velocity;
         
         return ret_val;
+    }
+
+    public synchronized DriveOutput naiveDrive(double throttle, double wheel, boolean isQuickTurn, boolean isHighGear) {
+        throttle = Util.handleDeadband(throttle, Constants.kDriveThrottleDeadband);
+        wheel = Util.handleDeadband(wheel, Constants.kDriveWheelDeadband);
+
+        // TODO: remap throttle and wheel differently (currently just squared)
+        throttle = Math.signum(throttle) * Math.pow(throttle, 2);
+        wheel = Math.signum(wheel) * Math.pow(wheel, 2) * kWheelGain;
+
+        DriveSignal velocity = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
+        velocity = velocity.normalize();
+
+        // TODO add support for low gear
+        double scaling_factor = kMaxHighGearVelocity;
+        velocity = new DriveSignal(velocity.getLeft() * scaling_factor, velocity.getRight() * scaling_factor);
+
+        return new DriveOutput(velocity.getLeft(), velocity.getRight(), 0, 0, 0, 0);
     }
 }

@@ -38,7 +38,7 @@ public class ShootAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() - mStartTime >= mShotDuration;
+        return (Timer.getFPGATimestamp() - mStartTime) >= mShotDuration;
     }
 
     @Override

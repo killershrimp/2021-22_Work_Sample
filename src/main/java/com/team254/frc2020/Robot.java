@@ -1,5 +1,6 @@
 package com.team254.frc2020;
 
+import java.util.Map;
 import java.util.Optional;
 
 import com.team254.frc2020.auto.AutoModeExecutor;
@@ -17,9 +18,12 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.CrashTracker;
 import com.team254.lib.util.OpenLoopCheesyDriveHelper;
 import com.team254.lib.util.Util;
+import com.team254.lib.util.VelocityCheesyDriveHelper;
 import com.team254.lib.wpilib.TimedRobot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
@@ -123,10 +127,9 @@ public class Robot extends TimedRobot {
             // Robot starts backwards, turret starts backwards (in robot frame)
             mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretConstants.kHomePosition)));
             mDrive.setHeading(Rotation2d.fromDegrees(180));
-
+            mEnabledLooper.start();
             mAutoModeExecutor.start();
 
-            mEnabledLooper.start();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -219,10 +222,10 @@ public class Robot extends TimedRobot {
            }
 
            mDrive.setHighGear(!mControlBoard.getWantsLowGear());
-            // mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(-mControlBoard.getThrottle(),
-            //         -mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
-            mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
-                    mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
+             mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
+                     mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
+//            mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
+//                    mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
 
             boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
 

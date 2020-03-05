@@ -87,18 +87,22 @@ public class Drive extends Subsystem {
 
         TalonUtil.checkError(talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 70, 70, 0.2), Constants.kLongCANTimeoutMs), "Could not set stator drive current limits");
 
+        TalonUtil.checkError(talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
+        TalonUtil.checkError(talon.configVelocityMeasurementWindow(1, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement window");
+
+
         // voltage comp
         TalonUtil.checkError(talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs), "could not config drive voltage comp saturation");
         talon.enableVoltageCompensation(true);
 
         if (main_encoder_talon) {
             // status frames (maybe set for characterization?)
-            // TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "could not set drive feedback frame");
+             TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "could not set drive feedback frame");
             // TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 10, Constants.kLongCANTimeoutMs), "could not set drive voltage frame");
 
             // velocity measurement
-            TalonUtil.checkError(talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
-            TalonUtil.checkError(talon.configVelocityMeasurementWindow(1, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement window");
+
+
         }
     }
 
@@ -107,19 +111,19 @@ public class Drive extends Subsystem {
 
         // start all Talons in open loop mode
         mLeftMaster1 = TalonFXFactory.createDefaultTalon(Constants.kLeftDriveMaster1Id);
-        configureTalon(mLeftMaster1, true, true);
+        configureTalon(mLeftMaster1, true, false);
 
         mLeftMaster2 = TalonFXFactory.createDefaultTalon(Constants.kLeftDriveMaster2Id);
-        configureTalon(mLeftMaster2, true, false);
+        configureTalon(mLeftMaster2, true, true);
 
         mLeftMaster3 = TalonFXFactory.createDefaultTalon(Constants.kLeftDriveMaster3Id);
         configureTalon(mLeftMaster3, true, false);
 
         mRightMaster1 = TalonFXFactory.createDefaultTalon(Constants.kRightDriveMaster1Id);
-        configureTalon(mRightMaster1, false, true);
+        configureTalon(mRightMaster1, false, false);
 
         mRightMaster2 = TalonFXFactory.createDefaultTalon(Constants.kRightDriveMaster2Id);
-        configureTalon(mRightMaster2, false, false);
+        configureTalon(mRightMaster2, false, true);
 
         mRightMaster3 = TalonFXFactory.createDefaultTalon(Constants.kRightDriveMaster3Id);
         configureTalon(mRightMaster3, false, false);
@@ -161,6 +165,10 @@ public class Drive extends Subsystem {
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
 
     public static class PeriodicIO {
+        // real outputs
+        public double left_demand;
+        public double right_demand;
+
         // INPUTS
         public double timestamp;
         public double left_voltage;
@@ -174,15 +182,13 @@ public class Drive extends Subsystem {
         public double left_velocity_in_per_sec;
         public double right_velocity_in_per_sec;
         public Rotation2d gyro_heading = Rotation2d.identity();
-        public Pose2d error = Pose2d.identity();
 
         // OUTPUTS
-        public double left_demand;
-        public double right_demand;
         public double left_accel;
         public double right_accel;
         public double left_feedforward;
         public double right_feedforward;
+        public Pose2d error = Pose2d.identity();
         public TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<Pose2dWithCurvature>(Pose2dWithCurvature.identity());
     }
 

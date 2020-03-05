@@ -314,6 +314,8 @@ public class RobotState {
     public synchronized void outputToSmartDashboard() {
         SmartDashboard.putString("Robot Velocity", getMeasuredVelocity().toString());
 
+        SmartDashboard.putString("Field To Robot", getLatestFieldToVehicle().getValue().toString());
+
         if (getVehicleToVisionTarget(Timer.getFPGATimestamp()) != null) {
             SmartDashboard.putString("Robot to Vision Target", getVehicleToVisionTarget(Timer.getFPGATimestamp()).toString());
         }
