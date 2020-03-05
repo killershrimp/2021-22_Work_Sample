@@ -230,10 +230,10 @@ public class Constants {
     public static final ShootingParameters kCoarseShootingParams = new ShootingParameters(
             kCoarseHoodMap,
             Pose2d.identity(),
-            4700, // shooter setpoint (rpm)
+            4500, // shooter setpoint (rpm)
             100, // shooter allowable error (rpm)
             1.0, // turret allowable error (°)
-            0.5 // turret allowable error (°)
+            0.5 // hood allowable error (°)
     );
 
     // 3 point map (TODO tune)
@@ -256,10 +256,10 @@ public class Constants {
     public static final ShootingParameters kFineShootingParams = new ShootingParameters(
             kFineHoodMap,
             Constants.kVisionTargetToGoalOffset,
-            4700, // shooter setpoint (rpm)
+            4500, // shooter setpoint (rpm)
             100, // shooter allowable error (rpm)
             1.0, // turret allowable error (°)
-            0.5 // turret allowable error (°)
+            0.5 // hood allowable error (°)
     );
 
     /**
