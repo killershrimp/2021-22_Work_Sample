@@ -209,7 +209,7 @@ public class Constants {
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
     // Shot tuning
-
+    public static final boolean kIsHoodTuning = false;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();
     static {
         // 2 point map (Tuned 2/22) TODO tune better and for new feeder

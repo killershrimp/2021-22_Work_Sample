@@ -213,6 +213,11 @@ public class RobotState {
         // SmartDashboard.putString("Camera to Vision Target", cameraToVisionTarget.toString());
 
         Pose2d fieldToVisionTarget = getFieldToTurret(timestamp).transformBy(source.getTurretToLens()).transformBy(cameraToVisionTarget);
+
+        if (fieldToVisionTarget.getTranslation().direction().cos() < 0.0) {
+            return;
+        }
+
         // Goal normal is always oriented at 180 deg.
         tracker.update(timestamp, List.of(new Pose2d(fieldToVisionTarget.getTranslation(), Rotation2d.fromDegrees(180.0))));
     }
@@ -252,7 +257,7 @@ public class RobotState {
         return getFieldToVehicle(timestamp).inverse().transformBy(fieldToVisionTarget);
     }
 
-    public synchronized Optional<AimingParameters> getAimingParameters(int prev_track_id, double max_track_age) {
+    public synchronized Optional<AimingParameters> getAimingParameters(int prev_track_id, double max_track_age, Pose2d target_to_goal_offset) {
         GoalTracker tracker = goal_tracker_;
         List<GoalTracker.TrackReport> reports = tracker.getTracks();
 
@@ -282,7 +287,7 @@ public class RobotState {
         }
 
         AimingParameters params = new AimingParameters(getFieldToVehicle(timestamp),
-                report.field_to_target,
+                report.field_to_target.transformBy(target_to_goal_offset),
                 report.latest_timestamp, report.stability, report.id);
         return Optional.of(params);
     }

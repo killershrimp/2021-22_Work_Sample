@@ -6,7 +6,6 @@ import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
-import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.util.InterpolatingDouble;
@@ -19,8 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Superstructure extends Subsystem {
-    private static final boolean kIsHoodTuning = false;
-
     private static Superstructure mInstance;
 
     public static Superstructure getInstance() {
@@ -34,11 +31,12 @@ public class Superstructure extends Subsystem {
     private Turret mTurret = Turret.getInstance();
     private Hood mHood = Hood.getInstance();
     private Shooter mShooter = Shooter.getInstance();
+    private Serializer mSerializer = Serializer.getInstance();
 
     private RobotState mRobotState = RobotState.getInstance();
 
     private Superstructure() {
-        if (kIsHoodTuning) {
+        if (Constants.kIsHoodTuning) {
             SmartDashboard.putNumber("HoodAngleToSet", 50.0);
         }
     }
@@ -69,7 +67,6 @@ public class Superstructure extends Subsystem {
     private int mTrackId = -1;
 
     private Optional<AimingParameters> mLatestAimingParameters = Optional.empty();
-    private double mCorrectedRangeToTarget = 0.0;
     private boolean mEnforceAutoAimMinDistance = false;
     private double mAutoAimMinDistance = 500;
     private double mLastShootingParamsPrintTime = 0.0;
@@ -216,6 +213,8 @@ public class Superstructure extends Subsystem {
     }
     
     private void writeIdleDesiredState(double timestamp) {
+        mSerializer.setWantedState(Serializer.WantedState.IDLE);
+
         if (mTurretHint.isPresent()) {
             mTurret.setSetpointPositionPID(getTurretSetpointFromFieldRelativeGoal(timestamp, mTurretHint.get()));
         } else if (mTurretJogDelta.isPresent()) {
@@ -223,11 +222,14 @@ public class Superstructure extends Subsystem {
         } else {
             mTurret.setSetpointPositionPID(mTurret.getAngle());
         }
+
         mHood.setSetpointPositionPID(mHood.getAngle());
         mShooter.setOpenLoop(0.0);
     }
 
     private void writeAimingDesiredState(double timestamp) {
+        mSerializer.setWantedState(Serializer.WantedState.PREPARE_TO_SHOOT);
+
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();
         double ffToSet = 0;
@@ -243,7 +245,7 @@ public class Superstructure extends Subsystem {
         }
         mTurret.setSetpointPositionPID(angleToSet, ffToSet);
 
-        if (kIsHoodTuning) {
+        if (Constants.kIsHoodTuning) {
             mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
         } else {
             if (mLatestAimingParameters.isPresent()) {
@@ -256,11 +258,13 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeShootDesiredState(double timestamp) {
+        mSerializer.setWantedState(Serializer.WantedState.FEED);
+
         mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
 
         double hoodAngle = Double.NaN;
         double range = Double.NaN;
-        if (kIsHoodTuning) {
+        if (Constants.kIsHoodTuning) {
             hoodAngle = SmartDashboard.getNumber("HoodAngleToSet", 50.0);
         } else {
             if (mLatestAimingParameters.isPresent()) {
@@ -284,6 +288,7 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeMoveToZeroDesiredState() {
+        mSerializer.setWantedState(Serializer.WantedState.IDLE);
         mTurret.setSetpointPositionPID(Constants.kTurretConstants.kHomePosition);
         mHood.setSetpointPositionPID(Constants.kHoodConstants.kHomePosition);
         mShooter.setOpenLoop(0.0);
@@ -320,25 +325,16 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized double getTurretSetpointFromVision(double timestamp) {
-        Optional<AimingParameters> latest_aiming_params = mRobotState.getAimingParameters(-1, Constants.kMaxGoalTrackAge);
-        if (latest_aiming_params.isPresent()) {
-            // TODO this should not be done here. Instead, push goal offset into aiming parameters itself.
-            mLatestAimingParameters = Optional.of(new AimingParameters(
-                latest_aiming_params.get().getFieldToVehicle(),
-                latest_aiming_params.get().getFieldToGoal().transformBy(mShootingParameters.getVisionTargetToGoalOffset()),
-                latest_aiming_params.get().getLastSeenTimestamp(),
-                latest_aiming_params.get().getStability(),
-                latest_aiming_params.get().getTrackId()
-            ));
-
+        mLatestAimingParameters = mRobotState.getAimingParameters(-1, Constants.kMaxGoalTrackAge, mShootingParameters.getVisionTargetToGoalOffset());
+        if (mLatestAimingParameters.isPresent()) {
             mTrackId = mLatestAimingParameters.get().getTrackId();
 
-            if (kIsHoodTuning) {
+            if (Constants.kIsHoodTuning) {
                 SmartDashboard.putNumber("Range To Target", mLatestAimingParameters.get().getRange());
             }
 
             // Don't aim if not in min distance
-            if (mEnforceAutoAimMinDistance && mCorrectedRangeToTarget > mAutoAimMinDistance) {
+            if (mEnforceAutoAimMinDistance && mLatestAimingParameters.get().getRange() > mAutoAimMinDistance) {
                 return mTurret.getAngle();
             }
 

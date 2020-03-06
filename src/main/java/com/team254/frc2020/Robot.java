@@ -221,17 +221,17 @@ public class Robot extends TimedRobot {
                mDrive.setHeading(Rotation2d.fromDegrees(180));
            }
 
-           mDrive.setHighGear(!mControlBoard.getWantsLowGear());
-             mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
-                     mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
-//            mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
-//                    mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
+            mDrive.setHighGear(!mControlBoard.getWantsLowGear());
+            // mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
+                    // mControlBoard.getTurn(), mControlBoard.getQuickTurn(), !mControlBoard.getWantsLowGear()));
+            mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
+                    mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
 
             boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
 
             if (mControlBoard.getShoot()) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
-            } else if (mControlBoard.getAimCoarse() || mControlBoard.getAimFine()) {
+            } else if (wants_aim) {
                 mSuperstructure.setShootingParams(mControlBoard.getAimFine() ? Constants.kFineShootingParams : Constants.kCoarseShootingParams);
                 mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
             } else if (mControlBoard.getMoveToZero()) {
@@ -258,37 +258,20 @@ public class Robot extends TimedRobot {
                 mIntake.stow();
             }
 
-            // TODO make serializer logic smarter
-            // check getExhaust first so can exh while intake is down by pressing both r/l bumpers
+            // TODO check getExhaust first so can exh while intake is down by pressing both r/l bumpers?
             if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband) {
-                mSerializer.setWantedState(Serializer.WantedState.IDLE);
                 mSerializer.setStirOverriding(true);
                 mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),
-                 Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
+                        Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
             } else {
-
                 mSerializer.setStirOverriding(false);
-                Serializer.WantedState serializer_wanted = Serializer.WantedState.IDLE;
+
                 if (mControlBoard.getExhaust()) {
                     mIntake.setWantedState(Intake.WantedState.EXHAUST);
                 } else if (mControlBoard.getIntake()) {
                     mIntake.setWantedState(Intake.WantedState.INTAKE);
-                    serializer_wanted = Serializer.WantedState.SERIALIZE;
-                } else if (mControlBoard.getHumanPlayerIntake()) {
-                    serializer_wanted = Serializer.WantedState.SERIALIZE;
                 } else {
                     mIntake.setWantedState(Intake.WantedState.IDLE);
-                    serializer_wanted = Serializer.WantedState.IDLE;
-                }
-
-                if (wants_aim) {
-                    serializer_wanted = Serializer.WantedState.PREPARE_TO_SHOOT;
-                }
-
-                if (mSuperstructure.getSystemState() != Superstructure.SystemState.SHOOT) {
-                    mSerializer.setWantedState(serializer_wanted);
-                } else {
-                    mSerializer.setWantedState(Serializer.WantedState.FEED);
                 }
             }
 
