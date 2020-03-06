@@ -172,7 +172,7 @@ public class LimelightTest {
         double x = 0;
         double y = 0;
         for (TargetInfo target : targets) {
-            Translation2d distance = RobotState.getCameraToVisionTargetPose(target, cameraHeight, cameraPitch);
+            Translation2d distance = RobotState.getCameraToVisionTargetTranslation(target, cameraHeight, cameraPitch);
             Assert.assertNotNull(distance);
             x += distance.x();
             y += distance.y();
