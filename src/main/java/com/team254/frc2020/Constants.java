@@ -203,7 +203,7 @@ public class Constants {
     public static final int kDefaultLimelightId = 1;
 
     public static final double kVisionTargetHeight = 98.25;
-    public static final Pose2d kVisionTargetToGoalOffset = new Pose2d(29.25, 0, Rotation2d.fromDegrees(0));
+    public static final Pose2d kVisionTargetToGoalOffset = new Pose2d(-29.25, 0, Rotation2d.identity());
 
     public static final PipelineConfiguration kLowRes1xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 1.0);
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);

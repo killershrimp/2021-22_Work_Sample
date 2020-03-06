@@ -322,10 +322,10 @@ public class Superstructure extends Subsystem {
     public synchronized double getTurretSetpointFromVision(double timestamp) {
         Optional<AimingParameters> latest_aiming_params = mRobotState.getAimingParameters(-1, Constants.kMaxGoalTrackAge);
         if (latest_aiming_params.isPresent()) {
+            // TODO this should not be done here. Instead, push goal offset into aiming parameters itself.
             mLatestAimingParameters = Optional.of(new AimingParameters(
-                latest_aiming_params.get().getRobotToGoal().transformBy(mShootingParameters.getVisionTargetToGoalOffset()), 
+                latest_aiming_params.get().getFieldToVehicle(),
                 latest_aiming_params.get().getFieldToGoal().transformBy(mShootingParameters.getVisionTargetToGoalOffset()),
-                latest_aiming_params.get().getFieldToGoal().transformBy(mShootingParameters.getVisionTargetToGoalOffset()).getRotation(),
                 latest_aiming_params.get().getLastSeenTimestamp(),
                 latest_aiming_params.get().getStability(),
                 latest_aiming_params.get().getTrackId()
@@ -336,14 +336,6 @@ public class Superstructure extends Subsystem {
             if (kIsHoodTuning) {
                 SmartDashboard.putNumber("Range To Target", mLatestAimingParameters.get().getRange());
             }
-
-            // TODO eliminate lookahead
-            final double kLookaheadTime = 0.0;
-            Pose2d robot_to_predicted_robot = mRobotState.getLatestFieldToVehicle().getValue().inverse()
-                    .transformBy(mRobotState.getPredictedFieldToVehicle(kLookaheadTime));
-            Pose2d predicted_robot_to_goal = robot_to_predicted_robot.inverse()
-                    .transformBy(mLatestAimingParameters.get().getRobotToGoal());
-            mCorrectedRangeToTarget = predicted_robot_to_goal.getTranslation().norm();
 
             // Don't aim if not in min distance
             if (mEnforceAutoAimMinDistance && mCorrectedRangeToTarget > mAutoAimMinDistance) {
@@ -383,8 +375,7 @@ public class Superstructure extends Subsystem {
      * @param field_relative_goal in degrees
      */
     public synchronized double getTurretSetpointFromFieldRelativeGoal(double timestamp, double field_relative_goal) {
-        final double kLookaheadTime = 0.0; // TODO eliminate
-        Rotation2d turret_error = mRobotState.getPredictedFieldToVehicle(kLookaheadTime)
+        Rotation2d turret_error = mRobotState.getFieldToVehicle(timestamp)
                 .transformBy(mRobotState.getVehicleToTurret(timestamp)).getRotation().inverse()
                 .rotateBy(Rotation2d.fromDegrees(field_relative_goal));
         double turret_setpoint = mTurret.getAngle() + turret_error.getDegrees();
