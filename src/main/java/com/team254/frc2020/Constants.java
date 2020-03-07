@@ -14,6 +14,8 @@ import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.ShootingParameters;
 
+import edu.wpi.first.wpilibj.util.Units;
+
 /**
  * A list of constants used by the rest of the robot code. This includes physics
  * constants as well as constants determined through calibration.
@@ -62,6 +64,7 @@ public class Constants {
     public static final double kDriveWheelTrackWidthInches = 30.0; //tuned 3/2
     public static final double kDriveWheelDiameterInches = 5.9067052758; //tuned 3/2
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
+    public static final double kDriveWheelRadiusMeters = Units.inchesToMeters(kDriveWheelDiameterInches);
     public static final double kDriveWheelTrackRadiusWidthMeters = kDriveWheelTrackWidthInches / 2.0 * 0.0254;
     public static final double kTrackScrubFactor = 1.0;
 
@@ -86,7 +89,7 @@ public class Constants {
     public static final double kFalcon500StallTorque = 4.69; // N*m
     public static final double kAssumedTorqueEfficiency = 0.95;
     public static final double kRobotLinearInertia = 62.051; // kg // TODO
-    public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ( (kDriveLowGearReduction * kFalcon500StallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusInches * kDriveWheelRadiusInches) );
+    public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ( (kDriveLowGearReduction * kFalcon500StallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusMeters * kDriveWheelRadiusMeters) );
     public static final double kDriveLinearKa = 0.00597 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
     public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
     public static final double kRobotAngularInertia = kDriveAngularKa / kDriveLinearKa *
