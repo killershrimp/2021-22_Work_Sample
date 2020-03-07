@@ -1,5 +1,6 @@
 package com.team254.frc2020;
 
+import java.sql.Time;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,10 +16,7 @@ import com.team254.frc2020.subsystems.*;
 import com.team254.frc2020.subsystems.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
-import com.team254.lib.util.CrashTracker;
-import com.team254.lib.util.OpenLoopCheesyDriveHelper;
-import com.team254.lib.util.Util;
-import com.team254.lib.util.VelocityCheesyDriveHelper;
+import com.team254.lib.util.*;
 import com.team254.lib.wpilib.TimedRobot;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -54,6 +52,8 @@ public class Robot extends TimedRobot {
     private Compressor mCompressor;
 
     private final RobotState mRobotState = RobotState.getInstance();
+
+    private DelayedBoolean mShouldNotShoot;
 
     Robot() {
         CrashTracker.logRobotConstruction();
@@ -93,6 +93,7 @@ public class Robot extends TimedRobot {
             mControlBoard.reset();
 
             mTurret.zeroSensors();
+            mShouldNotShoot = new DelayedBoolean(Timer.getFPGATimestamp(), 0.5);
 
             mSubsystemManager.stop();
         } catch (Throwable t) {
@@ -221,9 +222,14 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {}
 
+
+
     @Override
     public void teleopPeriodic() {
         try {
+
+
+            boolean wants_shoot = !mShouldNotShoot.update(Timer.getFPGATimestamp(), !mControlBoard.getShoot());
 
            if (mControlBoard.getZeroGyro()) {
                mDrive.setHeading(Rotation2d.fromDegrees(180));
@@ -237,7 +243,7 @@ public class Robot extends TimedRobot {
 
             boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
 
-            if (mControlBoard.getShoot()) {
+            if (wants_shoot) {
                 mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
             } else if (wants_aim) {
                 mSuperstructure.setShootingParams(mControlBoard.getAimFine() ? Constants.kFineShootingParams : Constants.kCoarseShootingParams);
