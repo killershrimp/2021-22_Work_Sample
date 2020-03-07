@@ -85,7 +85,7 @@ public class Drive extends Subsystem {
         TalonUtil.checkError(talon.config_kD(kLowGearPIDSlot, Constants.kDriveLowGearKd, Constants.kLongCANTimeoutMs), "Could not set low gear kd");
         TalonUtil.checkError(talon.config_kF(kLowGearPIDSlot, Constants.kDriveLowGearKf, Constants.kLongCANTimeoutMs), "Could not set low gear kf");
 
-        TalonUtil.checkError(talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 70, 70, 0.2), Constants.kLongCANTimeoutMs), "Could not set stator drive current limits");
+        TalonUtil.checkError(talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 60, 60, 0.2), Constants.kLongCANTimeoutMs), "Could not set stator drive current limits");
 
         TalonUtil.checkError(talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
         TalonUtil.checkError(talon.configVelocityMeasurementWindow(1, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement window");
