@@ -1,5 +1,6 @@
 package com.team254.frc2020.limelight.constants;
 
+import com.team254.frc2020.RobotType;
 import com.team254.frc2020.limelight.undistort.UndistortConstants;
 import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_0_320x240;
 import com.team254.frc2020.limelight.undistort.precomputedmaps.UndistortMap_Limelight_1_320x240;
@@ -81,5 +82,17 @@ public class LimelightConstantsFactory {
                         50.34836606499798
                 );
         }
+    }
+    public static LimelightConstants getConstantsForThisRobot() {
+        RobotType.Type type = RobotType.getRobotType();
+        int id = getIdForRobotType(type);
+        return getConstantsForId(id);
+    }
+
+    public static int getIdForRobotType(RobotType.Type type) {
+        if (type == RobotType.Type.PRACTICE) {
+            return 1;
+        }
+        return 2;
     }
 }

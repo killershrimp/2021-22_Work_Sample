@@ -42,7 +42,9 @@ public class Robot extends TimedRobot {
     // subsystems
     private final Drive mDrive = Drive.getInstance();
     private final Turret mTurret = Turret.getInstance();
-    private final Limelight mLimelight = new Limelight(LimelightConstantsFactory.getConstantsForId(Constants.kDefaultLimelightId), Constants.kLowRes1xZoom);
+    private final Limelight mLimelight = new Limelight(
+            LimelightConstantsFactory.getConstantsForThisRobot(),
+            Constants.kLowRes1xZoom);
     private final Superstructure mSuperstructure = Superstructure.getInstance();
     private final Intake mIntake = Intake.getInstance();
     private final Serializer mSerializer = Serializer.getInstance();
