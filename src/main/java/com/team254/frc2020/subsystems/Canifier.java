@@ -2,6 +2,7 @@ package com.team254.frc2020.subsystems;
 
 import com.ctre.phoenix.CANifier;
 import com.team254.frc2020.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Canifier extends Subsystem {
 
@@ -45,7 +46,9 @@ public class Canifier extends Subsystem {
     }
 
     @Override
-    public void outputTelemetry() {}
+    public void outputTelemetry() {
+        SmartDashboard.putBoolean("Turret Homing Limit Switch", mPeriodicIO.turret_homing_limit_switch);
+    }
 
     public synchronized boolean isBreamBeamSensorTriggered() {
         return mPeriodicIO.break_beam_triggered;
