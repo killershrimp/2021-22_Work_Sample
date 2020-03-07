@@ -43,12 +43,12 @@ public class Shooter extends Subsystem {
 
     private Shooter() {
         mRightMaster = TalonFXFactory.createDefaultTalon(Constants.kShooterRightMasterId);
-        mRightMaster.setInverted(true);
+        mRightMaster.setInverted(false);
         mRightMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mRightMaster.enableVoltageCompensation(true);
 
         mLeftMaster = TalonFXFactory.createDefaultTalon(Constants.kShooterLeftMasterId);
-        mLeftMaster.setInverted(false);
+        mLeftMaster.setInverted(true);
         mLeftMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mLeftMaster.enableVoltageCompensation(true);
 
