@@ -22,6 +22,7 @@ import com.team254.lib.util.VelocityCheesyDriveHelper;
 import com.team254.lib.wpilib.TimedRobot;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,6 +49,8 @@ public class Robot extends TimedRobot {
     private final Hood mHood = Hood.getInstance();
     private final Canifier mCanifier = Canifier.getInstance();
 
+    private Compressor mCompressor;
+
     private final RobotState mRobotState = RobotState.getInstance();
 
     Robot() {
@@ -71,6 +74,8 @@ public class Robot extends TimedRobot {
                 mLimelight,
                 mCanifier
             );
+
+            mCompressor = new Compressor();
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
@@ -123,7 +128,7 @@ public class Robot extends TimedRobot {
             CrashTracker.logAutoInit();
 
             mDisabledLooper.stop();
-
+            mCompressor.stop();
             // Robot starts backwards, turret starts backwards (in robot frame)
             mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretConstants.kHomePosition)));
             mDrive.setHeading(Rotation2d.fromDegrees(180));
@@ -141,6 +146,7 @@ public class Robot extends TimedRobot {
         try {
             CrashTracker.logTeleopInit();
             mDisabledLooper.stop();
+            mCompressor.start();
 
             if (mAutoModeExecutor != null) {
                 mAutoModeExecutor.stop();
