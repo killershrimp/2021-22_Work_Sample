@@ -12,6 +12,7 @@ public class ShootAction implements Action {
 
     private double mShotDuration;
     private double mStartTime = 0.0;
+    private boolean mHasStarted = false;
 
     public ShootAction(ShootingParameters params, double duration) {
         mShootingParameters = params;
@@ -20,18 +21,22 @@ public class ShootAction implements Action {
 
     @Override
     public void start() {
-        mStartTime = Timer.getFPGATimestamp();
-
         mSuperstructure.setShootingParams(mShootingParameters);
         mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        if (mSuperstructure.getSystemState() == Superstructure.SystemState.SHOOT && !mHasStarted) {
+            mStartTime = Timer.getFPGATimestamp();
+            mHasStarted = true;
+        }
+    }
+
 
     @Override
     public boolean isFinished() {
-        return (Timer.getFPGATimestamp() - mStartTime) >= mShotDuration;
+        return (Timer.getFPGATimestamp() - mStartTime) >= mShotDuration && mHasStarted;
     }
 
     @Override
