@@ -117,8 +117,8 @@ public class Constants {
         kTurretConstants.kPositionKp = 0.21;
         kTurretConstants.kPositionDeadband = (int) (0.5 * kTurretConstants.kTicksPerUnitDistance); // Ticks
 
-        kTurretConstants.kMinUnitsLimit = 20.0;
-        kTurretConstants.kMaxUnitsLimit = 340.0;
+        kTurretConstants.kMinUnitsLimit = 45.0;
+        kTurretConstants.kMaxUnitsLimit = 315.0;
 
         // TODO current limits, should recover position on reset?
 

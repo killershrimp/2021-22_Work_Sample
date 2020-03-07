@@ -2,7 +2,6 @@ package com.team254.frc2020.subsystems;
 
 import com.ctre.phoenix.CANifier;
 import com.team254.frc2020.Constants;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Canifier extends Subsystem {
 
@@ -18,9 +17,8 @@ public class Canifier extends Subsystem {
     private PeriodicIO mPeriodicIO;
 
     public static class PeriodicIO {
-
         boolean break_beam_triggered = false;
-
+        boolean turret_homing_limit_switch = false;
     }
 
     private CANifier mCanifier;
@@ -34,6 +32,7 @@ public class Canifier extends Subsystem {
     @Override
     public void readPeriodicInputs() {
         mPeriodicIO.break_beam_triggered = mCanifier.getGeneralInput(CANifier.GeneralPin.LIMR);
+        mPeriodicIO.turret_homing_limit_switch = !mCanifier.getGeneralInput(CANifier.GeneralPin.LIMF);
     }
 
     @Override
@@ -50,5 +49,9 @@ public class Canifier extends Subsystem {
 
     public synchronized boolean isBreamBeamSensorTriggered() {
         return mPeriodicIO.break_beam_triggered;
+    }
+
+    public synchronized boolean isTurretHomed() {
+        return mPeriodicIO.turret_homing_limit_switch;
     }
 }
