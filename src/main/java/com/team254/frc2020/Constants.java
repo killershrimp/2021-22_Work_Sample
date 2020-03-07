@@ -53,9 +53,9 @@ public class Constants {
 
     // Drive ratio.
     public static final double kDriveEncoderPPR = 1000.0;
-    public static final double kDriveRotationsPerTickHighGear = 1.0 / 2048.0 * 1.0 / 8.80; // ticks * kDriveRotationsPerTicksHighGear = wheel rotations
-    public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 10.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
-
+    public static final double kDriveRotationsPerTickHighGear = 1.0 / 2048.0 * 1.0 / (40.0 / 11.0 * 44.0 / 20.0); // ticks * kDriveRotationsPerTicksHighGear = wheel rotations
+    public static final double kDriveRotationsPerTickLowGear = 1.0 / 2048.0 * 1.0 / (40.0 / 11.0 * 50.0 / 14.0); // ticks * kDriveRotationsPerTicksLowGear = wheel rotations
+    public static final double kGearRatioScalar = (1.0 / (40.0 / 10.0 * 50.0 / 14.0)) / (1.0 / (40.0 / 11.0 * 50.0 / 14.0)); // TODO this is temporary, remove and just edit PID constants manually
     // Wheel parameters.
     public static final double kDriveWheelTrackWidthInches = 30.0; //tuned 3/2
     public static final double kDriveWheelDiameterInches = 5.9067052758; //tuned 3/2
@@ -64,7 +64,7 @@ public class Constants {
     public static final double kTrackScrubFactor = 1.0;
 
     // pidf gains (TODO tune)
-    public static final double kDriveHighGearKp = 0.0254;
+    public static final double kDriveHighGearKp = 0.0254 * kGearRatioScalar;
     public static final double kDriveHighGearKi = 0.0;
     public static final double kDriveHighGearKd = 0.0;
     public static final double kDriveHighGearKf = 0.0;
@@ -79,10 +79,10 @@ public class Constants {
 
 
     // robot dynamics (TODO tune)
-    public static final double kDriveVIntercept = 0.235; // V
-    public static final double kDriveLinearKv = 0.0488 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s
-    public static final double kDriveLinearKa = 0.00597 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s^2
-    public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches; // V per rad/s^2
+    public static final double kDriveVIntercept = 0.235 * kGearRatioScalar; // V // todo do i need to do this
+    public static final double kDriveLinearKv = 0.0488 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s
+    public static final double kDriveLinearKa = 0.00597 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
+    public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
     public static final double kRobotLinearInertia = 62.051; // kg // TODO
     public static final double kRobotAngularInertia = kDriveAngularKa / kDriveLinearKa *
             kDriveWheelTrackRadiusWidthMeters * kDriveWheelTrackRadiusWidthMeters * kRobotLinearInertia;  // kg m^2
