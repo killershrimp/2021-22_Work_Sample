@@ -30,7 +30,7 @@ public class AutoAimAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return mSuperstructure.getSystemState() == Superstructure.SystemState.AIMING;
     }
 
     @Override

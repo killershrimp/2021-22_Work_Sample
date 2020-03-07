@@ -38,7 +38,7 @@ public class FarWOF10Ball extends AutoModeBase {
                 new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().farWOF2ToShootingPoint),
                 new AutoAimAction(Rotation2d.fromDegrees(0)),
                 new SeriesAction(
-                        new WaitAction(1),
+                        new WaitAction(2),
                         new StopIntakingAction()),
                 new DeployIntakeAction(false)
         )
