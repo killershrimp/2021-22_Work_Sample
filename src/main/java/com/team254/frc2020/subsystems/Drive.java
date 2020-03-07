@@ -137,7 +137,7 @@ public class Drive extends Subsystem {
         mPTO = new Solenoid(Constants.kPCMId, Constants.kPTOSolenoidId);
 
         mPigeon = new PigeonIMU(Constants.kPigeonIMUId);
-        mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10, 10);
+        mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_6_SensorFusion, 10, 10);
 
         // force a solenoid message
         mIsHighGear = false;

@@ -1,6 +1,5 @@
 package com.team254.frc2020.auto.actions;
 
-import com.team254.frc2020.subsystems.Serializer;
 import com.team254.frc2020.subsystems.Superstructure;
 import com.team254.lib.util.ShootingParameters;
 
@@ -8,7 +7,6 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class ShootAction implements Action {
     private final Superstructure mSuperstructure = Superstructure.getInstance();
-    private final Serializer mSerializer = Serializer.getInstance();
 
     private final ShootingParameters mShootingParameters;
 
@@ -29,12 +27,7 @@ public class ShootAction implements Action {
     }
 
     @Override
-    public void update() {
-        // TODO move this somewhere better
-        if (mSuperstructure.getSystemState() == Superstructure.SystemState.SHOOT) {
-            mSerializer.setWantedState(Serializer.WantedState.FEED);
-        }
-    }
+    public void update() {}
 
     @Override
     public boolean isFinished() {
@@ -43,7 +36,6 @@ public class ShootAction implements Action {
 
     @Override
     public void done() {
-        mSerializer.setWantedState(Serializer.WantedState.IDLE);
         mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
     }
 }

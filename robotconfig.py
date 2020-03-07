@@ -18,12 +18,12 @@
     # Inversions for the right side motors
     "rightMotorsInverted": [True, True, True],
     # Wheel diameter (in units of your choice - will dictate units of analysis)
-    "wheelDiameter": 6.1316,
+    "wheelDiameter": 5.9067052758,
     # If your robot has only one encoder, set all right encoder fields to `None`
     # Encoder edges-per-revolution (*NOT* cycles per revolution!)
     # This value should be the edges per revolution *of the wheels*, and so
     # should take into account gearing between the encoder and the wheels
-    "encoderEPR": 18022.4,
+    "encoderEPR": 16384,
     # Whether the left encoder is inverted
     "leftEncoderInverted": False,
     # Whether the right encoder is inverted:

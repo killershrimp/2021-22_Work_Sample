@@ -69,7 +69,7 @@ public class Constants {
     public static final double kTrackScrubFactor = 1.0;
 
     // pidf gains (TODO tune)
-    public static final double kDriveHighGearKp = 0.0254 * kGearRatioScalar;
+    public static final double kDriveHighGearKp = 0.15;
     public static final double kDriveHighGearKi = 0.0;
     public static final double kDriveHighGearKd = 0.0;
     public static final double kDriveHighGearKf = 0.0;
@@ -84,8 +84,8 @@ public class Constants {
 
 
     // robot dynamics (TODO tune)
-    public static final double kDriveVIntercept = 0.235 * kGearRatioScalar; // V // todo do i need to do this
-    public static final double kDriveLinearKv = 0.0488 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s
+    public static final double kDriveVIntercept = 0.352; // V // todo do i need to do this
+    public static final double kDriveLinearKv = 0.0438 / 2.0 * Constants.kDriveWheelDiameterInches; // V / rad/s
     public static final double kFalcon500StallTorque = 4.69; // N*m
     public static final double kAssumedTorqueEfficiency = 0.95;
     public static final double kRobotLinearInertia = 62.051; // kg // TODO
@@ -94,7 +94,7 @@ public class Constants {
     public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
     public static final double kRobotAngularInertia = kDriveAngularKa / kDriveLinearKa *
             kDriveWheelTrackRadiusWidthMeters * kDriveWheelTrackRadiusWidthMeters * kRobotLinearInertia;  // kg m^2
-    public static final double kRobotAngularDrag = 40.0; // N*m / (rad/sec)
+    public static final double kRobotAngularDrag = 15.0; // N*m / (rad/sec)
 
     // path following (TODO tune?)
     public static final double kPathKX = 4.0; // units/s per unit of error

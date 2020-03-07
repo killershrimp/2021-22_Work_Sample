@@ -2,13 +2,11 @@ package com.team254.frc2020.auto.actions;
 
 import java.util.Optional;
 
-import com.team254.frc2020.subsystems.Serializer;
 import com.team254.frc2020.subsystems.Superstructure;
 import com.team254.lib.geometry.Rotation2d;
 
 public class AutoAimAction implements Action {
     private final Superstructure mSuperstructure = Superstructure.getInstance();
-    private final Serializer mSerializer = Serializer.getInstance();
 
     private Optional<Rotation2d> mHint = Optional.empty();
 
@@ -24,7 +22,6 @@ public class AutoAimAction implements Action {
             mSuperstructure.setTurretHint(mHint.get().getDegrees());
         }
 
-        mSerializer.setWantedState(Serializer.WantedState.PREPARE_TO_SHOOT);
         mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
     }
 
@@ -33,7 +30,7 @@ public class AutoAimAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return mSuperstructure.getSystemState() == Superstructure.SystemState.AIMING;
+        return true;
     }
 
     @Override

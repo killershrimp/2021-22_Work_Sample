@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
 
   static private double WHEEL_DIAMETER = 5.9067052758;
-  static private double ENCODER_EDGES_PER_REV = 18022.4;
+  static private double ENCODER_EDGES_PER_REV = 16384;
   static private int PIDIDX = 0;
 
   Joystick stick;
@@ -73,11 +73,15 @@ public class Robot extends TimedRobot {
     leftMaster.setInverted(false);
     leftMaster.setSensorPhase(false);
     leftMaster.setNeutralMode(NeutralMode.Brake);
+    leftMaster.configVoltageCompSaturation(12.0);
+    leftMaster.enableVoltageCompensation(true);
 
     rightMaster = new WPI_TalonFX(4);
     rightMaster.setInverted(true);
     rightMaster.setSensorPhase(false);
     rightMaster.setNeutralMode(NeutralMode.Brake);
+    rightMaster.configVoltageCompSaturation(12.0);
+    rightMaster.enableVoltageCompensation(true);
 
     WPI_TalonFX leftSlave0 = new WPI_TalonFX(2);
     leftSlave0.setInverted(false);
