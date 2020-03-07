@@ -284,7 +284,10 @@ public class Superstructure extends Subsystem {
 
         if ((timestamp - mLastShootingParamsPrintTime) > 0.5) {
             mLastShootingParamsPrintTime = timestamp;
-            System.out.println("Making shot, range: " + range + " hood: " + hoodAngle + " rpm: " + mShooter.getAverageRPM());
+            System.out.println("Making shot, range: " + range + " hood: " + hoodAngle + " rpm: " + mShooter.getAverageRPM()
+                    + " output voltage: " + mShooter.getAverageOutputVoltage()
+                    + " supply current: " + mShooter.getAverageSupplyCurrent()
+                    + " stator current: " + mShooter.getAverageStatorCurrent());
         }
     }
 

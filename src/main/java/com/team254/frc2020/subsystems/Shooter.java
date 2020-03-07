@@ -8,8 +8,10 @@ import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 import com.team254.lib.drivers.TalonUtil;
+import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Subsystem {
@@ -27,11 +29,20 @@ public class Shooter extends Subsystem {
 
     public static class PeriodicIO {
         // inputs
-        double right_velocity_ticks_per_100_ms = 0.0;
-        double left_velocity_ticks_per_100_ms = 0.0;
+        public double timestamp;
+        public double left_output_voltage;
+        public double left_supply_current;
+        public double left_stator_current;
+        public double right_output_voltage;
+        public double right_supply_current;
+        public double right_stator_current;
+        public double right_velocity_ticks_per_100_ms = 0.0;
+        public double left_velocity_ticks_per_100_ms = 0.0;
+        public double right_velocity_rpm = 0.0;
+        public double left_velocity_rpm = 0.0;
 
         // outputs
-        double demand = 0.0;
+        public double demand = 0.0;
     }
 
     public enum ShooterControlState {
@@ -39,6 +50,8 @@ public class Shooter extends Subsystem {
     }
 
     private PeriodicIO mPeriodicIO = new PeriodicIO();
+    private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
+
     private ShooterControlState mControlState = ShooterControlState.OPEN_LOOP;
 
     private Shooter() {
@@ -85,13 +98,16 @@ public class Shooter extends Subsystem {
     public void registerEnabledLoops(ILooper mEnabledLooper) {
         mEnabledLooper.register(new Loop() {
             @Override
-            public void onStart(double timestamp) {}
+            public void onStart(double timestamp) {
+                // startLogging();
+            }
 
             @Override
             public void onLoop(double timestamp) {}
 
             @Override
             public void onStop(double timestamp) {
+                // stopLogging();
                 stop();
             }
         });
@@ -99,8 +115,25 @@ public class Shooter extends Subsystem {
 
     @Override
     public void readPeriodicInputs() {
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
+
+        mPeriodicIO.left_output_voltage = mLeftMaster.getMotorOutputVoltage();
+        mPeriodicIO.left_supply_current = mLeftMaster.getSupplyCurrent();
+        mPeriodicIO.left_stator_current = mLeftMaster.getStatorCurrent();
+
+        mPeriodicIO.right_output_voltage = mRightMaster.getMotorOutputVoltage();
+        mPeriodicIO.right_supply_current = mRightMaster.getSupplyCurrent();
+        mPeriodicIO.right_stator_current = mRightMaster.getStatorCurrent();
+
         mPeriodicIO.right_velocity_ticks_per_100_ms = mRightMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.left_velocity_ticks_per_100_ms = mLeftMaster.getSelectedSensorVelocity(0);
+
+        mPeriodicIO.right_velocity_rpm = nativeUnitsToRPM(mPeriodicIO.right_velocity_ticks_per_100_ms);
+        mPeriodicIO.left_velocity_rpm = nativeUnitsToRPM(mPeriodicIO.left_velocity_ticks_per_100_ms);
+
+        if (mCSVWriter != null) {
+            mCSVWriter.add(mPeriodicIO);
+        }
     }
 
     @Override
@@ -168,6 +201,31 @@ public class Shooter extends Subsystem {
         return (getRightRPM() + getLeftRPM()) / 2.0;
     }
 
+    public synchronized double getAverageOutputVoltage() {
+        return (mPeriodicIO.right_output_voltage + mPeriodicIO.left_output_voltage) / 2.0;
+    }
+
+    public synchronized double getAverageSupplyCurrent() {
+        return (mPeriodicIO.right_supply_current + mPeriodicIO.left_supply_current) / 2.0;
+    }
+
+    public synchronized double getAverageStatorCurrent() {
+        return (mPeriodicIO.right_stator_current + mPeriodicIO.left_stator_current) / 2.0;
+    }
+
+    public synchronized void startLogging() {
+        if (mCSVWriter == null) {
+            mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/SHOOTER-LOGS.csv", PeriodicIO.class);
+        }
+    }
+
+    public synchronized void stopLogging() {
+        if (mCSVWriter != null) {
+            mCSVWriter.flush();
+            mCSVWriter = null;
+        }
+    }
+
     /**
      * @param ticks per 100 ms
      * @return rpm
@@ -191,5 +249,9 @@ public class Shooter extends Subsystem {
         SmartDashboard.putNumber("Shooter Demand", mControlState == ShooterControlState.OPEN_LOOP ? mPeriodicIO.demand
                 : (mControlState == ShooterControlState.VELOCITY ? nativeUnitsToRPM(mPeriodicIO.demand) : 0.0));
         SmartDashboard.putBoolean("Shooter At Setpoint", isAtSetpoint());
+
+        if (mCSVWriter != null) {
+            mCSVWriter.write();
+        }
     }
 }
