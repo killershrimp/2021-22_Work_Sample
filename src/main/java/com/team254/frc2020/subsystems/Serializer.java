@@ -90,7 +90,7 @@ public class Serializer extends Subsystem {
         mSpinCycleMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 50, 50, 0.2), Constants.kLongCANTimeoutMs);
 
         mRightRollerMaster = TalonFXFactory.createDefaultTalon(Constants.kSerializerRightRollerMasterId);
-        mRightRollerMaster.setInverted(false);
+        mRightRollerMaster.setInverted(true);
         mRightRollerMaster.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, Constants.kLongCANTimeoutMs);
         mRightRollerMaster.configVelocityMeasurementWindow(16, Constants.kLongCANTimeoutMs);
 
@@ -331,7 +331,7 @@ public class Serializer extends Subsystem {
     private void setFeedStateDemands() {
         mPeriodicIO.spin_cycle_demand = kSpinCycleFeedDemand;
         mPeriodicIO.left_roller_demand = kRollerDemandFeed;
-        mPeriodicIO.right_roller_demand = -kRollerDemandFeed;
+        mPeriodicIO.right_roller_demand = kRollerDemandFeed;
         setSkateParkDeployed(true);
         setChockDeployed(false);
     }
