@@ -16,13 +16,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Serializer extends Subsystem {
 
     public static final double kSpinCycleSerializeDemand = 0.45;
-    public static final double kSpinCycleRebalancingDemand = 0.75;
     public static final double kSpinCycleFeedDemand = 0.75;
     public static final double kRollerDemandFeed = 14000; // ticks/100ms
-    public static final double kSpinCycleOscillationTime = 1.2; // seconds before switching dir
-    public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
 
-    public static final double kRebalacingTime = 0.5; // seconds
     public static final double kBeamBreakSerializeTime = 0.25; // seconds, time it serializes after ball left beam break
 
     private boolean mStirOverride = false;
@@ -51,7 +47,6 @@ public class Serializer extends Subsystem {
     public enum WantedState {
         IDLE,
         SERIALIZE,
-        PREPARE_TO_SHOOT,
         FEED
     }
 
@@ -59,7 +54,6 @@ public class Serializer extends Subsystem {
         IDLE,
         SERIALIZE,
         FEED,
-        REBALANCING,
     }
 
     private TalonFX mSpinCycleMaster, mRightRollerMaster, mLeftRollerMaster;
@@ -192,16 +186,13 @@ public class Serializer extends Subsystem {
                         case FEED:
                             newState = handleFeed();
                             break;
-                        case REBALANCING:
-                            newState = handleRebalancing(timeInState);
-                            break;
                         default:
                             System.out.println("unexpected serializer system state: " + mSystemState);
                             break;
                     }
             
                     if (newState != mSystemState) {
-                        System.out.println(timestamp + ": Changed state: " + mSystemState + " -> " + newState);
+                        System.out.println(timestamp + ": Serializer Changed state: " + mSystemState + " -> " + newState);
                         mSystemState = newState;
                         mCurrentStateStartTime = timestamp;
                         timeInState = 0.0;
@@ -216,9 +207,6 @@ public class Serializer extends Subsystem {
                             break;
                         case FEED:
                             setFeedStateDemands();
-                            break;
-                        case REBALANCING:
-                            setRebalancingStateDemands(timeInState);
                             break;
                         default:
                             System.out.println("Unexpected serializer system state: " + mSystemState);
@@ -236,25 +224,21 @@ public class Serializer extends Subsystem {
 
     private SystemState handleIdle(double timestamp) {
         switch (mWantedState) {
-            case PREPARE_TO_SHOOT:
-                return SystemState.REBALANCING;
             case SERIALIZE:
                 return SystemState.SERIALIZE;
             case FEED:
-                return SystemState.REBALANCING;
+                return SystemState.FEED;
             case IDLE:
             default:
                 if (mPeriodicIO.break_beam_triggered) {
                     return SystemState.SERIALIZE;
                 }
-                return SystemState.IDLE;
+            return SystemState.IDLE;
         }
     }
 
     private SystemState handleSerialize(double timestamp) {
         switch (mWantedState) {
-            case PREPARE_TO_SHOOT:
-                return SystemState.REBALANCING;
             case IDLE:
                 if (timestamp - mLastBreakBreakTriggerTime < kBeamBreakSerializeTime) {
                     return SystemState.SERIALIZE;
@@ -270,8 +254,6 @@ public class Serializer extends Subsystem {
 
     private SystemState handleFeed() {
         switch (mWantedState) {
-            case PREPARE_TO_SHOOT:
-                return SystemState.REBALANCING;
             case IDLE:
                 return SystemState.IDLE;
             case SERIALIZE:
@@ -282,25 +264,6 @@ public class Serializer extends Subsystem {
         }
     }
 
-    private SystemState handleRebalancing(double timeInState) {
-
-        if (timeInState < kRebalacingTime) {
-            return SystemState.REBALANCING;
-        }
-
-        switch (mWantedState) {
-            case PREPARE_TO_SHOOT:
-                return SystemState.REBALANCING;
-            case IDLE:
-                return SystemState.IDLE;
-            case SERIALIZE:
-                return SystemState.SERIALIZE;
-            case FEED:
-                return SystemState.FEED;
-            default:
-                return SystemState.REBALANCING;
-        }
-    }
 
     private void setIdleStateDemands() {
         if (!mStirOverride) {
@@ -314,14 +277,7 @@ public class Serializer extends Subsystem {
     }
 
     private void setSerializeStateDemands(double timeInState) {
-        // double timeInCycle = timeInState % kTotalCycleTime;
-
-        // if (timeInCycle < kSpinCycleOscillationTime) {
-        //     mPeriodicIO.spin_cycle_demand = kSpinCycleSerializeDemand;
-        // } else {
         mPeriodicIO.spin_cycle_demand = kSpinCycleSerializeDemand;
-        // }
-
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
@@ -333,18 +289,6 @@ public class Serializer extends Subsystem {
         mPeriodicIO.left_roller_demand = kRollerDemandFeed;
         mPeriodicIO.right_roller_demand = kRollerDemandFeed;
         setSkateParkDeployed(true);
-        setChockDeployed(false);
-    }
-
-    private void setRebalancingStateDemands(double timeInState) {
-        if (timeInState <  kRebalacingTime) {
-            mPeriodicIO.spin_cycle_demand = kSpinCycleRebalancingDemand;
-        } else {
-            mPeriodicIO.spin_cycle_demand = 0.0;
-        }
-        mPeriodicIO.left_roller_demand = 0.0;
-        mPeriodicIO.right_roller_demand = 0.0;
-        setSkateParkDeployed(false);
         setChockDeployed(false);
     }
 
@@ -370,14 +314,13 @@ public class Serializer extends Subsystem {
         }
     }
 
-    public void setOpenLoop(double demand) {
+    public synchronized void setOpenLoop(double demand) {
         mPeriodicIO.spin_cycle_demand = demand;
     }
 
-    public void setStirOverriding(boolean override) {
+    public synchronized void setStirOverriding(boolean override) {
         mStirOverride = override;
     }
-
 
     public synchronized void setWantedState(WantedState wantedState) {
         mWantedState = wantedState;
