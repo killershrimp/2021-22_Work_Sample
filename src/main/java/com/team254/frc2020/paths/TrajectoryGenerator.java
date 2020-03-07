@@ -156,7 +156,7 @@ public class TrajectoryGenerator {
             waypoints.add(new Pose2d(-41, 4, Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-240, 0, Rotation2d.fromDegrees(180)));
             return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-                    75, kMaxAccel, kMaxVoltage);
+                    95, kMaxAccel, kMaxVoltage);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getFarWOF2ToShoot() {
