@@ -174,7 +174,7 @@ public class Superstructure extends Subsystem {
                 SmartDashboard.putBoolean("HoodAtSetpoint", mShootingParameters.isHoodAtSetpoint(mHood.getAngle(), mHood.getSetpointHomed()));
 
                 if (mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM()) && 
-                        mShootingParameters.isTurretAtSetpoint(mTurret.getAngle(), mTurret.getSetpointHomed()) &&
+                        visionHasTarget() && mShootingParameters.isTurretAtSetpoint(mTurret.getAngle(), mTurret.getSetpointHomed()) &&
                         mShootingParameters.isHoodAtSetpoint(mHood.getAngle(), mHood.getSetpointHomed())) {
                     return SystemState.SHOOT;
                 }
