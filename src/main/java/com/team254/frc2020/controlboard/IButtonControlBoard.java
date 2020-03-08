@@ -36,4 +36,6 @@ public interface IButtonControlBoard {
     boolean getToggleHangMode();
 
     boolean getZeroGyro();
+
+    boolean getToggleInPitHangMode();
 }

@@ -29,12 +29,12 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
 
     @Override
     public boolean getAimCoarse() {
-        return mController.getTrigger(XboxController.Side.LEFT);
+        return mController.getTrigger(XboxController.Side.LEFT) && !getFnKey();
     }
 
     @Override
     public boolean getAimFine() {
-        return mController.getTrigger(XboxController.Side.RIGHT);
+        return mController.getTrigger(XboxController.Side.RIGHT) && !getFnKey();
     }
 
     @Override
@@ -133,5 +133,8 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
         return mController.getButton(XboxController.Button.Y) && getFnKey();
     }
 
-
+    @Override
+    public boolean getToggleInPitHangMode() {
+        return  getFnKey() && mController.getTrigger(XboxController.Side.LEFT) && mController.getTrigger(XboxController.Side.RIGHT);
+    }
 }

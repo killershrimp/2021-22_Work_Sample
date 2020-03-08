@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
     private DelayedBoolean mShouldNotShoot;
     private ClimbingStateMachine mClimbingStateMachine = new ClimbingStateMachine();
     private LatchedBoolean mHangModeEnablePressed = new LatchedBoolean();
+    private LatchedBoolean mInPitHangModeEnablePressed = new LatchedBoolean();
     private LatchedBoolean mWOFModeEnablePressed = new LatchedBoolean();
     private boolean mInHangMode = false;
     private boolean mInWOFMode = false;
@@ -260,11 +261,14 @@ public class Robot extends TimedRobot {
 
             boolean hangModePressed =
                     mHangModeEnablePressed.update(mControlBoard.getToggleHangMode());
+            boolean inPitHangModePressed = mInPitHangModeEnablePressed.update(mControlBoard.getToggleInPitHangMode());
 
-            if (hangModePressed && !mInHangMode) {
+            if ((inPitHangModePressed || hangModePressed) && !mInHangMode) {
                 System.out.println("Entering hang mode!!!!");
+                // Set in pit mode or regular mode
+                mClimbingStateMachine.setInPitMode(inPitHangModePressed);
                 mInHangMode = true;
-            } else if (hangModePressed && mInHangMode) {
+            } else if ((inPitHangModePressed || hangModePressed) && mInHangMode) {
                 System.out.println("Exiting hang mode!");
                 mInHangMode = false;
                 mClimbingStateMachine.reset();

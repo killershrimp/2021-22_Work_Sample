@@ -137,4 +137,9 @@ public class ControlBoard implements IControlBoard {
         return mButtonControlBoard.getZeroGyro();
     }
 
+    @Override
+    public boolean getToggleInPitHangMode() {
+        return mButtonControlBoard.getToggleInPitHangMode();
+    }
+
 }

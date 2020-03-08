@@ -5,6 +5,7 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.nio.DoubleBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClimbingStateMachine {
     private static final double kFeedforwardDown = 1.0 / 12.0;
@@ -27,6 +28,7 @@ public class ClimbingStateMachine {
     private LatchedBoolean mDeployToggle = new LatchedBoolean();
     private LatchedBoolean mBreakToggle = new LatchedBoolean();
     private double mBreakTime = Double.NaN;
+    private AtomicBoolean mIsInPitMode = new AtomicBoolean(false);
 
     public ClimbingStateMachine() {
         mDrive = Drive.getInstance();
@@ -44,6 +46,10 @@ public class ClimbingStateMachine {
         mBreakToggle.update(true);
         mDrive.configPTOCurrentLimits(60);
         mBreakTime = Double.NaN;
+    }
+
+    public synchronized void setInPitMode(boolean enable) {
+        mIsInPitMode.set(enable);
     }
 
     public synchronized void handle(double timestamp, double climbThrottle, boolean climb,
@@ -112,7 +118,11 @@ public class ClimbingStateMachine {
         SystemState nextState = mSystemState;
         switch (mSystemState) {
             case PRECLIMB:
-                nextState = SystemState.DISENGAGING_BRAKE;
+                if (mIsInPitMode.get()) {
+                    nextState = SystemState.MANUAL;
+                } else {
+                    nextState = SystemState.DISENGAGING_BRAKE;
+                }
                 break;
             case DISENGAGING_BRAKE:
                 if (timeInState > 1.0) {
@@ -141,7 +151,7 @@ public class ClimbingStateMachine {
                 }
                 break;
             case MANUAL:
-                if (climb) {
+                if (climb && !mIsInPitMode.get()) {
                     nextState = SystemState.CLIMBING;
                 }
                 break;
