@@ -113,7 +113,7 @@ public class Superstructure extends Subsystem {
                     }
             
                     if (newState != mSystemState) {
-                        System.out.println(timestamp + ": Superstructure changed state: " + mSystemState + " -> " + newState);
+                        System.out.println(timestamp + ": Changed state: " + mSystemState + " -> " + newState);
                         mSystemState = newState;
                         mCurrentStateStartTime = timestamp;
                         timeInState = 0.0;
@@ -228,7 +228,7 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeAimingDesiredState(double timestamp) {
-        mSerializer.setWantedState(Serializer.WantedState.IDLE);
+        mSerializer.setWantedState(Serializer.WantedState.PREPARE_TO_SHOOT);
 
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();
@@ -258,6 +258,7 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeShootDesiredState(double timestamp) {
+        mSerializer.setWantedState(Serializer.WantedState.FEED);
 
         mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
 
@@ -275,8 +276,6 @@ public class Superstructure extends Subsystem {
                 System.out.println("Lost target while shooting! Maintaining: " + hoodAngle);
             }
         }
-        mSerializer.setWantedState(Serializer.WantedState.FEED);
-
         mHood.setSetpointPositionPID(hoodAngle);
 
         double shooterRpm = mShootingParameters.getShooterSetpointRPM();
