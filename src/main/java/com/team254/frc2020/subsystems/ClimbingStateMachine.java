@@ -29,6 +29,7 @@ public class ClimbingStateMachine {
     private LatchedBoolean mBreakToggle = new LatchedBoolean();
     private double mBreakTime = Double.NaN;
     private AtomicBoolean mIsInPitMode = new AtomicBoolean(false);
+    private double mCurrentLimit = 60;
 
     public ClimbingStateMachine() {
         mDrive = Drive.getInstance();
@@ -55,6 +56,7 @@ public class ClimbingStateMachine {
     public synchronized void handle(double timestamp, double climbThrottle, boolean climb,
                                     boolean deploy, boolean breakOn, boolean breakOff) {
         double timeInState = timestamp - mStateStartTime;
+        double wantedCurrentLimit = mCurrentLimit;
 
         if (mDeployToggle.update(deploy)) {
            mDrive.setDeploy(!mDrive.getDeploy());
@@ -83,7 +85,7 @@ public class ClimbingStateMachine {
                 mDrive.setPTOEngaged(true);
                 mDrive.setBreakEngaged(false);
                 mDrive.zeroPTOMotors();
-                mDrive.configPTOCurrentLimits(20);
+                wantedCurrentLimit = 20;
                 break;
             case DISENGAGING_BRAKE:
                 // Positive throttle is downwards.
@@ -107,6 +109,7 @@ public class ClimbingStateMachine {
                 } else {
                     mDrive.setPTOMotorsOpenLoop(Util.handleDeadband(-climbThrottle, kThrottleDeadband), 0.0);
                 }
+                wantedCurrentLimit = 40;
                 break;
             case CLIMBING:
                 mDrive.setPTOMotorsPosition(kClimbPosition);
@@ -142,7 +145,7 @@ public class ClimbingStateMachine {
                     System.out.println("Retrying to disengage.");
                     nextState = SystemState.DISENGAGING_BRAKE;
                 } else {
-                    mDrive.configPTOCurrentLimits(60);
+                    wantedCurrentLimit = 60;
                 }
                 break;
             case CLIMBING:
@@ -163,6 +166,11 @@ public class ClimbingStateMachine {
             System.out.println("Transitioned from : " + mSystemState + " to " + nextState);
             mSystemState = nextState;
             mStateStartTime = timestamp;
+        }
+
+        if (Util.epsilonEquals(wantedCurrentLimit, mCurrentLimit, .1)) {
+            mDrive.configPTOCurrentLimits(wantedCurrentLimit);
+            mCurrentLimit = wantedCurrentLimit;
         }
 
     }
