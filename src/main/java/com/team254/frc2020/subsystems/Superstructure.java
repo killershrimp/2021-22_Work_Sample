@@ -113,7 +113,7 @@ public class Superstructure extends Subsystem {
                     }
             
                     if (newState != mSystemState) {
-                        System.out.println(timestamp + ": Changed state: " + mSystemState + " -> " + newState);
+                        System.out.println(timestamp + ": Superstructure changed state: " + mSystemState + " -> " + newState);
                         mSystemState = newState;
                         mCurrentStateStartTime = timestamp;
                         timeInState = 0.0;
