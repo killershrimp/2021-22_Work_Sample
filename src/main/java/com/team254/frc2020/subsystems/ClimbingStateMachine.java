@@ -42,6 +42,7 @@ public class ClimbingStateMachine {
         mDrive.stop();
         mDeployToggle.update(true);
         mBreakToggle.update(true);
+        mDrive.configPTOCurrentLimits(60);
         mBreakTime = Double.NaN;
     }
 
@@ -76,10 +77,15 @@ public class ClimbingStateMachine {
                 mDrive.setPTOEngaged(true);
                 mDrive.setBreakEngaged(false);
                 mDrive.zeroPTOMotors();
+                mDrive.configPTOCurrentLimits(20);
                 break;
             case DISENGAGING_BRAKE:
                 // Positive throttle is downwards.
-                mDrive.setPTOMotorsOpenLoop(0.1, 0.0);
+                if (timeInState > 0.5) {
+                    mDrive.setPTOMotorsOpenLoop(0.1, 0.0);
+                } else {
+                    mDrive.setPTOMotorsOpenLoop(0.0, 0.0);
+                }
             //    System.out.println("PTO position" + mDrive.getPTOPosition() + " throttle: " +
                         //climbThrottle);
                 break;
@@ -109,7 +115,7 @@ public class ClimbingStateMachine {
                 nextState = SystemState.DISENGAGING_BRAKE;
                 break;
             case DISENGAGING_BRAKE:
-                if (timeInState > 0.5) {
+                if (timeInState > 1.0) {
                     nextState = SystemState.EXTENDING;
                     mDrive.setDeploy(true);
                     mDrive.configPTOPID(true);
@@ -121,6 +127,12 @@ public class ClimbingStateMachine {
                 }
                 if (climb) {
                     nextState = SystemState.CLIMBING;
+                }
+                if ((timeInState > 0.75) && mDrive.getPTOPosition() > -2000) {
+                    System.out.println("Retrying to disengage.");
+                    nextState = SystemState.DISENGAGING_BRAKE;
+                } else {
+                    mDrive.configPTOCurrentLimits(60);
                 }
                 break;
             case CLIMBING:

@@ -613,6 +613,12 @@ public class Drive extends Subsystem {
         mRightSide.getPTOMotors().forEach(t -> t.setSelectedSensorPosition(0));
     }
 
+    public synchronized void configPTOCurrentLimits(double current) {
+        mLeftSide.getPTOMotors().forEach(t -> t.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
+                true, current, current, 0.2), 0));
+        mRightSide.getPTOMotors().forEach(t -> t.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
+                true, current, current, 0.2), 0));
+    }
     public synchronized double getPTOPosition() {
         return mRightSide.getPTOMotors().iterator().next().getSelectedSensorPosition();
     }

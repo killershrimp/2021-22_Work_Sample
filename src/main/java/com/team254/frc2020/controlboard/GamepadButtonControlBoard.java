@@ -93,6 +93,11 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
+    public double getClimbJog() {
+        return mController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
+    }
+
+    @Override
     public double getHoodJog() {
         return mController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.Y);
     }

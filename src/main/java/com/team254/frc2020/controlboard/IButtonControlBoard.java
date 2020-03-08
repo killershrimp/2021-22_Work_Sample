@@ -23,6 +23,8 @@ public interface IButtonControlBoard {
 
     double getTurretJog();
 
+    double getClimbJog();
+
     double getHoodJog();
 
     double getStir();

@@ -103,6 +103,11 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
+    public double getClimbJog() {
+        return mButtonControlBoard.getClimbJog();
+    }
+
+    @Override
     public double getHoodJog() {
         return mButtonControlBoard.getHoodJog();
     }

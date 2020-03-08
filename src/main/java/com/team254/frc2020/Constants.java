@@ -187,6 +187,9 @@ public class Constants {
     public static final double kLightIntakePower = -0.25; // % output to run after stowing for kLightIntakeTime seconds
     public static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
 
+    // WOF
+    public static final int kWOFSpinnerId = 15;
+
     // Canifier
     public static final int kCanifierId = 16;
 
@@ -202,6 +205,7 @@ public class Constants {
     public static final int kChockSolenoidId = 7;
     public static final int kBreakSolenoidId = 6;
     public static final int kDeploySolenoidId = 3;
+    public static final int kWOFSolenoidId = 4;
 
     // Vision
     public static final boolean kShouldUndistort = true;

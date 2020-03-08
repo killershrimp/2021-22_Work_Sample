@@ -19,11 +19,8 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.*;
 import com.team254.lib.wpilib.TimedRobot;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
     private final Looper mEnabledLooper = new Looper();
@@ -48,6 +45,7 @@ public class Robot extends TimedRobot {
     private final Serializer mSerializer = Serializer.getInstance();
     private final Hood mHood = Hood.getInstance();
     private final Canifier mCanifier = Canifier.getInstance();
+    private final WOF mWOF = WOF.getInstance();
 
 
     private Compressor mCompressor;
@@ -57,7 +55,9 @@ public class Robot extends TimedRobot {
     private DelayedBoolean mShouldNotShoot;
     private ClimbingStateMachine mClimbingStateMachine = new ClimbingStateMachine();
     private LatchedBoolean mHangModeEnablePressed = new LatchedBoolean();
+    private LatchedBoolean mWOFModeEnablePressed = new LatchedBoolean();
     private boolean mInHangMode = false;
+    private boolean mInWOFMode = false;
     private double mDisabledStartTime = Double.NaN;
 
     Robot() {
@@ -79,7 +79,8 @@ public class Robot extends TimedRobot {
                 mIntake,
                 mSuperstructure,
                 mLimelight,
-                mCanifier
+                mCanifier,
+                mWOF
             );
 
             mCompressor = new Compressor();
@@ -225,7 +226,8 @@ public class Robot extends TimedRobot {
                 mAutoModeExecutor.setAutoMode(autoMode.get());
             }
 
-            if ((Timer.getFPGATimestamp() - mDisabledStartTime) > 5.0) {
+            if ((Timer.getFPGATimestamp() - mDisabledStartTime) > 5.0 &&
+                    (Timer.getFPGATimestamp() - mDisabledStartTime) < 5.5) {
                 System.out.println("Setting coast!");
                 mClimbingStateMachine.reset();
                 mDrive.setBrakeMode(false);
@@ -244,13 +246,11 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         try {
-
-
             boolean wants_shoot = !mShouldNotShoot.update(Timer.getFPGATimestamp(), !mControlBoard.getShoot());
 
-           if (mControlBoard.getZeroGyro()) {
-               mDrive.setHeading(Rotation2d.fromDegrees(180));
-           }
+            if (mControlBoard.getZeroGyro()) {
+                mDrive.setHeading(Rotation2d.fromDegrees(180));
+            }
 
             mDrive.setHighGear(!mControlBoard.getWantsLowGear());
             // mDrive.setVelocity(VelocityCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
@@ -270,26 +270,44 @@ public class Robot extends TimedRobot {
                 mClimbingStateMachine.reset();
             }
 
+            boolean WOFModePressed = mWOFModeEnablePressed.update(mControlBoard.getToggleWOFMode());
+            if (WOFModePressed && !mInWOFMode) {
+                System.out.println("Entering WOF mode!!!!");
+                mInWOFMode = true;
+            } else if (WOFModePressed && mInWOFMode) {
+                System.out.println("Exiting WOF mode!");
+                mInWOFMode = false;
+            }
+
+
+            if (mInWOFMode) {
+                mWOF.setDeploy(true);
+                mWOF.setOpenLoop(mControlBoard.getStir() * 0.5);
+            } else {
+                mWOF.setDeploy(false);
+            }
+
+
             if (mInHangMode) {
-                mClimbingStateMachine.handle(Timer.getFPGATimestamp(), mControlBoard.getHoodJog(), false, mControlBoard.getRetractIntake(),
+                mClimbingStateMachine.handle(Timer.getFPGATimestamp(), mControlBoard.getClimbJog(), false, mControlBoard.getRetractIntake(),
                         mControlBoard.getHumanPlayerIntake(), mControlBoard.getDeployIntake());
                 mSuperstructure.setTurretHintRobotRelative(Timer.getFPGATimestamp(), -90);
             } else {
-                // TODO check getExhaust first so can exh while intake is down by pressing both r/l bumpers?
-                if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband) {
+                //check getExhaust first so can exh while intake is down by pressing both r/l bumpers?
+                if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband && !mInWOFMode) {
                     mSerializer.setStirOverriding(true);
                     mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),
                             Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
                 } else {
                     mSerializer.setStirOverriding(false);
+                }
 
-                    if (mControlBoard.getExhaust()) {
-                        mIntake.setWantedState(Intake.WantedState.EXHAUST);
-                    } else if (mControlBoard.getIntake()) {
-                        mIntake.setWantedState(Intake.WantedState.INTAKE);
-                    } else {
-                        mIntake.setWantedState(Intake.WantedState.IDLE);
-                    }
+                if (mControlBoard.getExhaust()) {
+                    mIntake.setWantedState(Intake.WantedState.EXHAUST);
+                } else if (mControlBoard.getIntake()) {
+                    mIntake.setWantedState(Intake.WantedState.INTAKE);
+                } else {
+                    mIntake.setWantedState(Intake.WantedState.IDLE);
                 }
 
                 boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
