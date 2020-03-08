@@ -41,6 +41,8 @@ public class Drive extends Subsystem {
     private final TalonFX mLeftMaster1, mRightMaster1, mLeftMaster2, mRightMaster2, mLeftMaster3, mRightMaster3;
     private final Solenoid mShifter;
     private final Solenoid mPTO;
+    private final Solenoid mBreak;
+    private final Solenoid mDeploy;
     private final Encoder mLeftEncoder, mRightEncoder;
     private final DriveWithPTOSide mLeftSide;
     private final DriveWithPTOSide mRightSide;
@@ -59,6 +61,7 @@ public class Drive extends Subsystem {
 
     private int kHighGearPIDSlot = 0;
     private int kLowGearPIDSlot = 1;
+    private int kPositionPID = 2;
 
     public synchronized static Drive getInstance() {
         if (mInstance == null) {
@@ -85,6 +88,11 @@ public class Drive extends Subsystem {
         TalonUtil.checkError(talon.config_kD(kLowGearPIDSlot, Constants.kDriveLowGearKd, Constants.kLongCANTimeoutMs), "Could not set low gear kd");
         TalonUtil.checkError(talon.config_kF(kLowGearPIDSlot, Constants.kDriveLowGearKf, Constants.kLongCANTimeoutMs), "Could not set low gear kf");
 
+        TalonUtil.checkError(talon.config_kP(kPositionPID, Constants.kDrivePositionKp, Constants.kLongCANTimeoutMs), "Could not set low gear kp");
+        TalonUtil.checkError(talon.config_kI(kPositionPID, Constants.kDrivePositionKi, Constants.kLongCANTimeoutMs), "Could not set low gear ki");
+        TalonUtil.checkError(talon.config_kD(kPositionPID, Constants.kDrivePositionKd, Constants.kLongCANTimeoutMs), "Could not set low gear kd");
+        TalonUtil.checkError(talon.config_kF(kPositionPID, Constants.kDrivePositionKf, Constants.kLongCANTimeoutMs), "Could not set low gear kf");
+
         TalonUtil.checkError(talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 60, 60, 0.2), Constants.kLongCANTimeoutMs), "Could not set stator drive current limits");
 
         TalonUtil.checkError(talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs), "could not config drive velocity measurement period");
@@ -97,7 +105,7 @@ public class Drive extends Subsystem {
 
         if (main_encoder_talon) {
             // status frames (maybe set for characterization?)
-             TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "could not set drive feedback frame");
+            TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, Constants.kLongCANTimeoutMs), "could not set drive feedback frame");
             // TalonUtil.checkError(talon.setStatusFramePeriod(StatusFrame.Status_4_AinTempVbat, 10, Constants.kLongCANTimeoutMs), "could not set drive voltage frame");
 
             // velocity measurement
@@ -157,6 +165,8 @@ public class Drive extends Subsystem {
         mLeftEncoder.setReverseDirection(true);
         mRightEncoder.setReverseDirection(false);
 
+        mBreak = new Solenoid(Constants.kPCMId, Constants.kBreakSolenoidId);
+        mDeploy = new Solenoid(Constants.kPCMId, Constants.kDeploySolenoidId);
 
         resetEncoders();
     }
@@ -400,7 +410,7 @@ public class Drive extends Subsystem {
         }
     }
 
-    public boolean isHighGear() {
+    public synchronized boolean isHighGear() {
         return mIsHighGear;
     }
 
@@ -425,6 +435,50 @@ public class Drive extends Subsystem {
         mIsPTOEngaged.set(wantsEngage);
         mLeftSide.setPTOEngaged(wantsEngage);
         mRightSide.setPTOEngaged(wantsEngage);
+
+        if (!wantsEngage) {
+            // Retrigger break mode.
+            boolean cached = mIsBrakeMode;
+            mIsBrakeMode = !mIsBrakeMode;
+            setBrakeMode(cached);
+        } else {
+            mLeftSide.getPTOMotors().forEach(
+                    t -> t.setNeutralMode(NeutralMode.Brake));
+            mRightSide.getPTOMotors().forEach(
+                    t -> t.setNeutralMode(NeutralMode.Brake));
+        }
+    }
+
+    public synchronized void setDeploy(boolean deploy) {
+        mDeploy.set(deploy);
+    }
+
+    public synchronized boolean getDeploy() {
+        return mDeploy.get();
+    }
+
+
+    public synchronized void setBreakEngaged(boolean wantsEngage) {
+        mBreak.set(!wantsEngage);
+    }
+
+    public synchronized boolean getBreak() {
+        return !mBreak.get();
+    }
+
+    public synchronized void configPTOPID(boolean wantsPosition) {
+        if (wantsPosition) {
+            mLeftSide.getPTOMotors().forEach(
+                    t -> t.selectProfileSlot(kPositionPID, 0));
+            mRightSide.getPTOMotors().forEach(
+                    t -> t.selectProfileSlot(kPositionPID, 0));
+        } else {
+            final int desired_slot_idx = isHighGear() ? kHighGearPIDSlot : kLowGearPIDSlot;
+            mLeftSide.getPTOMotors().forEach(
+                    t -> t.selectProfileSlot(desired_slot_idx, 0));
+            mRightSide.getPTOMotors().forEach(
+                    t -> t.selectProfileSlot(desired_slot_idx, 0));
+        }
     }
 
     public boolean isBrakeMode() {
@@ -436,8 +490,8 @@ public class Drive extends Subsystem {
             mIsBrakeMode = shouldEnable;
             NeutralMode mode = shouldEnable ? NeutralMode.Brake : NeutralMode.Coast;
 
-            mLeftSide.getAllMotors().forEach(t -> t.setNeutralMode(mode));
-            mRightSide.getAllMotors().forEach(t -> t.setNeutralMode(mode));
+            mLeftSide.getDriveTalons().forEach(t -> t.setNeutralMode(mode));
+            mRightSide.getDriveTalons().forEach(t -> t.setNeutralMode(mode));
         }
     }
 
@@ -547,10 +601,25 @@ public class Drive extends Subsystem {
         FORCE_LOW_GEAR, FORCE_HIGH_GEAR
     }
 
-    public synchronized void setPTOMotorsOpenLoop(double signal) {
-        // TODO: Figure out if right is negative
-//        mLeftSide.getPTOMotors().forEach(t -> t.set(ControlMode.PercentOutput, signal));
-//        mRightSide.getPTOMotors().forEach(t -> t.set(ControlMode.PercentOutput, signal));
+    public synchronized void setPTOMotorsOpenLoop(double signal, double feedforward) {
+        mLeftSide.getPTOMotors().forEach(t -> t.set(ControlMode.PercentOutput, signal,
+                DemandType.ArbitraryFeedForward, feedforward));
+        mRightSide.getPTOMotors().forEach(t -> t.set(ControlMode.PercentOutput, signal,
+                DemandType.ArbitraryFeedForward, feedforward));
+    }
+
+    public synchronized void zeroPTOMotors() {
+        mLeftSide.getPTOMotors().forEach(t -> t.setSelectedSensorPosition(0));
+        mRightSide.getPTOMotors().forEach(t -> t.setSelectedSensorPosition(0));
+    }
+
+    public synchronized double getPTOPosition() {
+        return mRightSide.getPTOMotors().iterator().next().getSelectedSensorPosition();
+    }
+
+    public synchronized void setPTOMotorsPosition(double position) {
+        mLeftSide.getPTOMotors().forEach(t -> t.set(ControlMode.Position, position));
+        mRightSide.getPTOMotors().forEach(t -> t.set(ControlMode.Position, position));
     }
 
 

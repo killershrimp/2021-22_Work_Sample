@@ -49,11 +49,16 @@ public class Robot extends TimedRobot {
     private final Hood mHood = Hood.getInstance();
     private final Canifier mCanifier = Canifier.getInstance();
 
+
     private Compressor mCompressor;
 
     private final RobotState mRobotState = RobotState.getInstance();
 
     private DelayedBoolean mShouldNotShoot;
+    private ClimbingStateMachine mClimbingStateMachine = new ClimbingStateMachine();
+    private LatchedBoolean mHangModeEnablePressed = new LatchedBoolean();
+    private boolean mInHangMode = false;
+    private double mDisabledStartTime = Double.NaN;
 
     Robot() {
         CrashTracker.logRobotConstruction();
@@ -118,7 +123,7 @@ public class Robot extends TimedRobot {
 
             mDisabledLooper.start();
 
-            mDrive.setBrakeMode(false);
+            mDisabledStartTime = Timer.getFPGATimestamp();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -137,6 +142,8 @@ public class Robot extends TimedRobot {
             mDrive.setHeading(Rotation2d.fromDegrees(180));
             mEnabledLooper.start();
             mAutoModeExecutor.start();
+
+            mInHangMode = false;
 
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
@@ -158,6 +165,10 @@ public class Robot extends TimedRobot {
             mSubsystemManager.stop();
 
             mEnabledLooper.start();
+
+            mInHangMode = false;
+            mClimbingStateMachine.reset();
+            mHangModeEnablePressed.update(true);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -213,6 +224,12 @@ public class Robot extends TimedRobot {
                 System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
                 mAutoModeExecutor.setAutoMode(autoMode.get());
             }
+
+            if ((Timer.getFPGATimestamp() - mDisabledStartTime) > 5.0) {
+                System.out.println("Setting coast!");
+                mClimbingStateMachine.reset();
+                mDrive.setBrakeMode(false);
+            }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -241,51 +258,69 @@ public class Robot extends TimedRobot {
             mDrive.setOpenLoop(OpenLoopCheesyDriveHelper.getInstance().cheesyDrive(mControlBoard.getThrottle(),
                     mControlBoard.getTurn(), mControlBoard.getQuickTurn()));
 
-            boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
+            boolean hangModePressed =
+                    mHangModeEnablePressed.update(mControlBoard.getToggleHangMode());
 
-            if (wants_shoot) {
-                mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
-            } else if (wants_aim) {
-                mSuperstructure.setShootingParams(mControlBoard.getAimFine() ? Constants.kFineShootingParams : Constants.kCoarseShootingParams);
-                mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
-            } else if (mControlBoard.getMoveToZero()) {
-                mSuperstructure.setWantedState(Superstructure.WantedState.MOVE_TO_ZERO);
-            } else {
-                mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
-            }
-    
-            if (mControlBoard.getTurretHint() != CardinalDirection.NONE) {
-                mSuperstructure.resetTurretJog();
-                mSuperstructure.setTurretHint(mControlBoard.getTurretHint().getRotation().getDegrees());
-            } else if (mControlBoard.getTurretJog() != 0.0) {
-                mSuperstructure.resetTurretHint();
-                mSuperstructure.setTurretJog(mControlBoard.getTurretJog() * Constants.kJogTurretScalar);
-            } else {
-                mSuperstructure.resetTurretHint();
-                mSuperstructure.resetTurretJog();
-            }
-    
-            // Intake
-            if (mControlBoard.getIntake()) {
-                mIntake.deploy();
-            } else {
-                mIntake.stow();
+            if (hangModePressed && !mInHangMode) {
+                System.out.println("Entering hang mode!!!!");
+                mInHangMode = true;
+            } else if (hangModePressed && mInHangMode) {
+                System.out.println("Exiting hang mode!");
+                mInHangMode = false;
+                mClimbingStateMachine.reset();
             }
 
-            // TODO check getExhaust first so can exh while intake is down by pressing both r/l bumpers?
-            if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband) {
-                mSerializer.setStirOverriding(true);
-                mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),
-                        Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
+            if (mInHangMode) {
+                mClimbingStateMachine.handle(Timer.getFPGATimestamp(), mControlBoard.getHoodJog(), false, mControlBoard.getRetractIntake(),
+                        mControlBoard.getHumanPlayerIntake(), mControlBoard.getDeployIntake());
+                mSuperstructure.setTurretHintRobotRelative(Timer.getFPGATimestamp(), -90);
             } else {
-                mSerializer.setStirOverriding(false);
-
-                if (mControlBoard.getExhaust()) {
-                    mIntake.setWantedState(Intake.WantedState.EXHAUST);
-                } else if (mControlBoard.getIntake()) {
-                    mIntake.setWantedState(Intake.WantedState.INTAKE);
+                // TODO check getExhaust first so can exh while intake is down by pressing both r/l bumpers?
+                if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband) {
+                    mSerializer.setStirOverriding(true);
+                    mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),
+                            Constants.kSerializerStirDeadband) * Constants.kSerializerStirScalar);
                 } else {
-                    mIntake.setWantedState(Intake.WantedState.IDLE);
+                    mSerializer.setStirOverriding(false);
+
+                    if (mControlBoard.getExhaust()) {
+                        mIntake.setWantedState(Intake.WantedState.EXHAUST);
+                    } else if (mControlBoard.getIntake()) {
+                        mIntake.setWantedState(Intake.WantedState.INTAKE);
+                    } else {
+                        mIntake.setWantedState(Intake.WantedState.IDLE);
+                    }
+                }
+
+                boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
+
+                if (wants_shoot) {
+                    mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
+                } else if (wants_aim) {
+                    mSuperstructure.setShootingParams(mControlBoard.getAimFine() ? Constants.kFineShootingParams : Constants.kCoarseShootingParams);
+                    mSuperstructure.setWantedState(Superstructure.WantedState.AIM);
+                } else if (mControlBoard.getMoveToZero()) {
+                    mSuperstructure.setWantedState(Superstructure.WantedState.MOVE_TO_ZERO);
+                } else {
+                    mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
+                }
+
+                if (mControlBoard.getTurretHint() != CardinalDirection.NONE) {
+                    mSuperstructure.resetTurretJog();
+                    mSuperstructure.setTurretHint(mControlBoard.getTurretHint().getRotation().getDegrees());
+                } else if (mControlBoard.getTurretJog() != 0.0) {
+                    mSuperstructure.resetTurretHint();
+                    mSuperstructure.setTurretJog(mControlBoard.getTurretJog() * Constants.kJogTurretScalar);
+                } else {
+                    mSuperstructure.resetTurretHint();
+                    mSuperstructure.resetTurretJog();
+                }
+
+                // Intake
+                if (mControlBoard.getIntake()) {
+                    mIntake.deploy();
+                } else {
+                    mIntake.stow();
                 }
             }
 

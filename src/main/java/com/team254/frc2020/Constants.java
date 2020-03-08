@@ -73,10 +73,16 @@ public class Constants {
     public static final double kDriveHighGearKi = 0.0;
     public static final double kDriveHighGearKd = 0.0;
     public static final double kDriveHighGearKf = 0.0;
+
     public static final double kDriveLowGearKp = 0.0;
     public static final double kDriveLowGearKi = 0.0;
     public static final double kDriveLowGearKd = 0.0;
     public static final double kDriveLowGearKf = 0.0;
+
+    public static final double kDrivePositionKp = 0.012;
+    public static final double kDrivePositionKi = 0.0;
+    public static final double kDrivePositionKd = 0.0;
+    public static final double kDrivePositionKf = 0.0;
 
     // deadband
     public static final double kDriveThrottleDeadband = 0.04;
@@ -194,6 +200,8 @@ public class Constants {
     public static final int kIntakeSolenoidId = 2;
     public static final int kSkateParkSolenoidId = 5;
     public static final int kChockSolenoidId = 7;
+    public static final int kBreakSolenoidId = 6;
+    public static final int kDeploySolenoidId = 3;
 
     // Vision
     public static final boolean kShouldUndistort = true;

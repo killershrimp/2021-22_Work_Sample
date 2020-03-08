@@ -383,6 +383,12 @@ public class Superstructure extends Subsystem {
         return Util.limitTurret(turret_setpoint);
     }
 
+    public synchronized double getFieldRelativeTurretSetpointFromRobotGoal(double timestamp,
+                                                                           double robot_relative_goal) {
+        return mRobotState.getFieldToVehicle(timestamp).getRotation().rotateBy(
+                Rotation2d.fromDegrees(robot_relative_goal)).getDegrees();
+    }
+
     /**
      * pre condition: getTurretSetpointFromVision() is called
      * @return turret feedforward voltage
@@ -405,6 +411,10 @@ public class Superstructure extends Subsystem {
 
     public synchronized void setTurretHint(double hint) {
         mTurretHint = Optional.of(hint);
+    }
+
+    public synchronized void setTurretHintRobotRelative(double timestamp, double hint) {
+        mTurretHint = Optional.of(getFieldRelativeTurretSetpointFromRobotGoal(timestamp, hint));
     }
 
     public synchronized void resetTurretHint() {
