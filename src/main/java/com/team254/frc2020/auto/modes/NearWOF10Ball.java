@@ -16,10 +16,9 @@ public class NearWOF10Ball extends AutoModeBase {
         runAction(new StopIntakingAction());
         runAction(new DeployIntakeAction(false));
 
-        runAction(new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().nearWOFToPivotPoint));
         runAction(new ParallelAction(
                 new AutoAimAction(Rotation2d.fromDegrees(-30)),
-                new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().pivotPointToShootingPoint1)
+                new DriveTrajectoryAction(TrajectoryGenerator.getInstance().getTrajectorySet().nearWOFToShootingPoint1)
         ));
         runAction(new ShootAction(Constants.kCoarseShootingParams, 2.0));
 

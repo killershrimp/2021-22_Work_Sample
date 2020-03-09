@@ -14,7 +14,7 @@ public class AutoModeSelector {
 
     enum DesiredMode {
         DO_NOTHING, TEST_TRAJECTORY,
-        FAR_WOF_8_BALL, FAR_WOF_10_BALL,
+        FAR_WOF_8_BALL, FAR_WOF_10_BALL, FAR_WOF_11_BALL,
         NEAR_WOF_10_BALL
     }
 
@@ -39,6 +39,7 @@ public class AutoModeSelector {
         mModeChooser.addOption("Test Trajectory", DesiredMode.TEST_TRAJECTORY);
         mModeChooser.addOption("Far WOF 8 Ball", DesiredMode.FAR_WOF_8_BALL);
         mModeChooser.addOption("Far WOF 10 Ball", DesiredMode.FAR_WOF_10_BALL);
+        mModeChooser.addOption("Far WOF 11 Ball", DesiredMode.FAR_WOF_11_BALL);
         mModeChooser.addOption("Near WOF 10 Ball", DesiredMode.NEAR_WOF_10_BALL);
         SmartDashboard.putData("Auto mode", mModeChooser);
     }
@@ -78,6 +79,8 @@ public class AutoModeSelector {
                 return Optional.of(new FarWOF8Ball());
             case FAR_WOF_10_BALL:
                 return Optional.of(new FarWOF10Ball());
+            case FAR_WOF_11_BALL:
+                return Optional.of(new FarWOF11Ball());
             case NEAR_WOF_10_BALL:
                 return Optional.of(new NearWOF10Ball());
             default:

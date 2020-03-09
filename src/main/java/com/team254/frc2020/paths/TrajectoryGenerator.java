@@ -79,9 +79,12 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> farWOF2ToShootingPoint;
 
         public final Trajectory<TimedState<Pose2dWithCurvature>> startingToNearWOF;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> nearWOFToPivotPoint;
-        public final Trajectory<TimedState<Pose2dWithCurvature>> pivotPointToShootingPoint1;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> nearWOFToShootingPoint1;
         public final Trajectory<TimedState<Pose2dWithCurvature>> shootingPoint1ToShootingPoint2;
+
+        public final Trajectory<TimedState<Pose2dWithCurvature>> turningPointToNearWOF;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> nearWOFToCloseShootingPoint;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> closeShootingPointToAlliancePickupPoint;
 
         private TrajectorySet() {
             testTrajectory = getTestTrajectory();
@@ -96,9 +99,12 @@ public class TrajectoryGenerator {
             farWOF2ToShootingPoint = getFarWOF2ToShoot();
 
             startingToNearWOF = getStartToNearWOF();
-            nearWOFToPivotPoint = getNearWOFToPivotPoint();
-            pivotPointToShootingPoint1 = getPivotPointToShootingPoint1();
+            nearWOFToShootingPoint1 = getNearWOFToShootingPoint1();
             shootingPoint1ToShootingPoint2 = getShootingPoint1ToShootingPoint2();
+        
+            turningPointToNearWOF = getTurningPointToNearWOF();
+            nearWOFToCloseShootingPoint = getNearWOFToCloseShootingPoint();
+            closeShootingPointToAlliancePickupPoint = getCloseShootingPointToAlliancePickupPoint();
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getTestTrajectory() {
@@ -146,17 +152,33 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getPickupToTurningPoint() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(-93.5, 65, Rotation2d.fromDegrees(116.59)));
-            waypoints.add(new Pose2d(-41, 4, Rotation2d.fromDegrees(180)));
+            waypoints.add(new Pose2d(-51, 4, Rotation2d.fromDegrees(180)));
             return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getTurningPointToFarWOF2() {
             List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(new Pose2d(-41, 4, Rotation2d.fromDegrees(180)));
+            waypoints.add(new Pose2d(-51, 4, Rotation2d.fromDegrees(180)));
             waypoints.add(new Pose2d(-240, 0, Rotation2d.fromDegrees(180)));
             return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
                     95, kMaxAccel, kMaxVoltage);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getTurningPointToNearWOF() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(-51, 4, Rotation2d.fromDegrees(180)));
+            waypoints.add(new Pose2d(-180, 0, Rotation2d.fromDegrees(180)));
+            return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                    95, kMaxAccel, kMaxVoltage);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getNearWOFToCloseShootingPoint() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(-180, 0, Rotation2d.fromDegrees(180)));
+            waypoints.add(new Pose2d(-66, 62, Rotation2d.fromDegrees(180)));
+            return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
+                    kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getFarWOF2ToShoot() {
@@ -167,6 +189,14 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
+        private Trajectory<TimedState<Pose2dWithCurvature>> getCloseShootingPointToAlliancePickupPoint() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(-66, 62, Rotation2d.fromDegrees(180)));
+            waypoints.add(new Pose2d(-150, 74, Rotation2d.fromDegrees(180)));
+            return generateTrajectory(false, waypoints, Arrays.asList(),
+                    75, kMaxAccel, kMaxVoltage);
+        }
+
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToNearWOF() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(180)));
@@ -175,29 +205,23 @@ public class TrajectoryGenerator {
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
-        private Trajectory<TimedState<Pose2dWithCurvature>> getNearWOFToPivotPoint() {
+        private Trajectory<TimedState<Pose2dWithCurvature>> getNearWOFToShootingPoint1() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(-90, 0, Rotation2d.fromDegrees(180)));
-            waypoints.add(new Pose2d(-23, -12, Rotation2d.fromDegrees(180)));
+            waypoints.add(new Pose2d(-12, -92, Rotation2d.fromDegrees(112.5)));
             return generateTrajectory(true, waypoints, Arrays.asList(),
-                    kMaxVel, kMaxAccel, kMaxVoltage);
-        }
-
-        private Trajectory<TimedState<Pose2dWithCurvature>> getPivotPointToShootingPoint1() {
-            List<Pose2d> waypoints = new ArrayList<>();
-            waypoints.add(new Pose2d(-23, -12, Rotation2d.fromDegrees(180)));
-            waypoints.add(new Pose2d(-84, -92, Rotation2d.fromDegrees(-113)));
-            return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
                     kMaxVel, kMaxAccel, kMaxVoltage);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getShootingPoint1ToShootingPoint2() {
             List<Pose2d> waypoints = new ArrayList<>();
-            Pose2d shooting_point_1 = new Pose2d(-84, -92, Rotation2d.fromDegrees(-113));
-            waypoints.add(shooting_point_1);
-            waypoints.add(shooting_point_1.transformBy(new Pose2d(144, 0, Rotation2d.identity())));
+            waypoints.add(new Pose2d(-12, -92, Rotation2d.fromDegrees(112.5)));
+            waypoints.add(new Pose2d(-60, -74, Rotation2d.fromDegrees(180)));
+            Pose2d truss_entry_point = new Pose2d(-81, -92, Rotation2d.fromDegrees(-113));
+            waypoints.add(truss_entry_point);
+            waypoints.add(truss_entry_point.transformBy(new Pose2d(164, 0, Rotation2d.identity())));
             return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
-                    75, kMaxAccel, kMaxVoltage);
+                    65, kMaxAccel, kMaxVoltage);
         }
     }
 }
