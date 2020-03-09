@@ -184,7 +184,7 @@ public class Constants {
     public static final double kIntakeStowTime = 0.5; // seconds, time it takes to stow intake
     public static final double kIntakePower = 0.75;
     public static final double kIntakeExhaustPower = -0.5;
-    public static final double kLightIntakePower = -0.25; // % output to run after stowing for kLightIntakeTime seconds
+    public static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
     public static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
 
     // WOF
