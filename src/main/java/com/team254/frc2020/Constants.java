@@ -230,22 +230,27 @@ public class Constants {
 
     // Shot tuning
     public static final boolean kIsHoodTuning = false;
-    public static final double kHoodMapBias = 0.0; // degrees
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLaserHoodMap = new InterpolatingTreeMap<>();
     static {
         // tuned 3/8
-        kCoarseHoodMap.put(new InterpolatingDouble(248.999184), new InterpolatingDouble(61.039339 + kHoodMapBias));
-        kCoarseHoodMap.put(new InterpolatingDouble(290.866580), new InterpolatingDouble(61.446452 + kHoodMapBias));
-        kCoarseHoodMap.put(new InterpolatingDouble(179.368013), new InterpolatingDouble(58.555894 + kHoodMapBias));
-        kCoarseHoodMap.put(new InterpolatingDouble(151.1), new InterpolatingDouble(53.9 + kHoodMapBias));
-        kCoarseHoodMap.put(new InterpolatingDouble(124.535161), new InterpolatingDouble(51.917520 + kHoodMapBias));
-        kCoarseHoodMap.put(new InterpolatingDouble(101.349366), new InterpolatingDouble(47.373032 + kHoodMapBias));
+        kLaserHoodMap.put(new InterpolatingDouble(248.999184), new InterpolatingDouble(61.039339));
+        kLaserHoodMap.put(new InterpolatingDouble(290.866580), new InterpolatingDouble(61.446452));
+        kLaserHoodMap.put(new InterpolatingDouble(179.368013), new InterpolatingDouble(58.555894));
+        kLaserHoodMap.put(new InterpolatingDouble(151.1), new InterpolatingDouble(53.9));
+        kLaserHoodMap.put(new InterpolatingDouble(124.535161), new InterpolatingDouble(51.917520));
+        kLaserHoodMap.put(new InterpolatingDouble(101.349366), new InterpolatingDouble(47.373032));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLaserRPMMap = new InterpolatingTreeMap<>();
+    static {
+        kLaserRPMMap.put(new InterpolatingDouble(0.0), new InterpolatingDouble(4500.0));
     }
 
     public static final ShootingParameters kCoarseShootingParams = new ShootingParameters(
-            kCoarseHoodMap,
-            Pose2d.identity(),
-            4500, // shooter setpoint (rpm)
+            kLaserHoodMap, // hood map
+            kLaserRPMMap, // rpm map
+            Pose2d.identity(), // vision target to goal offset
+            0.75, // spin cycle setpoint (percent output)
             100, // shooter allowable error (rpm)
             1.0, // turret allowable error (°)
             0.5 // hood allowable error (°)
@@ -270,9 +275,10 @@ public class Constants {
     }
 
     public static final ShootingParameters kFineShootingParams = new ShootingParameters(
-            kLobHoodMap,
-            Constants.kVisionTargetToGoalOffset,
-            4500, // shooter setpoint (rpm)
+            kLobHoodMap, // hood map
+            kLobRPMMap, // rpm map
+            Constants.kVisionTargetToGoalOffset, // vision target to goal offset
+            0.5, // spin cycle setpoint (percent output)
             100, // shooter allowable error (rpm)
             1.0, // turret allowable error (°)
             0.5 // hood allowable error (°)

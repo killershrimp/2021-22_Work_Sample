@@ -17,7 +17,7 @@ public class Serializer extends Subsystem {
 
     public static final double kSpinCycleSerializeDemand = 0.45;
     public static final double kSpinCycleRebalancingDemand = 0.75;
-    public static final double kSpinCycleFeedDemand = 0.75;
+    public static double mSpinCycleFeedDemand = 0.75;
     public static final double kRollerDemandFeed = 14000; // ticks/100ms
     public static final double kSpinCycleOscillationTime = 1.2; // seconds before switching dir
     public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
@@ -356,8 +356,12 @@ public class Serializer extends Subsystem {
         setChockDeployed(true);
     }
 
+    public synchronized void setSpinCycleFeedSpeed(double demand) {
+        mSpinCycleFeedDemand = demand;
+    }
+
     private void setFeedStateDemands() {
-        mPeriodicIO.spin_cycle_demand = kSpinCycleFeedDemand;
+        mPeriodicIO.spin_cycle_demand = mSpinCycleFeedDemand;
         mPeriodicIO.left_roller_demand = kRollerDemandFeed;
         mPeriodicIO.right_roller_demand = kRollerDemandFeed;
         setSkateParkDeployed(true);

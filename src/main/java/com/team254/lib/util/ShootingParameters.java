@@ -4,31 +4,43 @@ import com.team254.lib.geometry.Pose2d;
 
 public class ShootingParameters {
 	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap;
+	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mShooterRPMMap;
 	private final Pose2d mVisionTargetToGoalOffset;
-	private final double mShooterSetpointRPM;
+	private final double mSpinCycleSetpoint; // percent output
 	private final double mShooterAllowableErrorRPM; // rpm
 	private final double mTurretAllowableErrorDegrees; // °
 	private final double mHoodAllowableErrorDegrees; // °
 
-	public ShootingParameters(InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap, Pose2d mVisionTargetToGoalOffset, double mShooterSetpointRPM, double mShooterAllowableErrorRPM, double mTurretAllowableErrorDegrees, double mHoodAllowableErrorDegrees) {
-		this.mHoodMap = mHoodMap;
-		this.mVisionTargetToGoalOffset = mVisionTargetToGoalOffset;
-		this.mShooterSetpointRPM = mShooterSetpointRPM;
-		this.mShooterAllowableErrorRPM = mShooterAllowableErrorRPM;
-		this.mTurretAllowableErrorDegrees = mTurretAllowableErrorDegrees;
-		this.mHoodAllowableErrorDegrees = mHoodAllowableErrorDegrees;
+	public ShootingParameters(InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> hoodMap,
+			InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> shooterRPMMap,
+			Pose2d visionTargetToGoalOffset,
+			double spinCycleSetpoint,
+			double shooterAllowableErrorRPM,
+			double turretAllowableErrorDegrees,
+			double hoodAllowableErrorDegrees) {
+		this.mHoodMap = hoodMap;
+		this.mShooterRPMMap = shooterRPMMap;
+		this.mVisionTargetToGoalOffset = visionTargetToGoalOffset;
+		this.mSpinCycleSetpoint = spinCycleSetpoint;
+		this.mShooterAllowableErrorRPM = shooterAllowableErrorRPM;
+		this.mTurretAllowableErrorDegrees = turretAllowableErrorDegrees;
+		this.mHoodAllowableErrorDegrees = hoodAllowableErrorDegrees;
 	}
 
 	public InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> getHoodMap() {
 		return mHoodMap;
 	}
 
+	public InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> getShooterRPMMap() {
+		return mShooterRPMMap;
+	}
+
 	public Pose2d getVisionTargetToGoalOffset() {
 		return mVisionTargetToGoalOffset;
 	}
 
-	public double getShooterSetpointRPM() {
-		return mShooterSetpointRPM;
+	public double getSpinCycleSetpoint() {
+		return mSpinCycleSetpoint;
 	}
 
 	public synchronized boolean isShooterAtSetpoint(double current_shooter_rpm, double shooter_setpoint) {

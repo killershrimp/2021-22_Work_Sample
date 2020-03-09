@@ -248,27 +248,26 @@ public class Superstructure extends Subsystem {
 
         if (Constants.kIsHoodTuning) {
             mHood.setSetpointPositionPID(SmartDashboard.getNumber("HoodAngleToSet", 50.0));
+            mShooter.setRPM(SmartDashboard.getNumber("ShooterRPMToSet", 4700.0));
         } else {
             if (mLatestAimingParameters.isPresent()) {
                 mHood.setSetpointPositionPID(
                         mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+                mShooter.setRPM(
+                        mShootingParameters.getShooterRPMMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
             }
-        }
-        if (Constants.kIsHoodTuning){
-            mShooter.setRPM(SmartDashboard.getNumber("ShooterRPMToSet", 4700.0));
-
-        } else {
-            mShooter.setRPM(mShootingParameters.getShooterSetpointRPM());
         }
     }
 
     private void writeShootDesiredState(double timestamp) {
+        mSerializer.setSpinCycleFeedSpeed(mShootingParameters.getSpinCycleSetpoint());
         mSerializer.setWantedState(Serializer.WantedState.FEED);
 
         mTurret.setSetpointPositionPID(getTurretSetpointFromVision(timestamp), getTurretFeedforwardVFromVision());
 
         double hoodAngle = Double.NaN;
         double range = Double.NaN;
+        double shooterRpm = 0.0;
 
         if (mLatestAimingParameters.isPresent()) {
             range = mLatestAimingParameters.get().getRange();
@@ -276,9 +275,11 @@ public class Superstructure extends Subsystem {
 
         if (Constants.kIsHoodTuning) {
             hoodAngle = SmartDashboard.getNumber("HoodAngleToSet", 50.0);
+            shooterRpm = SmartDashboard.getNumber("ShooterRPMToSet", 4500.0);
         } else {
             if (mLatestAimingParameters.isPresent()) {
                 hoodAngle = mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(range)).value;
+                shooterRpm = mShootingParameters.getShooterRPMMap().getInterpolated(new InterpolatingDouble(range)).value;
             } else {
                 hoodAngle = mHood.getAngle();
                 range = -1;
@@ -286,15 +287,6 @@ public class Superstructure extends Subsystem {
             }
         }
         mHood.setSetpointPositionPID(hoodAngle);
-
-
-        double shooterRpm;
-        if (Constants.kIsHoodTuning){
-            shooterRpm = SmartDashboard.getNumber("ShooterRPMToSet", 4500.0);
-
-        } else {
-            shooterRpm = mShootingParameters.getShooterSetpointRPM();
-        }
 
         mShooter.setRPM(shooterRpm);
 
