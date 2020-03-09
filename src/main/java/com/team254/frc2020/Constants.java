@@ -230,20 +230,16 @@ public class Constants {
 
     // Shot tuning
     public static final boolean kIsHoodTuning = false;
+    public static final double kHoodMapBias = 0.0; // degrees
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kCoarseHoodMap = new InterpolatingTreeMap<>();
     static {
-        // 2 point map (Tuned 2/22) TODO tune better and for new feeder
-        kCoarseHoodMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(46.0));
-        kCoarseHoodMap.put(new InterpolatingDouble(111.), new InterpolatingDouble(51.));
-        kCoarseHoodMap.put(new InterpolatingDouble(134.), new InterpolatingDouble(55.));
-        kCoarseHoodMap.put(new InterpolatingDouble(168.), new InterpolatingDouble(58.));
-        kCoarseHoodMap.put(new InterpolatingDouble(194.), new InterpolatingDouble(59.5));
-        kCoarseHoodMap.put(new InterpolatingDouble(234.), new InterpolatingDouble(61.0));
-        kCoarseHoodMap.put(new InterpolatingDouble(250.0), new InterpolatingDouble(62.0));
-        kCoarseHoodMap.put(new InterpolatingDouble(258.0), new InterpolatingDouble(62.0));
-        kCoarseHoodMap.put(new InterpolatingDouble(268.0), new InterpolatingDouble(63.5));
-        kCoarseHoodMap.put(new InterpolatingDouble(301.0), new InterpolatingDouble(63.5));
-        kCoarseHoodMap.put(new InterpolatingDouble(346.0), new InterpolatingDouble(64.5));
+        // tuned 3/8
+        kCoarseHoodMap.put(new InterpolatingDouble(248.999184), new InterpolatingDouble(61.039339 + kHoodMapBias));
+        kCoarseHoodMap.put(new InterpolatingDouble(290.866580), new InterpolatingDouble(61.446452 + kHoodMapBias));
+        kCoarseHoodMap.put(new InterpolatingDouble(179.368013), new InterpolatingDouble(58.555894 + kHoodMapBias));
+        kCoarseHoodMap.put(new InterpolatingDouble(151.1), new InterpolatingDouble(53.9 + kHoodMapBias));
+        kCoarseHoodMap.put(new InterpolatingDouble(124.535161), new InterpolatingDouble(51.917520 + kHoodMapBias));
+        kCoarseHoodMap.put(new InterpolatingDouble(101.349366), new InterpolatingDouble(47.373032 + kHoodMapBias));
     }
 
     public static final ShootingParameters kCoarseShootingParams = new ShootingParameters(
@@ -255,25 +251,26 @@ public class Constants {
             0.5 // hood allowable error (°)
     );
 
-    // 3 point map (TODO tune)
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kFineHoodMap = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobHoodMap = new InterpolatingTreeMap<>();
     static {
-        // same as above TODO tune better and for new feeder
-        kFineHoodMap.put(new InterpolatingDouble(82.0), new InterpolatingDouble(46.0));
-        kFineHoodMap.put(new InterpolatingDouble(111.), new InterpolatingDouble(51.));
-        kFineHoodMap.put(new InterpolatingDouble(134.), new InterpolatingDouble(55.));
-        kFineHoodMap.put(new InterpolatingDouble(168.), new InterpolatingDouble(58.));
-        kFineHoodMap.put(new InterpolatingDouble(194.), new InterpolatingDouble(59.5));
-        kFineHoodMap.put(new InterpolatingDouble(234.), new InterpolatingDouble(61.0));
-        kFineHoodMap.put(new InterpolatingDouble(250.0), new InterpolatingDouble(62.0));
-        kFineHoodMap.put(new InterpolatingDouble(258.0), new InterpolatingDouble(62.0));
-        kFineHoodMap.put(new InterpolatingDouble(268.0), new InterpolatingDouble(63.5));
-        kFineHoodMap.put(new InterpolatingDouble(301.0), new InterpolatingDouble(63.5));
-        kFineHoodMap.put(new InterpolatingDouble(346.0), new InterpolatingDouble(64.5));
+        kLobHoodMap.put(new InterpolatingDouble(172.149916), new InterpolatingDouble(48.750000));
+        kLobHoodMap.put(new InterpolatingDouble(208.664221), new InterpolatingDouble(50.185451));
+        kLobHoodMap.put(new InterpolatingDouble(248.562343), new InterpolatingDouble(53.421403));
+        kLobHoodMap.put(new InterpolatingDouble(274.035243), new InterpolatingDouble(55.572476));
+        kLobHoodMap.put(new InterpolatingDouble(316.418550), new InterpolatingDouble(57.561044));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobRPMMap = new InterpolatingTreeMap<>();
+    static {
+        kLobRPMMap.put(new InterpolatingDouble(172.149916), new InterpolatingDouble(2500.0));
+        kLobRPMMap.put(new InterpolatingDouble(208.664221), new InterpolatingDouble(2550.0));
+        kLobRPMMap.put(new InterpolatingDouble(248.562343), new InterpolatingDouble(2750.0));
+        kLobRPMMap.put(new InterpolatingDouble(274.035243), new InterpolatingDouble(2850.0));
+        kLobRPMMap.put(new InterpolatingDouble(316.418550), new InterpolatingDouble(3150.0));
     }
 
     public static final ShootingParameters kFineShootingParams = new ShootingParameters(
-            kFineHoodMap,
+            kLobHoodMap,
             Constants.kVisionTargetToGoalOffset,
             4500, // shooter setpoint (rpm)
             100, // shooter allowable error (rpm)
