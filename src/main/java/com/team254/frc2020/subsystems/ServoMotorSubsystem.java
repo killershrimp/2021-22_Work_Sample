@@ -533,7 +533,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         return false;
     }
 
-    public synchronized void resetIfAtLimit() {
+    public synchronized void resetIfAtHome() {
         if (atHomingLocation()) {
             zeroSensors();
         }

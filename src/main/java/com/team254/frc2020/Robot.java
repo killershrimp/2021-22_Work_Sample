@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     private final Hood mHood = Hood.getInstance();
     private final Canifier mCanifier = Canifier.getInstance();
     private final WOF mWOF = WOF.getInstance();
-
+    private final LED mLED = LED.getInstance();
 
     private Compressor mCompressor;
 
@@ -89,6 +89,9 @@ public class Robot extends TimedRobot {
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+
+            mLED.registerEnabledLoops(mEnabledLooper);
+            mLED.registerEnabledLoops(mDisabledLooper);
             
             mTrajectoryGenerator.generateTrajectories();
 
@@ -152,7 +155,7 @@ public class Robot extends TimedRobot {
             mAutoModeExecutor.start();
 
             mInHangMode = false;
-
+            mLED.setWantedAction(LED.WantedAction.DISPLAY_SUPERSTRUCTURE);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -177,6 +180,8 @@ public class Robot extends TimedRobot {
             mInHangMode = false;
             mClimbingStateMachine.reset();
             mHangModeEnablePressed.update(true);
+
+            mLED.setWantedAction(LED.WantedAction.DISPLAY_SUPERSTRUCTURE);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -222,10 +227,15 @@ public class Robot extends TimedRobot {
             // Update auto modes
             mAutoModeSelector.updateModeCreator();
 
-
+            mHood.resetIfAtHome();
             if (!mHood.hasBeenZeroed()) {
-                mHood.resetIfAtLimit();
+                mLED.setHoodFault();
+            } else {
+                mLED.clearHoodFault();
             }
+
+
+            mCanifier.writePeriodicOutputs();
 
             Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
             if (autoMode.isPresent() && autoMode.get() != mAutoModeExecutor.getAutoMode()) {
@@ -278,10 +288,12 @@ public class Robot extends TimedRobot {
                 // Set in pit mode or regular mode
                 mClimbingStateMachine.setInPitMode(inPitHangModePressed);
                 mInHangMode = true;
+                mLED.setWantedAction(LED.WantedAction.DISPLAY_CLIMB);
             } else if ((inPitHangModePressed || hangModePressed) && mInHangMode) {
                 System.out.println("Exiting hang mode!");
                 mInHangMode = false;
                 mClimbingStateMachine.reset();
+                mLED.setWantedAction(LED.WantedAction.DISPLAY_SUPERSTRUCTURE);
             }
 
             boolean WOFModePressed = mWOFModeEnablePressed.update(mControlBoard.getToggleWOFMode());
@@ -309,6 +321,8 @@ public class Robot extends TimedRobot {
                 mClimbingStateMachine.handle(Timer.getFPGATimestamp(), mControlBoard.getClimbJog(), false, mControlBoard.getRetractIntake(),
                         mControlBoard.getHumanPlayerIntake(), mControlBoard.getDeployIntake());
                 mSuperstructure.setTurretHintRobotRelative(Timer.getFPGATimestamp(), -90);
+
+
             } else {
                 mSuperstructure.setOverrideLimelightLEDs(false);
                 if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband && !mInWOFMode) {

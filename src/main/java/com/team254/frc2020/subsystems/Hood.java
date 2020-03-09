@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class Hood extends ServoMotorSubsystem {
     private static Hood mInstance;
+    private LED mLED = LED.getInstance();
     private LatchedBoolean mWasHoming = new LatchedBoolean();
     private double mHomingStartTime = Double.NaN;
     private double mHomingLimitStartTime = Double.NaN;
@@ -47,6 +48,7 @@ public class Hood extends ServoMotorSubsystem {
                         10,
                         mConstants.kStatorPeakCurrentDuration)),
                     mConstants.kName + ": Could not set stator current limit.");
+        mLED.setHoodFault();
     }
 
     @Override
@@ -71,11 +73,12 @@ public class Hood extends ServoMotorSubsystem {
             }
             if (!Double.isNaN(mHomingLimitStartTime) &&
                     (Timer.getFPGATimestamp() - mHomingLimitStartTime) > kHomingHardstopTime) {
-                resetIfAtLimit();
+                resetIfAtHome();
             }
 
             if (hasBeenZeroed()) {
                 System.out.println("Hood homed successfully!");
+                mLED.clearHoodFault();
                 mMaster.overrideLimitSwitchesEnable(true);
                 TalonUtil.checkError(mMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
                                 mConstants.kEnableStatorCurrentLimit,

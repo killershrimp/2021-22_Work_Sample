@@ -7,6 +7,7 @@ import com.team254.frc2020.RobotState;
 import com.team254.frc2020.limelight.LimelightManager;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
+import com.team254.frc2020.subsystems.utils.TimedLEDState;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.util.InterpolatingDouble;
@@ -32,6 +33,7 @@ public class Superstructure extends Subsystem {
 
     private Turret mTurret = Turret.getInstance();
     private Hood mHood = Hood.getInstance();
+    private LED mLED = LED.getInstance();
     private Shooter mShooter = Shooter.getInstance();
     private Serializer mSerializer = Serializer.getInstance();
     private LimelightManager mLLManager = LimelightManager.getInstance();
@@ -237,6 +239,7 @@ public class Superstructure extends Subsystem {
 
         mHood.setSetpointPositionPID(mHood.getAngle());
         mShooter.setOpenLoop(0.0);
+        mLED.setSuperstructureLEDState(TimedLEDState.StaticLEDState.kStaticOff);
     }
 
     private void writeAimingDesiredState(double timestamp) {
@@ -273,6 +276,7 @@ public class Superstructure extends Subsystem {
                 mShooter.setRPM(Constants.kDefaultShooterRPM);
             }
         }
+        mLED.setSuperstructureLEDState(TimedLEDState.BlinkingLEDState.kBlinkingAiming);
     }
 
     private void writeShootDesiredState(double timestamp) {
@@ -316,6 +320,7 @@ public class Superstructure extends Subsystem {
                     + " supply current: " + mShooter.getAverageSupplyCurrent()
                     + " stator current: " + mShooter.getAverageStatorCurrent());
         }
+        mLED.setSuperstructureLEDState(TimedLEDState.BlinkingLEDState.kBlinkingShooting);
     }
 
     private void writeMoveToZeroDesiredState() {

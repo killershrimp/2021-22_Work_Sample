@@ -1,5 +1,6 @@
 package com.team254.frc2020.subsystems;
 
+import com.team254.frc2020.subsystems.utils.TimedLEDState;
 import com.team254.lib.util.LatchedBoolean;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Timer;
@@ -22,6 +23,7 @@ public class ClimbingStateMachine {
     }
 
     private Drive mDrive;
+    private LED mLED;
 
     private SystemState mSystemState = SystemState.PRECLIMB;
     private double mStateStartTime = Timer.getFPGATimestamp();
@@ -33,7 +35,7 @@ public class ClimbingStateMachine {
 
     public ClimbingStateMachine() {
         mDrive = Drive.getInstance();
-
+        mLED = LED.getInstance();
     }
 
     public synchronized void reset() {
@@ -70,6 +72,12 @@ public class ClimbingStateMachine {
         } else if (breakOff) {
             mDrive.setBreakEngaged(false);
             mBreakTime = Double.NaN;
+        }
+
+        if (mDrive.getBreak()) {
+            mLED.setClimbLEDState(TimedLEDState.BlinkingLEDState.BlinkingLEDState.kClimbing);
+        } else {
+            mLED.setClimbLEDState(TimedLEDState.BlinkingLEDState.BlinkingLEDState.kBreakEngaged);
         }
 
         boolean stopMotors = false;

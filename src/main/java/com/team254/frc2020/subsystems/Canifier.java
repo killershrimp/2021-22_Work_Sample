@@ -17,10 +17,15 @@ public class Canifier extends Subsystem {
     }
 
     private PeriodicIO mPeriodicIO;
+    private boolean mOutputsChanged;
 
     public static class PeriodicIO {
         boolean break_beam_triggered = false;
         boolean turret_homing_limit_switch = false;
+
+        double g = 0.0;
+        double r = 0.0;
+        double b = 0.0;
     }
 
     private CANifier mCanifier;
@@ -30,6 +35,9 @@ public class Canifier extends Subsystem {
         mCanifier.setStatusFramePeriod(CANifierStatusFrame.Status_2_General, 10, Constants.kLongCANTimeoutMs);
 
         mPeriodicIO = new PeriodicIO();
+
+        // Force a first update.
+        mOutputsChanged = true;
     }
 
     @Override
@@ -37,6 +45,30 @@ public class Canifier extends Subsystem {
         mPeriodicIO.break_beam_triggered = mCanifier.getGeneralInput(CANifier.GeneralPin.SDA);
         // TODO make practice bot and comp bot the same... is LIMR on practice bot, SDA on comp bot
         mPeriodicIO.turret_homing_limit_switch = !mCanifier.getGeneralInput(CANifier.GeneralPin.LIMF);
+    }
+
+    public synchronized void setLEDColor(double red, double green, double blue) {
+        if (red != mPeriodicIO.r ||
+                green != mPeriodicIO.g ||
+                blue != mPeriodicIO.b) {
+            mPeriodicIO.r = red;
+            mPeriodicIO.g = green;
+            mPeriodicIO.b = blue;
+            mOutputsChanged = true;
+        }
+    }
+
+    @Override
+    public synchronized void writePeriodicOutputs() {
+        // A: Green
+        // B: Red
+        // C: Blue
+        if (mOutputsChanged) {
+            mCanifier.setLEDOutput(mPeriodicIO.g, CANifier.LEDChannel.LEDChannelA);
+            mCanifier.setLEDOutput(mPeriodicIO.r, CANifier.LEDChannel.LEDChannelB);
+            mCanifier.setLEDOutput(mPeriodicIO.b, CANifier.LEDChannel.LEDChannelC);
+            mOutputsChanged = false;
+        }
     }
 
     @Override
