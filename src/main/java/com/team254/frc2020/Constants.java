@@ -229,6 +229,7 @@ public class Constants {
     public static final PipelineConfiguration kLowRes2xZoom = new PipelineConfiguration(CameraResolution.F_320x240, 2.0);
 
     // Shot tuning
+    public static final double kDefaultShooterRPM = 4500;
     public static final boolean kIsHoodTuning = false;
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLaserHoodMap = new InterpolatingTreeMap<>();
     static {

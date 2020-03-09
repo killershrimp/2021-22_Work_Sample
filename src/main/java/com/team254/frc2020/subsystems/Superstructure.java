@@ -255,6 +255,8 @@ public class Superstructure extends Subsystem {
                         mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
                 mShooter.setRPM(
                         mShootingParameters.getShooterRPMMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+            } else {
+                mShooter.setRPM(Constants.kDefaultShooterRPM);
             }
         }
     }
@@ -267,7 +269,7 @@ public class Superstructure extends Subsystem {
 
         double hoodAngle = Double.NaN;
         double range = Double.NaN;
-        double shooterRpm = 0.0;
+        double shooterRpm = Constants.kDefaultShooterRPM;
 
         if (mLatestAimingParameters.isPresent()) {
             range = mLatestAimingParameters.get().getRange();
