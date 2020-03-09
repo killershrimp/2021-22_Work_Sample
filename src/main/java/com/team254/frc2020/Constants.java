@@ -121,7 +121,7 @@ public class Constants {
 
         kTurretConstants.kKf = 1023.0 * 0.25 / 4650.0; // Tuned 3/4
         kTurretConstants.kPositionKp = 0.21;
-        kTurretConstants.kPositionDeadband = (int) (0.5 * kTurretConstants.kTicksPerUnitDistance); // Ticks
+        kTurretConstants.kPositionDeadband = (int) (0.1 * kTurretConstants.kTicksPerUnitDistance); // Ticks
 
         kTurretConstants.kMinUnitsLimit = 45.0;
         kTurretConstants.kMaxUnitsLimit = 315.0;
@@ -146,7 +146,7 @@ public class Constants {
         kHoodConstants.kTicksPerUnitDistance = 1.0 / (1.0 / 2048.0 * 8.0 / 40.0 * 16.0 / 38.0 * 14.0 / 366.0 * 360.0);
 
         kHoodConstants.kPositionKp = 0.254; // TODO (tune better)
-        kHoodConstants.kPositionDeadband = (int) (0.5 * kHoodConstants.kTicksPerUnitDistance); // Ticks
+        kHoodConstants.kPositionDeadband = (int) (0.1 * kHoodConstants.kTicksPerUnitDistance); // Ticks
 
         kHoodConstants.kMinUnitsLimit = 45.0;
         kHoodConstants.kMaxUnitsLimit = 70.0;
