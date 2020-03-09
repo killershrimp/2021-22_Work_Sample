@@ -201,6 +201,10 @@ public class Shooter extends Subsystem {
         return (getRightRPM() + getLeftRPM()) / 2.0;
     }
 
+    public synchronized double getDemandRPM() {
+        return nativeUnitsToRPM(mPeriodicIO.demand);
+    }
+
     public synchronized double getAverageOutputVoltage() {
         return (mPeriodicIO.right_output_voltage + mPeriodicIO.left_output_voltage) / 2.0;
     }
@@ -212,7 +216,7 @@ public class Shooter extends Subsystem {
     public synchronized double getAverageStatorCurrent() {
         return (mPeriodicIO.right_stator_current + mPeriodicIO.left_stator_current) / 2.0;
     }
-
+    
     public synchronized void startLogging() {
         if (mCSVWriter == null) {
             mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/SHOOTER-LOGS.csv", PeriodicIO.class);

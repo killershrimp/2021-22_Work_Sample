@@ -31,8 +31,8 @@ public class ShootingParameters {
 		return mShooterSetpointRPM;
 	}
 
-	public synchronized boolean isShooterAtSetpoint(double current_shooter_rpm) {
-		return Util.epsilonEquals(current_shooter_rpm, mShooterSetpointRPM, mShooterAllowableErrorRPM);
+	public synchronized boolean isShooterAtSetpoint(double current_shooter_rpm, double shooter_setpoint) {
+		return Util.epsilonEquals(current_shooter_rpm, shooter_setpoint, mShooterAllowableErrorRPM);
 	}
 
 	public synchronized boolean isTurretAtSetpoint(double current_turret_angle, double turret_setpoint) {

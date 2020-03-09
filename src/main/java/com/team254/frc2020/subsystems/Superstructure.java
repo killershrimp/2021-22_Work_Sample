@@ -38,6 +38,7 @@ public class Superstructure extends Subsystem {
     private Superstructure() {
         if (Constants.kIsHoodTuning) {
             SmartDashboard.putNumber("HoodAngleToSet", 50.0);
+            SmartDashboard.putNumber("ShooterRPMToSet", 4500.0);
         }
     }
 
@@ -169,11 +170,11 @@ public class Superstructure extends Subsystem {
             case IDLE:
                 return SystemState.IDLE;
             case SHOOT:
-                SmartDashboard.putBoolean("ShooterAtSetpoint", mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM()));
+                SmartDashboard.putBoolean("ShooterAtSetpoint", mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM(), mShooter.getDemandRPM()));
                 SmartDashboard.putBoolean("TurretAtSetpoint",  mShootingParameters.isTurretAtSetpoint(mTurret.getAngle(), mTurret.getSetpointHomed()));
                 SmartDashboard.putBoolean("HoodAtSetpoint", mShootingParameters.isHoodAtSetpoint(mHood.getAngle(), mHood.getSetpointHomed()));
 
-                if (mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM()) && 
+                if (mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM(), mShooter.getDemandRPM()) &&
                         visionHasTarget() && mShootingParameters.isTurretAtSetpoint(mTurret.getAngle(), mTurret.getSetpointHomed()) &&
                         mShootingParameters.isHoodAtSetpoint(mHood.getAngle(), mHood.getSetpointHomed())) {
                     return SystemState.SHOOT;
@@ -253,8 +254,12 @@ public class Superstructure extends Subsystem {
                         mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
             }
         }
+        if (Constants.kIsHoodTuning){
+            mShooter.setRPM(SmartDashboard.getNumber("ShooterRPMToSet", 4700.0));
 
-        mShooter.setRPM(mShootingParameters.getShooterSetpointRPM());
+        } else {
+            mShooter.setRPM(mShootingParameters.getShooterSetpointRPM());
+        }
     }
 
     private void writeShootDesiredState(double timestamp) {
@@ -264,11 +269,15 @@ public class Superstructure extends Subsystem {
 
         double hoodAngle = Double.NaN;
         double range = Double.NaN;
+
+        if (mLatestAimingParameters.isPresent()) {
+            range = mLatestAimingParameters.get().getRange();
+        }
+
         if (Constants.kIsHoodTuning) {
             hoodAngle = SmartDashboard.getNumber("HoodAngleToSet", 50.0);
         } else {
             if (mLatestAimingParameters.isPresent()) {
-                range = mLatestAimingParameters.get().getRange();
                 hoodAngle = mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(range)).value;
             } else {
                 hoodAngle = mHood.getAngle();
@@ -278,12 +287,20 @@ public class Superstructure extends Subsystem {
         }
         mHood.setSetpointPositionPID(hoodAngle);
 
-        double shooterRpm = mShootingParameters.getShooterSetpointRPM();
+
+        double shooterRpm;
+        if (Constants.kIsHoodTuning){
+            shooterRpm = SmartDashboard.getNumber("ShooterRPMToSet", 4500.0);
+
+        } else {
+            shooterRpm = mShootingParameters.getShooterSetpointRPM();
+        }
+
         mShooter.setRPM(shooterRpm);
 
         if ((timestamp - mLastShootingParamsPrintTime) > 0.5) {
             mLastShootingParamsPrintTime = timestamp;
-            System.out.println("Making shot, range: " + range + " hood: " + hoodAngle + " rpm: " + mShooter.getAverageRPM()
+            System.out.println("Making shot, range: " + range + " hood: " + mHood.getAngle() + " rpm: " + mShooter.getAverageRPM()
                     + " output voltage: " + mShooter.getAverageOutputVoltage()
                     + " supply current: " + mShooter.getAverageSupplyCurrent()
                     + " stator current: " + mShooter.getAverageStatorCurrent());
@@ -332,9 +349,9 @@ public class Superstructure extends Subsystem {
         if (mLatestAimingParameters.isPresent()) {
             mTrackId = mLatestAimingParameters.get().getTrackId();
 
-            if (Constants.kIsHoodTuning) {
+//            if (Constants.kIsHoodTuning) {
                 SmartDashboard.putNumber("Range To Target", mLatestAimingParameters.get().getRange());
-            }
+//            }
 
             // Don't aim if not in min distance
             if (mEnforceAutoAimMinDistance && mLatestAimingParameters.get().getRange() > mAutoAimMinDistance) {
