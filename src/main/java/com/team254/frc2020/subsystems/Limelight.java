@@ -188,7 +188,7 @@ public class Limelight extends Subsystem {
     }
 
     public synchronized List<TargetInfo> getRawTargetInfos() {
-        return getRawTargetInfos(getTopCorners(), mPipelineConfig, mTargets, mConstants.getUndistortMap(), mConstants.getHorizontalFOV(), mConstants.getVerticalFOV());
+        return getRawTargetInfos(getBottomCorners(), mPipelineConfig, mTargets, mConstants.getUndistortMap(), mConstants.getHorizontalFOV(), mConstants.getVerticalFOV());
     }
 
     public static List<TargetInfo> getRawTargetInfos(List<double[]> corners, PipelineConfiguration pipeline, List<TargetInfo> targets,
@@ -267,6 +267,29 @@ public class Limelight extends Subsystem {
         return extractTopCornersFromBoundingBoxes(xCorners, yCorners);
     }
 
+    private List<double[]> getBottomCorners() {
+        double[] corners = mNetworkTable.getEntry("tcornxy").getDoubleArray(mZeroArray);
+        mSeesTarget = mNetworkTable.getEntry("tv").getDouble(0) == 1.0;
+
+        // something went wrong
+        if (!mSeesTarget || corners.length != 8 || corners == mZeroArray) {
+            return null;
+        }
+
+        double[] xCorners = new double[corners.length / 2];
+        double[] yCorners = new double[corners.length / 2];
+
+        for (int i = 0; i < corners.length; i++) {
+            if (i % 2 == 0) {
+                xCorners[i / 2] = corners[i];
+            } else {
+                yCorners[i / 2] = corners[i];
+            }
+        }
+
+        return extractBottomCornersFromBoundingBoxes(xCorners, yCorners);
+    }
+
     private static final Comparator<Translation2d> xSort = Comparator.comparingDouble(Translation2d::x);
     private static final Comparator<Translation2d> ySort = Comparator.comparingDouble(Translation2d::y);
 
@@ -297,6 +320,35 @@ public class Limelight extends Subsystem {
 
         Translation2d leftCorner = leftTop.get(0);
         Translation2d rightCorner = rightTop.get(rightTop.size()-1);
+        return Arrays.asList(new double[]{leftCorner.x(), leftCorner.y()}, new double[]{rightCorner.x(), rightCorner.y()});
+    }
+
+    public static List<double[]> extractBottomCornersFromBoundingBoxes(double[] xCorners, double[] yCorners) {
+        List<Translation2d> corners = new ArrayList<>();
+        for (int i = 0; i < xCorners.length; i++) {
+            corners.add(new Translation2d(xCorners[i], yCorners[i]));
+        }
+
+        corners.sort(xSort);
+
+        List<Translation2d> left = corners.subList(0, corners.size()/2);
+        List<Translation2d> right = corners.subList(corners.size()/2, corners.size());
+
+        left.sort(ySort);
+        right.sort(ySort);
+
+//        List<Translation2d> leftTop = left.subList(0, (corners.size()/2)/2);
+//        List<Translation2d> rightTop = right.subList(0, (corners.size()/2)/2);
+//
+//        leftTop.sort(xSort);
+//        rightTop.sort(xSort);
+
+//        Translation2d leftCorner = leftTop.get(leftTop.size() - 1);
+//        Translation2d rightCorner = rightTop.get(0);
+
+        Translation2d leftCorner = left.get(left.size() - 1);
+        Translation2d rightCorner = right.get(right.size() - 1);
+
         return Arrays.asList(new double[]{leftCorner.x(), leftCorner.y()}, new double[]{rightCorner.x(), rightCorner.y()});
     }
 

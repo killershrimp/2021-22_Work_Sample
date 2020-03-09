@@ -72,6 +72,12 @@ public class LimelightTest {
                 new double[]{44.0, 61.0, 67.0, 46.0, 50.0, 50.0, 70.0, 90.0});
         Assert.assertArrayEquals(new double[]{86.0, 44.0}, topCorners6.get(0), Util.kEpsilon);
         Assert.assertArrayEquals(new double[]{134.0, 46.0}, topCorners6.get(1), Util.kEpsilon);
+
+        List<double[]> bottom1 = Limelight.extractBottomCornersFromBoundingBoxes(
+                new double[]{94.0, 98.0, 140.0, 142.0},
+                new double[]{65.0, 87.0, 86.0, 65.0});
+        Assert.assertArrayEquals(new double[]{98.0, 87.0}, bottom1.get(0), Util.kEpsilon);
+        Assert.assertArrayEquals(new double[]{140.0, 86.0}, bottom1.get(1), Util.kEpsilon);
     }
 
     @Test
