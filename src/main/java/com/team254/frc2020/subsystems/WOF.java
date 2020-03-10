@@ -8,9 +8,12 @@ import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Map;
@@ -24,6 +27,8 @@ public class WOF extends Subsystem {
     private boolean mGameDataObtained = false;
 
     private final boolean kDeployValue = true;
+
+    private SimpleWidget colorWidget;
 
     private boolean mIsDeployed;
 
@@ -41,6 +46,9 @@ public class WOF extends Subsystem {
         mSpinnerMaster.setNeutralMode(NeutralMode.Brake);
         mIsDeployed = true;
         setDeploy(false);
+
+        colorWidget = Shuffleboard.getTab("Color").add("Position Control Color", false).withWidget(BuiltInWidgets.kBooleanBox)
+                .withProperties(Map.of("color when false", "black"));
     }
 
     public static WOF getInstance() {
@@ -48,6 +56,35 @@ public class WOF extends Subsystem {
             mInstance = new WOF();
         }
         return mInstance;
+    }
+
+    @Override
+    public void readPeriodicInputs() {
+        String gameData = DriverStation.getInstance().getGameSpecificMessage();
+        if (gameData.length() > 0 && !mGameDataObtained) {
+            mGameDataObtained = true;
+            String color;
+            switch (gameData) {
+                case "B":
+                    color = "blue";
+                    break;
+                case "G":
+                    color = "green";
+                    break;
+                case "R":
+                    color = "red";
+                    break;
+                case "Y":
+                    color = "yellow";
+                    break;
+                default:
+                    color = "black";
+                    break;
+            }
+
+            colorWidget.withProperties(Map.of("color when true", color));
+            colorWidget.getEntry().setBoolean(true);
+        }
     }
 
     @Override
@@ -85,10 +122,6 @@ public class WOF extends Subsystem {
         mSpinnerMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand);
     }
 
-    private String getGameData() {
-        return DriverStation.getInstance().getGameSpecificMessage();
-    }
-
     @Override
     public void stop() {
         mPeriodicIO.demand = 0.0;
@@ -106,30 +139,6 @@ public class WOF extends Subsystem {
         SmartDashboard.putBoolean("WOF Solenoid Deployed", mIsDeployed);
         SmartDashboard.putNumber("WOF Demand", mPeriodicIO.demand);
 
-//        String gameData = getGameData();
-//        if (gameData != null && !gameData.equals("") && !mGameDataObtained) {
-//            mGameDataObtained = true;
-//            String color;
-//            switch (gameData) {
-//                case "B":
-//                    color = "blue";
-//                    break;
-//                case "G":
-//                    color = "green";
-//                    break;
-//                case "R":
-//                    color = "red";
-//                    break;
-//                case "Y":
-//                    color = "yellow";
-//                    break;
-//                default:
-//                    return;
-//            }
-//
-//            Shuffleboard.getTab("Color").add("Position Control Color", true).withWidget(BuiltInWidgets.kBooleanBox)
-//                    .withProperties(Map.of("color when true", color));
-//        }
     }
 }
 
