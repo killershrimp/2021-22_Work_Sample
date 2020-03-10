@@ -313,6 +313,8 @@ public class Robot extends TimedRobot {
                     mSerializer.setStirOverriding(false);
                 }
 
+                mSerializer.setSerializerCanceled(mControlBoard.getCancelAutoSerialize());
+
                 if (mControlBoard.getExhaust()) {
                     mIntake.setWantedState(Intake.WantedState.EXHAUST);
                 } else if (mControlBoard.getIntake()) {

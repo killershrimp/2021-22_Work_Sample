@@ -118,6 +118,11 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
+    public boolean getCancelAutoSerialize() {
+        return mButtonControlBoard.getCancelAutoSerialize();
+    }
+
+    @Override
     public boolean getFnKey() {
         return mButtonControlBoard.getFnKey();
     }

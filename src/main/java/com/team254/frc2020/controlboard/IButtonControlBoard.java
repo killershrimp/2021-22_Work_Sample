@@ -29,6 +29,8 @@ public interface IButtonControlBoard {
 
     double getStir();
 
+    boolean getCancelAutoSerialize();
+
     boolean getFnKey();
 
     boolean getToggleWOFMode();

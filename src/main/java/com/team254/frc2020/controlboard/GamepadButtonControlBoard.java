@@ -108,6 +108,11 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     }
 
     @Override
+    public boolean getCancelAutoSerialize() {
+        return mController.getButton(XboxController.Button.R_JOYSTICK);
+    }
+
+    @Override
     public void reset() {
         mLastCardinal = CardinalDirection.NONE;
         mDPadValid = new DelayedBoolean(Timer.getFPGATimestamp(), kDPadDelay);

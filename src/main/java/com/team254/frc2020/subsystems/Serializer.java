@@ -72,6 +72,9 @@ public class Serializer extends Subsystem {
 
     private WantedState mWantedState = WantedState.IDLE;
     private SystemState mSystemState = SystemState.IDLE;
+
+    private boolean mSerializerCanceled = false;
+
     private double mCurrentStateStartTime = 0.0;
     private double mLastBreakBreakTriggerTime = 0.0;
 
@@ -251,7 +254,7 @@ public class Serializer extends Subsystem {
                 return SystemState.REBALANCING;
             case IDLE:
             default:
-                if (mPeriodicIO.break_beam_triggered) {
+                if (mPeriodicIO.break_beam_triggered && !mSerializerCanceled) {
                     return SystemState.SERIALIZE;
                 }
                 return SystemState.IDLE;
@@ -261,12 +264,12 @@ public class Serializer extends Subsystem {
     private SystemState handleSerialize(double timestamp) {
         switch (mWantedState) {
             case PREPARE_TO_SHOOT:
-                if (timestamp - mLastBreakBreakTriggerTime < kBeamBreakSerializeTime) {
+                if (!mSerializerCanceled && timestamp - mLastBreakBreakTriggerTime < kBeamBreakSerializeTime) {
                     return SystemState.SERIALIZE;
                 }
                 return SystemState.REBALANCING;
             case IDLE:
-                if (timestamp - mLastBreakBreakTriggerTime < kBeamBreakSerializeTime) {
+                if (!mSerializerCanceled && timestamp - mLastBreakBreakTriggerTime < kBeamBreakSerializeTime) {
                     return SystemState.SERIALIZE;
                 }
                 return SystemState.IDLE;
@@ -304,7 +307,7 @@ public class Serializer extends Subsystem {
             case IDLE:
                 if (timeInState >= kRebalacingTime && !mPeriodicIO.break_beam_triggered) {
                     return SystemState.REBALANCED;
-                } else if (mPeriodicIO.break_beam_triggered) {
+                } else if (mPeriodicIO.break_beam_triggered && !mSerializerCanceled) {
                     return SystemState.SERIALIZE;
                 }
                 return SystemState.REBALANCING;
@@ -330,7 +333,7 @@ public class Serializer extends Subsystem {
             case PREPARE_TO_SHOOT:
             case IDLE:
             default:
-                if (mPeriodicIO.break_beam_triggered) {
+                if (mPeriodicIO.break_beam_triggered && !mSerializerCanceled) {
                     return SystemState.SERIALIZE;
                 }
                 return SystemState.REBALANCED;
@@ -414,7 +417,11 @@ public class Serializer extends Subsystem {
         mPeriodicIO.spin_cycle_demand = demand;
     }
 
-    public void setStirOverriding(boolean override) {
+    public synchronized void setSerializerCanceled(boolean cancel) {
+        mSerializerCanceled = cancel;
+    }
+
+    public synchronized void setStirOverriding(boolean override) {
         mStirOverride = override;
     }
 
@@ -445,5 +452,7 @@ public class Serializer extends Subsystem {
         SmartDashboard.putNumber("Serializer Left Roller Speed RPM", nativeUnitsToRpm(mPeriodicIO.left_roller_demand));
 
         SmartDashboard.putBoolean("Is Break Beam Sensor Triggered", mPeriodicIO.break_beam_triggered);
+
+        SmartDashboard.putBoolean("Serializer Cancelled", mSerializerCanceled);
     }
 }
