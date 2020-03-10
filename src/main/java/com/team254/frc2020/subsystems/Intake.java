@@ -12,6 +12,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake extends Subsystem {
+    private static final double kIntakeStowTime = 0.5; // seconds, time it takes to stow intake
+    private static final double kIntakePower = 0.75;
+    private static final double kIntakeExhaustPower = -0.25;
+    private static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
+    private static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
+    
     private static Intake mInstance;
 
     public static Intake getInstance() {
@@ -127,13 +133,13 @@ public class Intake extends Subsystem {
                             mPeriodicIO.motor_demand = 0;
                             break;
                         case INTAKING:
-                            mPeriodicIO.motor_demand = Constants.kIntakePower;
+                            mPeriodicIO.motor_demand = kIntakePower;
                             break;
                         case EXHAUSTING:
-                            mPeriodicIO.motor_demand = Constants.kIntakeExhaustPower;
+                            mPeriodicIO.motor_demand = kIntakeExhaustPower;
                             break;
                         case LIGHT_INTAKE:
-                            mPeriodicIO.motor_demand = Constants.kLightIntakePower;
+                            mPeriodicIO.motor_demand = kLightIntakePower;
                             break;
                         default:
                             System.out.println("Unexpected intake system state: " + mSystemState);
@@ -153,14 +159,14 @@ public class Intake extends Subsystem {
         double timeSinceStowCommand = timestamp - mLastStowTime;
         switch (mWantedState) {
             case INTAKE:
-                if (timeSinceStowCommand < Constants.kIntakeStowTime) {
+                if (timeSinceStowCommand < kIntakeStowTime) {
                     return SystemState.IDLE;
                 }
                 return SystemState.INTAKING;
             case EXHAUST:
                 return SystemState.EXHAUSTING;
             case IDLE:
-                if (timeSinceStowCommand > Constants.kIntakeStowTime && (timeSinceStowCommand - Constants.kIntakeStowTime) < Constants.kLightIntakeTime) {
+                if (timeSinceStowCommand > kIntakeStowTime && (timeSinceStowCommand - kIntakeStowTime) < kLightIntakeTime) {
                     return SystemState.LIGHT_INTAKE;
                 }
                 return SystemState.IDLE;

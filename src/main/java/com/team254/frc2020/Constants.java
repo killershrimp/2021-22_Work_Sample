@@ -179,13 +179,9 @@ public class Constants {
     public static final double kFeederRollersKf = 0.04795003;
     public static final double kFeederRollersTicksPerRevolutions = 2048.0 * 1.0/36.0 * 16.0;
     public static final int kFeederAllowableError = 50;
+
     // Intake
     public static final int kIntakeMasterId = 14;
-    public static final double kIntakeStowTime = 0.5; // seconds, time it takes to stow intake
-    public static final double kIntakePower = 0.75;
-    public static final double kIntakeExhaustPower = -0.5;
-    public static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
-    public static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
 
     // WOF
     public static final int kWOFSpinnerId = 15;
