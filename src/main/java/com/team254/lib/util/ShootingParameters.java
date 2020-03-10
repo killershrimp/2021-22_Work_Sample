@@ -3,7 +3,9 @@ package com.team254.lib.util;
 import com.team254.lib.geometry.Pose2d;
 
 public class ShootingParameters {
-	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mHoodMap;
+	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mOldBallHoodMap;
+	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mMediumBallHoodMap;
+	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mNewBallHoodMap;
 	private final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mShooterRPMMap;
 	private final Pose2d mVisionTargetToGoalOffset;
 	private final double mSpinCycleSetpoint; // percent output
@@ -11,14 +13,24 @@ public class ShootingParameters {
 	private final double mTurretAllowableErrorDegrees; // °
 	private final double mHoodAllowableErrorDegrees; // °
 
-	public ShootingParameters(InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> hoodMap,
+	public static enum BallQuality {
+		NEW_BALL,
+		MEDIUM_BALL,
+		OLD_BALL
+	}
+
+	public ShootingParameters(InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> oldBallHoodMap,
+			InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> mediumBallHoodMap,
+			InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> newBallHoodMap,
 			InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> shooterRPMMap,
 			Pose2d visionTargetToGoalOffset,
 			double spinCycleSetpoint,
 			double shooterAllowableErrorRPM,
 			double turretAllowableErrorDegrees,
 			double hoodAllowableErrorDegrees) {
-		this.mHoodMap = hoodMap;
+		this.mOldBallHoodMap = oldBallHoodMap;
+		this.mMediumBallHoodMap = mediumBallHoodMap;
+		this.mNewBallHoodMap = newBallHoodMap;
 		this.mShooterRPMMap = shooterRPMMap;
 		this.mVisionTargetToGoalOffset = visionTargetToGoalOffset;
 		this.mSpinCycleSetpoint = spinCycleSetpoint;
@@ -27,8 +39,16 @@ public class ShootingParameters {
 		this.mHoodAllowableErrorDegrees = hoodAllowableErrorDegrees;
 	}
 
-	public InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> getHoodMap() {
-		return mHoodMap;
+	public InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> getHoodMap(BallQuality ballQuality) {
+		switch (ballQuality) {
+			case NEW_BALL:
+				return mNewBallHoodMap;
+			case OLD_BALL:
+				return mOldBallHoodMap;
+			case MEDIUM_BALL:
+			default:
+				return mMediumBallHoodMap;
+		}
 	}
 
 	public InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> getShooterRPMMap() {

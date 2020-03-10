@@ -13,6 +13,7 @@ import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.ShootingParameters;
 import com.team254.lib.util.Units;
 import com.team254.lib.util.Util;
+import com.team254.lib.util.ShootingParameters.BallQuality;
 import com.team254.lib.vision.AimingParameters;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -80,6 +81,7 @@ public class Superstructure extends Subsystem {
     private Optional<Double> mTurretJogDelta = Optional.empty();
     
     private ShootingParameters mShootingParameters = Constants.kCoarseShootingParams;
+    private BallQuality mBallQuality = BallQuality.MEDIUM_BALL;
 
     private double mTurretFeedforwardVFromVision = 0.0;
 
@@ -264,7 +266,7 @@ public class Superstructure extends Subsystem {
         } else {
             if (mLatestAimingParameters.isPresent()) {
                 mHood.setSetpointPositionPID(
-                        mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
+                        mShootingParameters.getHoodMap(mBallQuality).getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
                 mShooter.setRPM(
                         mShootingParameters.getShooterRPMMap().getInterpolated(new InterpolatingDouble(mLatestAimingParameters.get().getRange())).value);
             } else {
@@ -295,7 +297,7 @@ public class Superstructure extends Subsystem {
             shooterRpm = SmartDashboard.getNumber("ShooterRPMToSet", 4500.0);
         } else {
             if (mLatestAimingParameters.isPresent()) {
-                hoodAngle = mShootingParameters.getHoodMap().getInterpolated(new InterpolatingDouble(range)).value;
+                hoodAngle = mShootingParameters.getHoodMap(mBallQuality).getInterpolated(new InterpolatingDouble(range)).value;
                 shooterRpm = mShootingParameters.getShooterRPMMap().getInterpolated(new InterpolatingDouble(range)).value;
             } else {
                 hoodAngle = mHood.getAngle();
@@ -467,5 +469,9 @@ public class Superstructure extends Subsystem {
         } else {
             DriverStation.reportError("Trying to set null Shooting Params in Superstructure", true);
         }
+    }
+
+    public synchronized void setBallQuality(BallQuality ballQuality) {
+        mBallQuality = ballQuality;
     }
 }

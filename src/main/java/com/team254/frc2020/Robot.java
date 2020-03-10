@@ -16,6 +16,7 @@ import com.team254.frc2020.subsystems.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.*;
+import com.team254.lib.util.ShootingParameters.BallQuality;
 import com.team254.lib.wpilib.TimedRobot;
 
 import edu.wpi.first.wpilibj.Compressor;
@@ -321,6 +322,14 @@ public class Robot extends TimedRobot {
                 }
 
                 boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
+
+                if (mControlBoard.getHoodJog() > 0.5) {
+                    mSuperstructure.setBallQuality(BallQuality.OLD_BALL);
+                } else if (mControlBoard.getHoodJog() < -0.5) {
+                    mSuperstructure.setBallQuality(BallQuality.NEW_BALL);
+                } else {
+                    mSuperstructure.setBallQuality(BallQuality.MEDIUM_BALL);
+                }
 
                 if (wants_shoot) {
                     mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
