@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
+import com.team254.frc2020.limelight.LimelightManager;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.geometry.Rotation2d;
@@ -32,6 +33,7 @@ public class Superstructure extends Subsystem {
     private Hood mHood = Hood.getInstance();
     private Shooter mShooter = Shooter.getInstance();
     private Serializer mSerializer = Serializer.getInstance();
+    private LimelightManager mLLManager = LimelightManager.getInstance();
 
     private RobotState mRobotState = RobotState.getInstance();
 
@@ -72,6 +74,8 @@ public class Superstructure extends Subsystem {
     private double mAutoAimMinDistance = 500;
     private double mLastShootingParamsPrintTime = 0.0;
 
+    private boolean mOverrideLimelightLEDs = false;
+
     private Optional<Double> mTurretHint = Optional.empty();
     private Optional<Double> mTurretJogDelta = Optional.empty();
     
@@ -86,6 +90,7 @@ public class Superstructure extends Subsystem {
             public void onStart(double timestamp) {
                 synchronized (Superstructure.this) {
                     mWantedState = WantedState.IDLE;
+                    mOverrideLimelightLEDs = false;
                 }
             }
 
@@ -214,6 +219,10 @@ public class Superstructure extends Subsystem {
     }
     
     private void writeIdleDesiredState(double timestamp) {
+        if (!mOverrideLimelightLEDs) {
+            mLLManager.getTurretLimelight().setLed(Limelight.LedMode.OFF);
+        }
+
         mSerializer.setWantedState(Serializer.WantedState.IDLE);
 
         if (mTurretHint.isPresent()) {
@@ -230,6 +239,9 @@ public class Superstructure extends Subsystem {
 
     private void writeAimingDesiredState(double timestamp) {
         mSerializer.setWantedState(Serializer.WantedState.PREPARE_TO_SHOOT);
+        if (!mOverrideLimelightLEDs) {
+            mLLManager.getTurretLimelight().setLed(Limelight.LedMode.PIPELINE);
+        }
 
         double visionAngle = getTurretSetpointFromVision(timestamp);
         double angleToSet = mTurret.getAngle();
@@ -262,6 +274,9 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeShootDesiredState(double timestamp) {
+        if (!mOverrideLimelightLEDs) {
+            mLLManager.getTurretLimelight().setLed(Limelight.LedMode.PIPELINE);
+        }
         mSerializer.setSpinCycleFeedSpeed(mShootingParameters.getSpinCycleSetpoint());
         mSerializer.setWantedState(Serializer.WantedState.FEED);
 
@@ -302,6 +317,9 @@ public class Superstructure extends Subsystem {
     }
 
     private void writeMoveToZeroDesiredState() {
+        if (!mOverrideLimelightLEDs) {
+            mLLManager.getTurretLimelight().setLed(Limelight.LedMode.OFF);
+        }
         mSerializer.setWantedState(Serializer.WantedState.IDLE);
         mTurret.setSetpointPositionPID(Constants.kTurretConstants.kHomePosition);
         mHood.setSetpointPositionPID(Constants.kHoodConstants.kHomePosition);
@@ -336,6 +354,10 @@ public class Superstructure extends Subsystem {
 
     public boolean visionHasTarget() {
         return mHasTarget;
+    }
+
+    public void setOverrideLimelightLEDs(boolean should_override) {
+        mOverrideLimelightLEDs = should_override;
     }
 
     public synchronized double getTurretSetpointFromVision(double timestamp) {

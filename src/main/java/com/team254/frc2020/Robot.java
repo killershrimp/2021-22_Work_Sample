@@ -1,7 +1,5 @@
 package com.team254.frc2020;
 
-import java.sql.Time;
-import java.util.Map;
 import java.util.Optional;
 
 import com.team254.frc2020.auto.AutoModeExecutor;
@@ -9,6 +7,7 @@ import com.team254.frc2020.auto.modes.AutoModeBase;
 import com.team254.frc2020.controlboard.CardinalDirection;
 import com.team254.frc2020.controlboard.ControlBoard;
 import com.team254.frc2020.controlboard.IControlBoard;
+import com.team254.frc2020.limelight.LimelightManager;
 import com.team254.frc2020.limelight.constants.LimelightConstantsFactory;
 import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
@@ -103,6 +102,8 @@ public class Robot extends TimedRobot {
             mShouldNotShoot = new DelayedBoolean(Timer.getFPGATimestamp(), 0.5);
 
             mSubsystemManager.stop();
+
+            LimelightManager.getInstance().setTurretLimelight(mLimelight);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -126,6 +127,8 @@ public class Robot extends TimedRobot {
             mDisabledLooper.start();
 
             mDisabledStartTime = Timer.getFPGATimestamp();
+            LimelightManager.getInstance().writePeriodicOutputs();
+
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -293,11 +296,14 @@ public class Robot extends TimedRobot {
 
 
             if (mInHangMode) {
+                mSuperstructure.setOverrideLimelightLEDs(true);
+                LimelightManager.getInstance().getTurretLimelight().setLed(Limelight.LedMode.BLINK);
+                mSuperstructure.setWantedState(Superstructure.WantedState.IDLE);
                 mClimbingStateMachine.handle(Timer.getFPGATimestamp(), mControlBoard.getClimbJog(), false, mControlBoard.getRetractIntake(),
                         mControlBoard.getHumanPlayerIntake(), mControlBoard.getDeployIntake());
                 mSuperstructure.setTurretHintRobotRelative(Timer.getFPGATimestamp(), -90);
             } else {
-                //check getExhaust first so can exh while intake is down by pressing both r/l bumpers?
+                mSuperstructure.setOverrideLimelightLEDs(false);
                 if (Math.abs(mControlBoard.getStir()) > Constants.kSerializerStirDeadband && !mInWOFMode) {
                     mSerializer.setStirOverriding(true);
                     mSerializer.setOpenLoop(Util.handleDeadband(mControlBoard.getStir(),

@@ -110,7 +110,7 @@ public class Limelight extends Subsystem {
         Loop mLoop = new Loop() {
             @Override
             public void onStart(double timestamp) {
-                setLed(Limelight.LedMode.ON);
+                setLed(Limelight.LedMode.OFF);
                 RobotState.getInstance().resetVision();
             }
 
@@ -146,6 +146,7 @@ public class Limelight extends Subsystem {
     public synchronized void outputTelemetry() {
         SmartDashboard.putBoolean(mConstants.getName() + ": Has Target", mSeesTarget);
         SmartDashboard.putNumber(mConstants.getName() + ": Pipeline Latency (ms)", mPeriodicIO.latency);
+        SmartDashboard.putNumber(mConstants.getName() + ": LED Mode", mPeriodicIO.ledMode);
     }
 
     public enum LedMode {
