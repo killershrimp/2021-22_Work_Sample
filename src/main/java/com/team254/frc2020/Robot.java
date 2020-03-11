@@ -46,10 +46,9 @@ public class Robot extends TimedRobot {
     private final Serializer mSerializer = Serializer.getInstance();
     private final Hood mHood = Hood.getInstance();
     private final Canifier mCanifier = Canifier.getInstance();
+    private final Infrastructure mInfrastructure = Infrastructure.getInstance();
     private final WOF mWOF = WOF.getInstance();
     private final LED mLED = LED.getInstance();
-
-    private Compressor mCompressor;
 
     private final RobotState mRobotState = RobotState.getInstance();
 
@@ -82,18 +81,17 @@ public class Robot extends TimedRobot {
                 mIntake,
                 mSuperstructure,
                 mLimelight,
+                mInfrastructure,
                 mCanifier,
                 mWOF
             );
-
-            mCompressor = new Compressor();
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
 
             mLED.registerEnabledLoops(mEnabledLooper);
             mLED.registerEnabledLoops(mDisabledLooper);
-            
+
             mTrajectoryGenerator.generateTrajectories();
 
             // Robot starts backwards, turret starts backwards (in robot frame)
@@ -151,7 +149,7 @@ public class Robot extends TimedRobot {
             CrashTracker.logAutoInit();
 
             mDisabledLooper.stop();
-            mCompressor.stop();
+            mInfrastructure.setIsTeleop(false);
             // Robot starts backwards, turret starts backwards (in robot frame)
             mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.fromRotation(Rotation2d.fromDegrees(180)), new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Constants.kTurretConstants.kHomePosition)));
             mDrive.setHeading(Rotation2d.fromDegrees(180));
@@ -169,9 +167,11 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         try {
+
+            mInfrastructure.setIsTeleop(true);
+
             CrashTracker.logTeleopInit();
             mDisabledLooper.stop();
-            mCompressor.start();
 
             if (mAutoModeExecutor != null) {
                 mAutoModeExecutor.stop();
