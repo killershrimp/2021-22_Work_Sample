@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClimbingStateMachine {
     private static final double kFeedforwardDown = 1.0 / 12.0;
-    private static final int kMaxExtension = -280000;
+    private static final int kMaxExtension = -294000;
     private static final int kClimbPosition = -100000;//-280000;
     private static final double kThrottleDeadband = 0.4;
 

@@ -79,7 +79,7 @@ public class Constants {
     public static final double kDriveLowGearKd = 0.0;
     public static final double kDriveLowGearKf = 0.0;
 
-    public static final double kDrivePositionKp = 0.012;
+    public static final double kDrivePositionKp = 0.006;
     public static final double kDrivePositionKi = 0.0;
     public static final double kDrivePositionKd = 0.0;
     public static final double kDrivePositionKf = 0.0;
