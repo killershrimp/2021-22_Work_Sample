@@ -154,7 +154,7 @@ public class Serializer extends Subsystem {
     }
 
     @Override
-    public void readPeriodicInputs() {
+    public synchronized void readPeriodicInputs() {
         mPeriodicIO.right_roller_velocity = mRightRollerMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.left_roller_velocity = mLeftRollerMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.break_beam_triggered = mCanifier.isBreamBeamSensorTriggered();
@@ -164,7 +164,7 @@ public class Serializer extends Subsystem {
     }
 
     @Override
-    public void writePeriodicOutputs() {
+    public synchronized void writePeriodicOutputs() {
         mSpinCycleMaster.set(ControlMode.PercentOutput, mPeriodicIO.spin_cycle_demand);
         mRightRollerMaster.set(ControlMode.Velocity, mPeriodicIO.right_roller_demand);
         mLeftRollerMaster.set(ControlMode.Velocity, mPeriodicIO.left_roller_demand);
@@ -393,7 +393,7 @@ public class Serializer extends Subsystem {
         setChockDeployed(false);
     }
 
-    private void setSkateParkDeployed(boolean should_deploy) {
+    private synchronized void setSkateParkDeployed(boolean should_deploy) {
         if (should_deploy != mIsSkateParkDeployed) {
             mSkatePark.set(should_deploy);
             mIsSkateParkDeployed = should_deploy;
@@ -408,14 +408,14 @@ public class Serializer extends Subsystem {
         return native_units * 60.0 * 10.0 / Constants.kFeederRollersTicksPerRevolutions;
     }
 
-    private void setChockDeployed(boolean should_deploy) {
+    private synchronized void setChockDeployed(boolean should_deploy) {
         if (should_deploy != mIsChockDeployed) {
             mChock.set(should_deploy);
             mIsChockDeployed = should_deploy;
         }
     }
 
-    public void setOpenLoop(double demand) {
+    public synchronized void setOpenLoop(double demand) {
         mPeriodicIO.spin_cycle_demand = demand;
     }
 
@@ -433,10 +433,12 @@ public class Serializer extends Subsystem {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         mSpinCycleMaster.set(ControlMode.PercentOutput, 0.0);
         mRightRollerMaster.set(ControlMode.PercentOutput, 0.0);
         mLeftRollerMaster.set(ControlMode.PercentOutput, 0.0);
+        setChockDeployed(false);
+        setSkateParkDeployed(false);
     }
 
     @Override
