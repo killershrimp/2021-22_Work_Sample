@@ -35,7 +35,7 @@ public class Canifier extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.break_beam_triggered = mCanifier.getGeneralInput(CANifier.GeneralPin.SDA);
-        // TODO make practice bot and comp bot the same... is LIMR on comp bot
+        // TODO make practice bot and comp bot the same... is LIMR on practice bot, SDA on comp bot
         mPeriodicIO.turret_homing_limit_switch = !mCanifier.getGeneralInput(CANifier.GeneralPin.LIMF);
     }
 
