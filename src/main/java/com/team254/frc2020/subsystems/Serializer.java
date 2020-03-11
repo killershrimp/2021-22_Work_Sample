@@ -176,6 +176,10 @@ public class Serializer extends Subsystem {
             @Override
             public void onStart(double timestamp) {
                 synchronized (Serializer.this) {
+                    mIsChockDeployed = true;
+                    mIsSkateParkDeployed = true;
+                    setChockDeployed(false);
+                    setSkateParkDeployed(false);
                     mWantedState = WantedState.IDLE;
                 }
             }
@@ -348,7 +352,11 @@ public class Serializer extends Subsystem {
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
-        setChockDeployed(true);
+        if (mSerializerCanceled) {
+            setChockDeployed(false);
+        } else {
+            setChockDeployed(true);
+        }
     }
 
     private void setSerializeStateDemands() {
@@ -356,7 +364,11 @@ public class Serializer extends Subsystem {
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
-        setChockDeployed(true);
+        if (mSerializerCanceled) {
+            setChockDeployed(false);
+        } else {
+            setChockDeployed(true);
+        }
     }
 
     public synchronized void setSpinCycleFeedSpeed(double demand) {
@@ -437,6 +449,8 @@ public class Serializer extends Subsystem {
         mSpinCycleMaster.set(ControlMode.PercentOutput, 0.0);
         mRightRollerMaster.set(ControlMode.PercentOutput, 0.0);
         mLeftRollerMaster.set(ControlMode.PercentOutput, 0.0);
+        mIsChockDeployed = true;
+        mIsSkateParkDeployed = true;
         setChockDeployed(false);
         setSkateParkDeployed(false);
     }
