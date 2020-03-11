@@ -236,6 +236,7 @@ public class Constants {
         kLaserOldHoodMap.put(new InterpolatingDouble(167.806665), new InterpolatingDouble(52.024536));
         kLaserOldHoodMap.put(new InterpolatingDouble(183.306690), new InterpolatingDouble(54.025561));
         kLaserOldHoodMap.put(new InterpolatingDouble(214.597001), new InterpolatingDouble(56.017068));
+        kLaserOldHoodMap.put(new InterpolatingDouble(226.597001), new InterpolatingDouble(56.78082148));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLaserNewHoodMap = new InterpolatingTreeMap<>();
@@ -251,16 +252,19 @@ public class Constants {
         kLaserNewHoodMap.put(new InterpolatingDouble(183.160319), new InterpolatingDouble(60.119230));
         kLaserNewHoodMap.put(new InterpolatingDouble(244.351501), new InterpolatingDouble(61.206940));
         kLaserNewHoodMap.put(new InterpolatingDouble(263.950477), new InterpolatingDouble(62.035888));
+        kLaserNewHoodMap.put(new InterpolatingDouble(275.950477), new InterpolatingDouble(62.54343370034679));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLaserMediumHoodMap = new InterpolatingTreeMap<>();
     static {
         // tuned 3/8
-        kLaserMediumHoodMap.put(new InterpolatingDouble(248.999184), new InterpolatingDouble(61.039339));
+        kLaserMediumHoodMap.put(new InterpolatingDouble(302.86658), new InterpolatingDouble(61.56313840676865));
         kLaserMediumHoodMap.put(new InterpolatingDouble(290.866580), new InterpolatingDouble(61.446452));
+        kLaserMediumHoodMap.put(new InterpolatingDouble(248.999184), new InterpolatingDouble(61.039339));
         kLaserMediumHoodMap.put(new InterpolatingDouble(179.368013), new InterpolatingDouble(58.555894));
         kLaserMediumHoodMap.put(new InterpolatingDouble(151.1), new InterpolatingDouble(53.9));
         kLaserMediumHoodMap.put(new InterpolatingDouble(124.535161), new InterpolatingDouble(51.917520));
+        kLaserMediumHoodMap.put(new InterpolatingDouble(101.349366), new InterpolatingDouble(47.373032));
         kLaserMediumHoodMap.put(new InterpolatingDouble(101.349366), new InterpolatingDouble(47.373032));
     }
 
@@ -288,6 +292,7 @@ public class Constants {
         kLobHoodMap.put(new InterpolatingDouble(248.562343), new InterpolatingDouble(53.421403));
         kLobHoodMap.put(new InterpolatingDouble(274.035243), new InterpolatingDouble(55.572476));
         kLobHoodMap.put(new InterpolatingDouble(316.418550), new InterpolatingDouble(57.561044));
+        kLobHoodMap.put(new InterpolatingDouble(328.41855), new InterpolatingDouble(58.124067928264964));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kLobRPMMap = new InterpolatingTreeMap<>();
