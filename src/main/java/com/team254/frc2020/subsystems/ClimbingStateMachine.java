@@ -12,6 +12,8 @@ public class ClimbingStateMachine {
     private static final double kFeedforwardDown = 1.0 / 12.0;
     private static final int kMaxExtension = -294000;
     private static final int kClimbPosition = -100000;//-280000;
+    private static final int kDeployPistonPosition = -155196;
+    private static final int kDeployPistonHysteresis = 5000; // dont undeploy until falls 5000 below deploy postion
     private static final double kThrottleDeadband = 0.4;
 
     enum SystemState {
@@ -87,6 +89,14 @@ public class ClimbingStateMachine {
         }
 
         climbThrottle = Util.limit(climbThrottle, 1.0);
+
+        if (mSystemState == SystemState.EXTENDING || mSystemState == SystemState.MANUAL ||  mSystemState == SystemState.CLIMBING) {
+            if (mDrive.getPTOPosition() < kDeployPistonPosition) {
+                mDrive.setDeploy(true);
+            } else if (mDrive.getPTOPosition() > (kDeployPistonPosition + kDeployPistonHysteresis)){
+                mDrive.setDeploy(false);
+            }
+        }
 
         switch (mSystemState) {
             case PRECLIMB:
