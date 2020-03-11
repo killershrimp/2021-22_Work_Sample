@@ -13,6 +13,7 @@ import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
 import com.team254.frc2020.subsystems.*;
 import com.team254.frc2020.subsystems.Limelight;
+import com.team254.frc2020.subsystems.utils.TimedLEDState;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.*;
@@ -103,7 +104,8 @@ public class Robot extends TimedRobot {
 
             mControlBoard.reset();
 
-            mTurret.zeroSensors();
+            mTurret.forceZero();
+
             mShouldNotShoot = new DelayedBoolean(Timer.getFPGATimestamp(), 0.5);
             mShouldNotAim = new DelayedBoolean(Timer.getFPGATimestamp(), 0.5);
 
@@ -134,6 +136,8 @@ public class Robot extends TimedRobot {
 
             mDisabledStartTime = Timer.getFPGATimestamp();
             LimelightManager.getInstance().writePeriodicOutputs();
+
+            mLED.setWantedAction(LED.WantedAction.DISPLAY_ZEROED);
 
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
@@ -234,6 +238,12 @@ public class Robot extends TimedRobot {
                 mLED.clearHoodFault();
             }
 
+            mTurret.resetIfAtHome();
+            if (!mTurret.hasBeenZeroed()) {
+                mLED.setTurretFault();
+            } else {
+                mLED.clearTurretFault();
+            }
 
             mCanifier.writePeriodicOutputs();
 
@@ -269,6 +279,14 @@ public class Robot extends TimedRobot {
             boolean wants_shoot = !mShouldNotShoot.update(timestamp, !mControlBoard.getShoot());
             boolean wants_aim = !mShouldNotAim.update(timestamp, ! (mControlBoard.getAimFine() || mControlBoard.getAimCoarse()) );
 
+            if (mHood.hasBeenZeroed()) {
+                mLED.clearHoodFault();
+            }
+
+            if (mTurret.hasBeenZeroed()) {
+                mLED.clearTurretFault();
+            }
+
             if (mControlBoard.getZeroGyro()) {
                 mDrive.setHeading(Rotation2d.fromDegrees(180));
             }
@@ -300,9 +318,12 @@ public class Robot extends TimedRobot {
             if (WOFModePressed && !mInWOFMode) {
                 System.out.println("Entering WOF mode!!!!");
                 mInWOFMode = true;
+                mLED.setWOFLEDState(TimedLEDState.BlinkingLEDState.kBlinkingWOF);
+                mLED.setWantedAction(LED.WantedAction.DISPLAY_WOF);
             } else if (WOFModePressed && mInWOFMode) {
                 System.out.println("Exiting WOF mode!");
                 mInWOFMode = false;
+                mLED.setWantedAction(LED.WantedAction.DISPLAY_SUPERSTRUCTURE);
             }
 
 

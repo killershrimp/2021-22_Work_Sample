@@ -11,14 +11,16 @@ public interface TimedLEDState {
 
         public static BlinkingLEDState kClimbing = new BlinkingLEDState(
                 LEDState.kOff, LEDState.kClimbing, 0.5);
-         public static BlinkingLEDState kBreakEngaged = new BlinkingLEDState(
+        public static BlinkingLEDState kBreakEngaged = new BlinkingLEDState(
                 LEDState.kOff, LEDState.kBreakEngaged, 0.5);
-
 
         public static BlinkingLEDState kBlinkingAiming = new BlinkingLEDState(
                 LEDState.kOff, LEDState.kAiming, 0.1);
         public static BlinkingLEDState kBlinkingShooting = new BlinkingLEDState(
                 LEDState.kOff, LEDState.kShooting, 0.1);
+
+        public static BlinkingLEDState kBlinkingWOF = new BlinkingLEDState(
+                LEDState.kOff, LEDState.kWOF, 0.5);
 
 
         LEDState mStateOne = new LEDState(0.0, 0.0, 0.0);

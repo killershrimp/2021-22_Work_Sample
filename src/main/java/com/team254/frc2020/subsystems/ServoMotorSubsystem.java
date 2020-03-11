@@ -234,7 +234,7 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         public double master_current;
         public double error_ticks;
         public int encoder_wraps;
-        public int absolute_pulse_offset;
+        public int absolute_pulse_offset = 0;
         // public int absolute_pulse_position;
         public int absolute_pulse_position_modded;
         public boolean reset_occured;
@@ -544,6 +544,11 @@ public abstract class ServoMotorSubsystem extends Subsystem {
         mMaster.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
         mPeriodicIO.absolute_pulse_offset = getAbsoluteEncoderRawPosition();
         mHasBeenZeroed = true;
+    }
+
+    public synchronized void forceZero() {
+        mMaster.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+        mPeriodicIO.absolute_pulse_offset = getAbsoluteEncoderRawPosition();
     }
 
     public synchronized boolean hasBeenZeroed() {

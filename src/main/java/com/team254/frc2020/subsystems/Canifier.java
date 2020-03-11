@@ -42,8 +42,7 @@ public class Canifier extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
-        mPeriodicIO.break_beam_triggered = mCanifier.getGeneralInput(CANifier.GeneralPin.SDA);
-        // TODO make practice bot and comp bot the same... is LIMR on practice bot, SDA on comp bot
+        mPeriodicIO.break_beam_triggered = mCanifier.getGeneralInput(CANifier.GeneralPin.LIMR);
         mPeriodicIO.turret_homing_limit_switch = !mCanifier.getGeneralInput(CANifier.GeneralPin.LIMF);
     }
 
@@ -64,8 +63,8 @@ public class Canifier extends Subsystem {
         // B: Red
         // C: Blue
         if (mOutputsChanged) {
-            mCanifier.setLEDOutput(mPeriodicIO.g, CANifier.LEDChannel.LEDChannelA);
-            mCanifier.setLEDOutput(mPeriodicIO.r, CANifier.LEDChannel.LEDChannelB);
+            mCanifier.setLEDOutput(mPeriodicIO.g, CANifier.LEDChannel.LEDChannelB);
+            mCanifier.setLEDOutput(mPeriodicIO.r, CANifier.LEDChannel.LEDChannelA);
             mCanifier.setLEDOutput(mPeriodicIO.b, CANifier.LEDChannel.LEDChannelC);
             mOutputsChanged = false;
         }

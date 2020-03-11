@@ -122,8 +122,8 @@ public class LED extends Subsystem {
                             System.out.println("Fell through on LED commands: " + mSystemState);
                             break;
                     }
-                    //mCanifier.setLEDColor(mDesiredLEDState.red, mDesiredLEDState.green,
-                    //        mDesiredLEDState.blue);
+                    mCanifier.setLEDColor(mDesiredLEDState.red, mDesiredLEDState.green,
+                            mDesiredLEDState.blue);
                 }
             }
 
