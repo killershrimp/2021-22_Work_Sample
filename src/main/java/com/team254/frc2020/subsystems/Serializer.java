@@ -384,7 +384,9 @@ public class Serializer extends Subsystem {
     }
 
     private void setRebalancedStateDemands(double timeInState) {
-        mPeriodicIO.spin_cycle_demand = 0.0;
+        if (!mStirOverride) {
+            mPeriodicIO.spin_cycle_demand = 0.0;
+        }
         mPeriodicIO.left_roller_demand = 0.0;
         mPeriodicIO.right_roller_demand = 0.0;
         setSkateParkDeployed(false);
