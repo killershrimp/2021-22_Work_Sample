@@ -53,6 +53,7 @@ public class Robot extends TimedRobot {
     private final RobotState mRobotState = RobotState.getInstance();
 
     private DelayedBoolean mShouldNotShoot;
+    private DelayedBoolean mShouldNotAim;
     private ClimbingStateMachine mClimbingStateMachine = new ClimbingStateMachine();
     private LatchedBoolean mHangModeEnablePressed = new LatchedBoolean();
     private LatchedBoolean mInPitHangModeEnablePressed = new LatchedBoolean();
@@ -101,6 +102,7 @@ public class Robot extends TimedRobot {
 
             mTurret.zeroSensors();
             mShouldNotShoot = new DelayedBoolean(Timer.getFPGATimestamp(), 0.5);
+            mShouldNotAim = new DelayedBoolean(Timer.getFPGATimestamp(), 0.5);
 
             mSubsystemManager.stop();
 
@@ -251,7 +253,11 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         try {
-            boolean wants_shoot = !mShouldNotShoot.update(Timer.getFPGATimestamp(), !mControlBoard.getShoot());
+
+            double timestamp = Timer.getFPGATimestamp();
+
+            boolean wants_shoot = !mShouldNotShoot.update(timestamp, !mControlBoard.getShoot());
+            boolean wants_aim = !mShouldNotAim.update(timestamp, ! (mControlBoard.getAimFine() || mControlBoard.getAimCoarse()) );
 
             if (mControlBoard.getZeroGyro()) {
                 mDrive.setHeading(Rotation2d.fromDegrees(180));
@@ -323,8 +329,6 @@ public class Robot extends TimedRobot {
                     mIntake.setWantedState(Intake.WantedState.IDLE);
                 }
 
-                boolean wants_aim = mControlBoard.getAimCoarse() || mControlBoard.getAimFine();
-
                 if (mControlBoard.getHoodJog() > 0.5) {
                     mSuperstructure.setBallQuality(BallQuality.OLD_BALL);
                 } else if (mControlBoard.getHoodJog() < -0.5) {
@@ -333,7 +337,7 @@ public class Robot extends TimedRobot {
                     mSuperstructure.setBallQuality(BallQuality.MEDIUM_BALL);
                 }
 
-                if (wants_shoot) {
+                if (wants_shoot && wants_aim) {
                     mSuperstructure.setWantedState(Superstructure.WantedState.SHOOT);
                 } else if (wants_aim) {
                     mSuperstructure.setShootingParams(mControlBoard.getAimFine() ? Constants.kFineShootingParams : Constants.kCoarseShootingParams);
