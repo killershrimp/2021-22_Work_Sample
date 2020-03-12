@@ -12,11 +12,13 @@ import com.team254.lib.vision.AimingParameters;
 import com.team254.lib.vision.GoalTracker;
 import com.team254.lib.vision.GoalTracker.TrackReportComparator;
 import com.team254.lib.vision.TargetInfo;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class RobotState {
     private static RobotState mInstance;
@@ -204,7 +206,7 @@ public class RobotState {
         if (cameraToVisionTargetTranslations.size() != 2 ||
                 cameraToVisionTargetTranslations.get(0) == null ||
                 cameraToVisionTargetTranslations.get(1) == null) {
-                return;
+            return;
         }
 
         Pose2d cameraToVisionTarget = Pose2d.fromTranslation(cameraToVisionTargetTranslations.get(0).interpolate(
@@ -236,7 +238,7 @@ public class RobotState {
 
         updateGoalTracker(timestamp, cameraToVisionTargetTranslations, goal_tracker_, source);
     }
- 
+
     public synchronized Pose2d getFieldToVisionTarget() {
         GoalTracker tracker = goal_tracker_;
 

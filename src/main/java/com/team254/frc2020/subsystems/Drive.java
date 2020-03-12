@@ -29,8 +29,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Drive extends Subsystem {
 
@@ -619,6 +619,7 @@ public class Drive extends Subsystem {
         mRightSide.getPTOMotors().forEach(t -> t.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
                 true, current, current, 0.2), 0));
     }
+
     public synchronized double getPTOPosition() {
         return mRightSide.getPTOMotors().iterator().next().getSelectedSensorPosition();
     }

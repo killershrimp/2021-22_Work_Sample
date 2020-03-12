@@ -2,7 +2,6 @@ package com.team254.lib.spline;
 
 import com.team254.lib.geometry.*;
 import com.team254.lib.util.Util;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -10,7 +10,6 @@ import com.team254.lib.drivers.TalonFXFactory;
 import com.team254.lib.drivers.TalonUtil;
 import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -178,7 +177,7 @@ public class Shooter extends Subsystem {
         return Util.epsilonEquals(getLeftRPM(), nativeUnitsToRPM(mPeriodicIO.demand),
                 Constants.kShooterAllowableErrorRPM)
                 && Util.epsilonEquals(getRightRPM(), nativeUnitsToRPM(mPeriodicIO.demand),
-                        Constants.kShooterAllowableErrorRPM);
+                Constants.kShooterAllowableErrorRPM);
     }
 
     public synchronized double getRightRPM() {
@@ -216,7 +215,7 @@ public class Shooter extends Subsystem {
     public synchronized double getAverageStatorCurrent() {
         return (mPeriodicIO.right_stator_current + mPeriodicIO.left_stator_current) / 2.0;
     }
-    
+
     public synchronized void startLogging() {
         if (mCSVWriter == null) {
             mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/SHOOTER-LOGS.csv", PeriodicIO.class);

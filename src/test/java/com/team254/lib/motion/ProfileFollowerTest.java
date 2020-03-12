@@ -1,11 +1,9 @@
 package com.team254.lib.motion;
 
 import com.team254.lib.motion.MotionProfileGoal.CompletionBehavior;
-
 import org.junit.Test;
 
 import static com.team254.lib.motion.MotionTestUtil.*;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

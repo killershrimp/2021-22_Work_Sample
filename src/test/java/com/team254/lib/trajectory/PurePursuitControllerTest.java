@@ -4,7 +4,6 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.geometry.Twist2d;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

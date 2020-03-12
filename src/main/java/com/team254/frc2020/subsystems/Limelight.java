@@ -251,7 +251,7 @@ public class Limelight extends Subsystem {
 
         // something went wrong
         if (!mSeesTarget || corners.length < 8 || corners == mZeroArray || corners.length % 2 != 0) {
-            return null; 
+            return null;
         }
 
         double[] xCorners = new double[corners.length / 2];
@@ -307,20 +307,20 @@ public class Limelight extends Subsystem {
 
         corners.sort(xSort);
 
-        List<Translation2d> left = corners.subList(0, corners.size()/2);
-        List<Translation2d> right = corners.subList(corners.size()/2, corners.size());
+        List<Translation2d> left = corners.subList(0, corners.size() / 2);
+        List<Translation2d> right = corners.subList(corners.size() / 2, corners.size());
 
         left.sort(ySort);
         right.sort(ySort);
 
-        List<Translation2d> leftTop = left.subList(0, (corners.size()/2)/2);
-        List<Translation2d> rightTop = right.subList(0, (corners.size()/2)/2);
+        List<Translation2d> leftTop = left.subList(0, (corners.size() / 2) / 2);
+        List<Translation2d> rightTop = right.subList(0, (corners.size() / 2) / 2);
 
         leftTop.sort(xSort);
         rightTop.sort(xSort);
 
         Translation2d leftCorner = leftTop.get(0);
-        Translation2d rightCorner = rightTop.get(rightTop.size()-1);
+        Translation2d rightCorner = rightTop.get(rightTop.size() - 1);
         return Arrays.asList(new double[]{leftCorner.x(), leftCorner.y()}, new double[]{rightCorner.x(), rightCorner.y()});
     }
 
@@ -332,8 +332,8 @@ public class Limelight extends Subsystem {
 
         corners.sort(xSort);
 
-        List<Translation2d> left = corners.subList(0, corners.size()/2);
-        List<Translation2d> right = corners.subList(corners.size()/2, corners.size());
+        List<Translation2d> left = corners.subList(0, corners.size() / 2);
+        List<Translation2d> right = corners.subList(corners.size() / 2, corners.size());
 
         left.sort(ySort);
         right.sort(ySort);

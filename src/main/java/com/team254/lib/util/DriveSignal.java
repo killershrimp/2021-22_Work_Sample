@@ -36,7 +36,7 @@ public class DriveSignal {
 
     /**
      * @return a new DriveSignal object with the outputs normalized so the max motor
-     *         output is 1.0
+     * output is 1.0
      */
     public DriveSignal normalize() {
         // if either of the left or right signals is greater than 1, creating a scaling

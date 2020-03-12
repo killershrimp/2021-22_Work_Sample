@@ -3,7 +3,6 @@ package com.team254.lib.trajectory.timing;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.Util;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

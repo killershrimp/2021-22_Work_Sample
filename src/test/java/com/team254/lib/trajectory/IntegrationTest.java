@@ -10,7 +10,6 @@ import com.team254.lib.trajectory.timing.DifferentialDriveDynamicsConstraint;
 import com.team254.lib.trajectory.timing.TimedState;
 import com.team254.lib.trajectory.timing.TimingUtil;
 import com.team254.lib.util.Units;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

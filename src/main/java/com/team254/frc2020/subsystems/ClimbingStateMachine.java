@@ -5,7 +5,6 @@ import com.team254.lib.util.LatchedBoolean;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Timer;
 
-import java.nio.DoubleBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClimbingStateMachine {
@@ -63,7 +62,7 @@ public class ClimbingStateMachine {
         double wantedCurrentLimit = mCurrentLimit;
 
         if (mDeployToggle.update(deploy)) {
-           mDrive.setDeploy(!mDrive.getDeploy());
+            mDrive.setDeploy(!mDrive.getDeploy());
         }
 
         if (breakOn) {
@@ -90,10 +89,10 @@ public class ClimbingStateMachine {
 
         climbThrottle = Util.limit(climbThrottle, 1.0);
 
-        if (mSystemState == SystemState.EXTENDING || mSystemState == SystemState.MANUAL ||  mSystemState == SystemState.CLIMBING) {
+        if (mSystemState == SystemState.EXTENDING || mSystemState == SystemState.MANUAL || mSystemState == SystemState.CLIMBING) {
             if (mDrive.getPTOPosition() < kDeployPistonPosition) {
                 mDrive.setDeploy(true);
-            } else if (mDrive.getPTOPosition() > (kDeployPistonPosition + kDeployPistonHysteresis)){
+            } else if (mDrive.getPTOPosition() > (kDeployPistonPosition + kDeployPistonHysteresis)) {
                 mDrive.setDeploy(false);
             }
         }
@@ -112,8 +111,8 @@ public class ClimbingStateMachine {
                 } else {
                     mDrive.setPTOMotorsOpenLoop(0.0, 0.0);
                 }
-            //    System.out.println("PTO position" + mDrive.getPTOPosition() + " throttle: " +
-                        //climbThrottle);
+                // System.out.println("PTO position" + mDrive.getPTOPosition() + " throttle: " +
+                //         climbThrottle);
                 break;
             case EXTENDING:
                 mDrive.setPTOMotorsPosition(kMaxExtension);

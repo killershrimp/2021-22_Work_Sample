@@ -1,7 +1,5 @@
 package com.team254.frc2020.subsystems;
 
-import java.util.Optional;
-
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.RobotState;
 import com.team254.frc2020.limelight.LimelightManager;
@@ -12,13 +10,14 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.ShootingParameters;
+import com.team254.lib.util.ShootingParameters.BallQuality;
 import com.team254.lib.util.Units;
 import com.team254.lib.util.Util;
-import com.team254.lib.util.ShootingParameters.BallQuality;
 import com.team254.lib.vision.AimingParameters;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.Optional;
 
 public class Superstructure extends Subsystem {
     private static Superstructure mInstance;
@@ -81,7 +80,7 @@ public class Superstructure extends Subsystem {
 
     private Optional<Double> mTurretHint = Optional.empty();
     private Optional<Double> mTurretJogDelta = Optional.empty();
-    
+
     private ShootingParameters mShootingParameters = Constants.kCoarseShootingParams;
     private BallQuality mBallQuality = BallQuality.MEDIUM_BALL;
 
@@ -89,7 +88,7 @@ public class Superstructure extends Subsystem {
 
     @Override
     public void registerEnabledLoops(ILooper mEnabledLooper) {
-        mEnabledLooper.register(new Loop(){
+        mEnabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
                 synchronized (Superstructure.this) {
@@ -103,7 +102,7 @@ public class Superstructure extends Subsystem {
                 synchronized (Superstructure.this) {
                     SystemState newState = mSystemState;
                     double timeInState = timestamp - mCurrentStateStartTime;
-            
+
                     switch (mSystemState) {
                         case IDLE:
                             newState = handleIdle(mWantedState);
@@ -121,15 +120,14 @@ public class Superstructure extends Subsystem {
                             System.out.println("unexpected superstructure system state: " + mSystemState);
                             break;
                     }
-            
+
                     if (newState != mSystemState) {
                         System.out.println(timestamp + ": Superstructure changed state: " + mSystemState + " -> " + newState);
                         mSystemState = newState;
                         mCurrentStateStartTime = timestamp;
                         timeInState = 0.0;
-                        
                     }
-            
+
                     switch (mSystemState) {
                         case IDLE:
                             writeIdleDesiredState(timestamp);
@@ -180,7 +178,7 @@ public class Superstructure extends Subsystem {
                 return SystemState.IDLE;
             case SHOOT:
                 SmartDashboard.putBoolean("ShooterAtSetpoint", mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM(), mShooter.getDemandRPM()));
-                SmartDashboard.putBoolean("TurretAtSetpoint",  mShootingParameters.isTurretAtSetpoint(mTurret.getAngle(), mTurret.getSetpointHomed()));
+                SmartDashboard.putBoolean("TurretAtSetpoint", mShootingParameters.isTurretAtSetpoint(mTurret.getAngle(), mTurret.getSetpointHomed()));
                 SmartDashboard.putBoolean("HoodAtSetpoint", mShootingParameters.isHoodAtSetpoint(mHood.getAngle(), mHood.getSetpointHomed()));
 
                 if (mShootingParameters.isShooterAtSetpoint(mShooter.getAverageRPM(), mShooter.getDemandRPM()) &&
@@ -221,7 +219,7 @@ public class Superstructure extends Subsystem {
                 return SystemState.MOVE_TO_ZERO;
         }
     }
-    
+
     private void writeIdleDesiredState(double timestamp) {
         if (!mOverrideLimelightLEDs) {
             mLLManager.getTurretLimelight().setLed(Limelight.LedMode.OFF);
@@ -372,9 +370,9 @@ public class Superstructure extends Subsystem {
         if (mLatestAimingParameters.isPresent()) {
             mTrackId = mLatestAimingParameters.get().getTrackId();
 
-//            if (Constants.kIsHoodTuning) {
+            // if (Constants.kIsHoodTuning) {
                 SmartDashboard.putNumber("Range To Target", mLatestAimingParameters.get().getRange());
-//            }
+            // }
 
             // Don't aim if not in min distance
             if (mEnforceAutoAimMinDistance && mLatestAimingParameters.get().getRange() > mAutoAimMinDistance) {
@@ -382,8 +380,8 @@ public class Superstructure extends Subsystem {
             }
 
             Rotation2d turret_error = mRobotState.getVehicleToTurret(timestamp).inverse()
-                .transformBy(mRobotState.getFieldToVehicle(timestamp).inverse())
-                .transformBy(mLatestAimingParameters.get().getFieldToGoal()).getTranslation().direction();
+                    .transformBy(mRobotState.getFieldToVehicle(timestamp).inverse())
+                    .transformBy(mLatestAimingParameters.get().getFieldToGoal()).getTranslation().direction();
 
             double turret_setpoint = mTurret.getAngle() + turret_error.getDegrees();
             Twist2d velocity = mRobotState.getMeasuredVelocity();
@@ -395,11 +393,7 @@ public class Superstructure extends Subsystem {
 
             mHasTarget = true;
 
-            if (Util.epsilonEquals(turret_error.getDegrees(), 0.0, 3.0)) {
-                mOnTarget = true;
-            } else {
-                mOnTarget = false;
-            }
+            mOnTarget = Util.epsilonEquals(turret_error.getDegrees(), 0.0, 3.0);
 
             return Util.limitTurret(turret_setpoint);
         } else {
@@ -430,6 +424,7 @@ public class Superstructure extends Subsystem {
 
     /**
      * pre condition: getTurretSetpointFromVision() is called
+     *
      * @return turret feedforward voltage
      */
     public synchronized double getTurretFeedforwardVFromVision() {

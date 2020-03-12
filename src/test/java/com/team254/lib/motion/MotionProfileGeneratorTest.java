@@ -2,14 +2,12 @@ package com.team254.lib.motion;
 
 import com.team254.lib.motion.MotionProfileGoal.CompletionBehavior;
 import com.team254.lib.util.Util;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import static com.team254.lib.motion.MotionUtil.kEpsilon;
-
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 

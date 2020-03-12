@@ -29,8 +29,8 @@ public class LimelightConstantsFactory {
                         new UndistortConstants(
                                 new double[]{2.35265164e-01, -6.86035030e-01, 3.10037972e-04, 8.34493852e-05, 6.41764110e-01},
                                 new double[][]{
-                                        {778.08226793/960, 0, 452.8538724/960},
-                                        {0, 777.04925262/720, 351.05573266/720},
+                                        {778.08226793 / 960, 0, 452.8538724 / 960},
+                                        {0, 777.04925262 / 720, 351.05573266 / 720},
                                         {0, 0, 1.0}
                                 }
                         ),
@@ -171,6 +171,7 @@ public class LimelightConstantsFactory {
                 );
         }
     }
+
     public static LimelightConstants getConstantsForThisRobot() {
         RobotType.Type type = RobotType.getRobotType();
         int id = getIdForRobotType(type);

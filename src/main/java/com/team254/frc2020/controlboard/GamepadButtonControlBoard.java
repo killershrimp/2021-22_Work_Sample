@@ -76,7 +76,7 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     public boolean getDeployIntake() {
         return mController.getButton(XboxController.Button.B);
     }
-    
+
     @Override
     public boolean getRetractIntake() {
         return mController.getButton(XboxController.Button.Y) && !getFnKey();
@@ -140,6 +140,6 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
 
     @Override
     public boolean getToggleInPitHangMode() {
-        return  getFnKey() && mController.getTrigger(XboxController.Side.LEFT) && mController.getTrigger(XboxController.Side.RIGHT);
+        return getFnKey() && mController.getTrigger(XboxController.Side.LEFT) && mController.getTrigger(XboxController.Side.RIGHT);
     }
 }

@@ -101,7 +101,7 @@ public class TrajectoryGenerator {
             startingToNearWOF = getStartToNearWOF();
             nearWOFToShootingPoint1 = getNearWOFToShootingPoint1();
             shootingPoint1ToShootingPoint2 = getShootingPoint1ToShootingPoint2();
-        
+
             turningPointToNearWOF = getTurningPointToNearWOF();
             nearWOFToCloseShootingPoint = getNearWOFToCloseShootingPoint();
             closeShootingPointToAlliancePickupPoint = getCloseShootingPointToAlliancePickupPoint();

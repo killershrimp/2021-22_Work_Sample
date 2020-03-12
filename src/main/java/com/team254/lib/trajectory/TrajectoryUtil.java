@@ -124,6 +124,4 @@ public class TrajectoryUtil {
         return new Trajectory<>(SplineGenerator.parameterizeSplines(splines, maxDx, maxDy,
                 maxDTheta));
     }
-
-    ;
 }

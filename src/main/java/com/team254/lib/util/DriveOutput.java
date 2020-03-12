@@ -18,8 +18,8 @@ public class DriveOutput {
     }
 
     public DriveOutput(double left_velocity, double right_velocity, double left_accel, double right_accel,
-                  double left_feedforward_voltage, double
-                          right_feedforward_voltage) {
+                       double left_feedforward_voltage, double
+                               right_feedforward_voltage) {
         this.left_velocity = left_velocity;
         this.right_velocity = right_velocity;
         this.left_accel = left_accel;

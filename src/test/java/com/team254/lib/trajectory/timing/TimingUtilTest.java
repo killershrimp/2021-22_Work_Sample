@@ -7,7 +7,6 @@ import com.team254.lib.trajectory.DistanceView;
 import com.team254.lib.trajectory.Trajectory;
 import com.team254.lib.trajectory.timing.TimingConstraint.MinMaxAcceleration;
 import com.team254.lib.util.Util;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

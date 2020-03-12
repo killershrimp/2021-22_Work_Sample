@@ -38,7 +38,6 @@ public class UndistortMapFileWriterTest {
                 String.format("public class %s implements UndistortMap {\n", className));
 
 
-
         long start = System.currentTimeMillis();
         OpenCVCalculatedUndistortMap map = new OpenCVCalculatedUndistortMap(constants.getUndistortConstants(), resolution, false);
         long end = System.currentTimeMillis();

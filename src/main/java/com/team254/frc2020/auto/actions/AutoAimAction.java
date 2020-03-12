@@ -1,9 +1,9 @@
 package com.team254.frc2020.auto.actions;
 
-import java.util.Optional;
-
 import com.team254.frc2020.subsystems.Superstructure;
 import com.team254.lib.geometry.Rotation2d;
+
+import java.util.Optional;
 
 public class AutoAimAction implements Action {
     private final Superstructure mSuperstructure = Superstructure.getInstance();

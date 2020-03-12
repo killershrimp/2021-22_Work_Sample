@@ -9,6 +9,7 @@ import org.junit.runners.JUnit4;
 public class DeadbandTest {
 
     private final double kEpsilon = 1e-5;
+
     @Test
     public void testInDeadband() {
         Assert.assertEquals(Util.handleDeadband(1, .5), 1, kEpsilon);

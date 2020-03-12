@@ -17,7 +17,7 @@ public class Intake extends Subsystem {
     private static final double kIntakeExhaustPower = -0.25;
     private static final double kLightIntakePower = 0.25; // % output to run after stowing for kLightIntakeTime seconds
     private static final double kLightIntakeTime = 1.0; // seconds, time to run intake for at kLightIntakePower after stowing
-    
+
     private static Intake mInstance;
 
     public static Intake getInstance() {
@@ -75,6 +75,7 @@ public class Intake extends Subsystem {
     }
 
     private boolean isStowed = false;
+
     public synchronized boolean isStowed() {
         return isStowed;
     }

@@ -1,13 +1,11 @@
 package com.team254.frc2020.subsystems;
 
-import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
 import com.team254.lib.drivers.TalonFXFactory;
-
 import com.team254.lib.drivers.TalonUtil;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -172,7 +170,7 @@ public class Serializer extends Subsystem {
 
     @Override
     public void registerEnabledLoops(ILooper mEnabledLooper) {
-        mEnabledLooper.register(new Loop(){        
+        mEnabledLooper.register(new Loop() {
             @Override
             public void onStart(double timestamp) {
                 synchronized (Serializer.this) {
@@ -183,13 +181,13 @@ public class Serializer extends Subsystem {
                     mWantedState = WantedState.IDLE;
                 }
             }
-        
+
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Serializer.this) {
                     SystemState newState = mSystemState;
                     double timeInState = timestamp - mCurrentStateStartTime;
-            
+
                     switch (mSystemState) {
                         case IDLE:
                             newState = handleIdle(timestamp);
@@ -210,14 +208,14 @@ public class Serializer extends Subsystem {
                             System.out.println("unexpected serializer system state: " + mSystemState);
                             break;
                     }
-            
+
                     if (newState != mSystemState) {
                         System.out.println(timestamp + ": Serializer changed state: " + mSystemState + " -> " + newState);
                         mSystemState = newState;
                         mCurrentStateStartTime = timestamp;
                         timeInState = 0.0;
                     }
-            
+
                     switch (mSystemState) {
                         case IDLE:
                             setIdleStateDemands();

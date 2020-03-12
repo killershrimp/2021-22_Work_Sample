@@ -1,25 +1,20 @@
 package com.team254.frc2020;
 
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
-
-import com.team254.frc2020.subsystems.ServoMotorSubsystem.ServoMotorSubsystemConstants;
 import com.team254.frc2020.limelight.CameraResolution;
 import com.team254.frc2020.limelight.PipelineConfiguration;
+import com.team254.frc2020.subsystems.ServoMotorSubsystem.ServoMotorSubsystemConstants;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.util.InterpolatingDouble;
 import com.team254.lib.util.InterpolatingTreeMap;
 import com.team254.lib.util.ShootingParameters;
-
 import edu.wpi.first.wpilibj.util.Units;
 
 /**
  * A list of constants used by the rest of the robot code. This includes physics
  * constants as well as constants determined through calibration.
- * 
+ * <p>
  * Port assignments should match up with the spreadsheet here:
  * https://docs.google.com/spreadsheets/d/1U1r9AyXk8nuGuACa36iQRRekL6HqLXF7dZ437_qiD98/edit?usp=sharing
  */
@@ -95,7 +90,7 @@ public class Constants {
     public static final double kFalcon500StallTorque = 4.69; // N*m
     public static final double kAssumedTorqueEfficiency = 0.95;
     public static final double kRobotLinearInertia = 62.051; // kg // TODO
-    public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ( (kDriveHighGearReduction * kFalcon500StallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusMeters * kDriveWheelRadiusMeters) );
+    public static final double kDriveAnalyticalLinearKa = 12.0 /* V */ / ((kDriveHighGearReduction * kFalcon500StallTorque * kAssumedTorqueEfficiency * 6) / (kRobotLinearInertia * kDriveWheelRadiusMeters * kDriveWheelRadiusMeters));
     public static final double kDriveLinearKa = 0.00597 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V / rad/s^2
     public static final double kDriveAngularKa = 0.00517 / 2.0 * Constants.kDriveWheelDiameterInches * kGearRatioScalar; // V per rad/s^2
     public static final double kRobotAngularInertia = kDriveAngularKa / kDriveLinearKa *
@@ -162,7 +157,7 @@ public class Constants {
     public static final double kShooterKi = 0.0;
     public static final double kShooterKd = 0.0;
     public static final double kShooterKf = 0.05033127788;
-    public static final double kShooterTicksPerRevolution = 2048.0 ; // based on gear reduction between encoder and output shaft, and encoder ppr
+    public static final double kShooterTicksPerRevolution = 2048.0; // based on gear reduction between encoder and output shaft, and encoder ppr
     public static final double kShooterAllowableErrorRPM = 250.0; // TODO
 
     // Serializer
@@ -177,7 +172,7 @@ public class Constants {
     public static final double kFeederRollersKi = 0.0;
     public static final double kFeederRollersKd = 0.2;
     public static final double kFeederRollersKf = 0.04795003;
-    public static final double kFeederRollersTicksPerRevolutions = 2048.0 * 1.0/36.0 * 16.0;
+    public static final double kFeederRollersTicksPerRevolutions = 2048.0 * 1.0 / 36.0 * 16.0;
     public static final int kFeederAllowableError = 50;
 
     // Intake

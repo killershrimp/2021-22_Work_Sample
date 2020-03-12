@@ -130,10 +130,10 @@ public class TalonFXFactory {
         talon.configVoltageMeasurementFilter(32, kTimeoutMs);
         talon.enableVoltageCompensation(false);
 
-        talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(config.ENABLE_SUPPLY_CURRENT_LIMIT, 20,60,.2), kTimeoutMs);
+        talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(config.ENABLE_SUPPLY_CURRENT_LIMIT, 20, 60, .2), kTimeoutMs);
         talon.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(config.ENABLE_STATOR_CURRENT_LIMIT, 20, 60, .2), kTimeoutMs);
 
-        talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0,kTimeoutMs);
+        talon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, kTimeoutMs);
         talon.configIntegratedSensorInitializationStrategy(config.SENSOR_INITIALIZATION_STRATEGY, kTimeoutMs);
         talon.configIntegratedSensorOffset(config.SENSOR_OFFSET_DEGREES, kTimeoutMs);
 

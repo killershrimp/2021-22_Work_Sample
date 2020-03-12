@@ -71,7 +71,7 @@ public class LED extends Subsystem {
         mClimbLEDState = climbLEDState;
     }
 
-     public synchronized void setWOFLEDState(TimedLEDState climbLEDState) {
+    public synchronized void setWOFLEDState(TimedLEDState climbLEDState) {
         mWOFLEDState = climbLEDState;
     }
 

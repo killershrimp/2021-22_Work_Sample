@@ -74,7 +74,7 @@ public class Util {
     }
 
     /**
-     * @param angle of turret in degrees 
+     * @param angle of turret in degrees
      */
     public static double limitTurret(double turret_degrees) {
         if (turret_degrees < Constants.kTurretConstants.kMinUnitsLimit) {
@@ -92,7 +92,7 @@ public class Util {
         if (deadband == 1) {
             return 0;
         }
-        double scaledValue = (value + (value < 0 ? deadband : -deadband) ) / (1 - deadband);
+        double scaledValue = (value + (value < 0 ? deadband : -deadband)) / (1 - deadband);
         return (Math.abs(value) > Math.abs(deadband)) ? scaledValue : 0;
     }
 }

@@ -1,7 +1,6 @@
 package com.team254.frc2020.subsystems.utils;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.wpilibj.Talon;
 
 import java.util.HashSet;
 import java.util.Set;

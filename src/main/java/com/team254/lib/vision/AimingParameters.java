@@ -13,7 +13,7 @@ public class AimingParameters {
     private final int track_id;
 
     public AimingParameters(Pose2d field_to_vehicle,
-                            Pose2d field_to_goal,double last_seen_timestamp,
+                            Pose2d field_to_goal, double last_seen_timestamp,
                             double stability, int track_id) {
         this.field_to_vehicle = field_to_vehicle;
         this.field_to_goal = field_to_goal;

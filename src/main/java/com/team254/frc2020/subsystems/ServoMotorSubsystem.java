@@ -14,7 +14,6 @@ import com.team254.lib.motion.SetpointGenerator;
 import com.team254.lib.motion.SetpointGenerator.Setpoint;
 import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -174,17 +173,17 @@ public abstract class ServoMotorSubsystem extends Subsystem {
                 mConstants.kName + ": Could not set closed loop ramp rate: ");
 
         TalonUtil.checkError(mMaster.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(
-                mConstants.kEnableSupplyCurrentLimit,
-                mConstants.kSupplyContinuousCurrentLimit,
-                mConstants.kSupplyPeakCurrentLimit,
-                mConstants.kSupplyPeakCurrentDuration)),
+                        mConstants.kEnableSupplyCurrentLimit,
+                        mConstants.kSupplyContinuousCurrentLimit,
+                        mConstants.kSupplyPeakCurrentLimit,
+                        mConstants.kSupplyPeakCurrentDuration)),
                 mConstants.kName + ": Could not set supply current limit.");
 
         TalonUtil.checkError(mMaster.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(
-                mConstants.kEnableStatorCurrentLimit,
-                mConstants.kStatorContinuousCurrentLimit,
-                mConstants.kStatorPeakCurrentLimit,
-                mConstants.kStatorPeakCurrentDuration)),
+                        mConstants.kEnableStatorCurrentLimit,
+                        mConstants.kStatorContinuousCurrentLimit,
+                        mConstants.kStatorPeakCurrentLimit,
+                        mConstants.kStatorPeakCurrentDuration)),
                 mConstants.kName + ": Could not set stator current limit.");
 
         mMaster.configVoltageMeasurementFilter(8);
@@ -412,11 +411,8 @@ public abstract class ServoMotorSubsystem extends Subsystem {
     }
 
     public synchronized boolean hasFinishedTrajectory() {
-        if (Util.epsilonEquals(mPeriodicIO.active_trajectory_position, ticksToUnits(getSetpoint()),
-                Math.max(1, mConstants.kDeadband))) {
-            return true;
-        }
-        return false;
+        return Util.epsilonEquals(mPeriodicIO.active_trajectory_position, ticksToUnits(getSetpoint()),
+                Math.max(1, mConstants.kDeadband));
     }
 
     public synchronized double getSetpoint() {

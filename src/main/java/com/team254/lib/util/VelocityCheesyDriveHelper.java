@@ -10,8 +10,6 @@ import com.team254.lib.physics.DifferentialDrive.DriveDynamics;
 import com.team254.lib.physics.DifferentialDrive.WheelState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import static com.team254.lib.util.Util.handleDeadband;
-
 public class VelocityCheesyDriveHelper {
     private static VelocityCheesyDriveHelper mInstance;
 
@@ -33,18 +31,18 @@ public class VelocityCheesyDriveHelper {
     private static final double kWheelGain = 0.05; // TODO tune
 
     private static final DCMotorTransmission kTransmission = new DCMotorTransmission(
-        1.0 / Constants.kDriveLinearKv,
-        Units.inches_to_meters(Constants.kDriveWheelRadiusInches) * Units.inches_to_meters(Constants
-                .kDriveWheelRadiusInches) * Constants.kRobotLinearInertia / (2.0 * Constants.kDriveLinearKa),
-        Constants.kDriveVIntercept);
+            1.0 / Constants.kDriveLinearKv,
+            Units.inches_to_meters(Constants.kDriveWheelRadiusInches) * Units.inches_to_meters(Constants
+                    .kDriveWheelRadiusInches) * Constants.kRobotLinearInertia / (2.0 * Constants.kDriveLinearKa),
+            Constants.kDriveVIntercept);
 
     private static final DifferentialDrive mModel = new DifferentialDrive(
-        Constants.kRobotLinearInertia,
-        Constants.kRobotAngularInertia,
-        Constants.kRobotAngularDrag,
-        Units.inches_to_meters(Constants.kDriveWheelDiameterInches / 2.0),
-        Units.inches_to_meters(Constants.kDriveWheelTrackWidthInches / 2.0 * Constants.kTrackScrubFactor),
-        kTransmission, kTransmission
+            Constants.kRobotLinearInertia,
+            Constants.kRobotAngularInertia,
+            Constants.kRobotAngularDrag,
+            Units.inches_to_meters(Constants.kDriveWheelDiameterInches / 2.0),
+            Units.inches_to_meters(Constants.kDriveWheelTrackWidthInches / 2.0 * Constants.kTrackScrubFactor),
+            kTransmission, kTransmission
     );
 
     private double mLastLeftVel = 0.0, mLastRightVel = 0.0;
@@ -75,7 +73,7 @@ public class VelocityCheesyDriveHelper {
 
         ret_val.left_accel = Util.limit((ret_val.left_velocity - mLastLeftVel) / kDt, kMaxHighGearAcceleration);
         ret_val.right_accel = Util.limit((ret_val.right_velocity - mLastRightVel) / kDt, kMaxHighGearAcceleration);
-        
+
 //        WheelState wheel_acceleration = new WheelState(ret_val.left_accel, ret_val.right_accel); TODO
         WheelState wheel_acceleration = new WheelState(0., 0.);
 
@@ -86,7 +84,7 @@ public class VelocityCheesyDriveHelper {
 
         mLastLeftVel = ret_val.left_velocity;
         mLastRightVel = ret_val.right_velocity;
-        
+
         return ret_val;
     }
 

@@ -1,7 +1,5 @@
 package com.team254.frc2020;
 
-import java.util.Optional;
-
 import com.team254.frc2020.auto.AutoModeExecutor;
 import com.team254.frc2020.auto.modes.AutoModeBase;
 import com.team254.frc2020.controlboard.CardinalDirection;
@@ -12,16 +10,15 @@ import com.team254.frc2020.limelight.constants.LimelightConstantsFactory;
 import com.team254.frc2020.loops.Looper;
 import com.team254.frc2020.paths.TrajectoryGenerator;
 import com.team254.frc2020.subsystems.*;
-import com.team254.frc2020.subsystems.Limelight;
 import com.team254.frc2020.subsystems.utils.TimedLEDState;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.*;
 import com.team254.lib.util.ShootingParameters.BallQuality;
 import com.team254.lib.wpilib.TimedRobot;
-
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Timer;
+
+import java.util.Optional;
 
 public class Robot extends TimedRobot {
     private final Looper mEnabledLooper = new Looper();
@@ -72,18 +69,18 @@ public class Robot extends TimedRobot {
             CrashTracker.logRobotInit();
 
             mSubsystemManager.setSubsystems(
-                RobotStateEstimator.getInstance(),
-                mDrive,
-                mTurret,
-                mHood,
-                Shooter.getInstance(),
-                mSerializer,
-                mIntake,
-                mSuperstructure,
-                mLimelight,
-                mInfrastructure,
-                mCanifier,
-                mWOF
+                    RobotStateEstimator.getInstance(),
+                    mDrive,
+                    mTurret,
+                    mHood,
+                    Shooter.getInstance(),
+                    mSerializer,
+                    mIntake,
+                    mSuperstructure,
+                    mLimelight,
+                    mInfrastructure,
+                    mCanifier,
+                    mWOF
             );
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
@@ -269,7 +266,6 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {}
 
 
-
     @Override
     public void teleopPeriodic() {
         try {
@@ -277,7 +273,7 @@ public class Robot extends TimedRobot {
             double timestamp = Timer.getFPGATimestamp();
 
             boolean wants_shoot = !mShouldNotShoot.update(timestamp, !mControlBoard.getShoot());
-            boolean wants_aim = !mShouldNotAim.update(timestamp, ! (mControlBoard.getAimFine() || mControlBoard.getAimCoarse()) );
+            boolean wants_aim = !mShouldNotAim.update(timestamp, !(mControlBoard.getAimFine() || mControlBoard.getAimCoarse()));
 
             if (mHood.hasBeenZeroed()) {
                 mLED.clearHoodFault();

@@ -47,7 +47,7 @@ public class Hood extends ServoMotorSubsystem {
                         5,
                         10,
                         mConstants.kStatorPeakCurrentDuration)),
-                    mConstants.kName + ": Could not set stator current limit.");
+                mConstants.kName + ": Could not set stator current limit.");
         mLED.setHoodFault();
     }
 
@@ -87,7 +87,7 @@ public class Hood extends ServoMotorSubsystem {
                                 mConstants.kStatorPeakCurrentDuration)),
                         mConstants.kName + ": Could not set stator current limit.");
                 mMaster.set(ControlMode.PercentOutput, 0.0,
-                    DemandType.ArbitraryFeedForward, 0.0);
+                        DemandType.ArbitraryFeedForward, 0.0);
 
                 mHoming = false;
             }

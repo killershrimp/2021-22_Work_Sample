@@ -23,8 +23,8 @@ public class FarWOF8Ball extends AutoModeBase {
                 new SeriesAction(
                         new WaitAction(.5),
                         new StopIntakingAction()),
-                        new DeployIntakeAction(false)
-                    )
+                new DeployIntakeAction(false)
+        )
         ));
         runAction(new ShootAction(Constants.kFineShootingParams, 2));
     }
