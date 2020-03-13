@@ -194,7 +194,7 @@ public class Constants {
     public static final int kIntakeSolenoidId = 2;
     public static final int kSkateParkSolenoidId = 5;
     public static final int kChockSolenoidId = 7;
-    public static final int kBreakSolenoidId = 6;
+    public static final int kBrakeSolenoidId = 6;
     public static final int kDeploySolenoidId = 3;
     public static final int kWOFSolenoidId = 4;
 

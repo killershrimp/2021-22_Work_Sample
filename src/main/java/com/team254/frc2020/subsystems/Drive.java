@@ -41,7 +41,7 @@ public class Drive extends Subsystem {
     private final TalonFX mLeftMaster1, mRightMaster1, mLeftMaster2, mRightMaster2, mLeftMaster3, mRightMaster3;
     private final Solenoid mShifter;
     private final Solenoid mPTO;
-    private final Solenoid mBreak;
+    private final Solenoid mBrake;
     private final Solenoid mDeploy;
     private final Encoder mLeftEncoder, mRightEncoder;
     private final DriveWithPTOSide mLeftSide;
@@ -165,7 +165,7 @@ public class Drive extends Subsystem {
         mLeftEncoder.setReverseDirection(true);
         mRightEncoder.setReverseDirection(false);
 
-        mBreak = new Solenoid(Constants.kPCMId, Constants.kBreakSolenoidId);
+        mBrake = new Solenoid(Constants.kPCMId, Constants.kBrakeSolenoidId);
         mDeploy = new Solenoid(Constants.kPCMId, Constants.kDeploySolenoidId);
 
         resetEncoders();
@@ -437,7 +437,7 @@ public class Drive extends Subsystem {
         mRightSide.setPTOEngaged(wantsEngage);
 
         if (!wantsEngage) {
-            // Retrigger break mode.
+            // Retrigger brake mode.
             boolean cached = mIsBrakeMode;
             mIsBrakeMode = !mIsBrakeMode;
             setBrakeMode(cached);
@@ -458,12 +458,12 @@ public class Drive extends Subsystem {
     }
 
 
-    public synchronized void setBreakEngaged(boolean wantsEngage) {
-        mBreak.set(!wantsEngage);
+    public synchronized void setBrakeEngaged(boolean wantsEngage) {
+        mBrake.set(!wantsEngage);
     }
 
-    public synchronized boolean getBreak() {
-        return !mBreak.get();
+    public synchronized boolean getBrake() {
+        return !mBrake.get();
     }
 
     public synchronized void configPTOPID(boolean wantsPosition) {

@@ -20,7 +20,7 @@ public class Serializer extends Subsystem {
     public static final double kSpinCycleOscillationTime = 1.2; // seconds before switching dir
     public static final double kTotalCycleTime = 2.0; // 2 switches in direction per cycle
 
-    public static final double kRebalacingTime = 0.5; // seconds
+    public static final double kRebalancingTime = 0.5; // seconds
     public static final double kBeamBreakSerializeTime = 0.25; // seconds, time it serializes after ball left beam break
 
     private boolean mStirOverride = false;
@@ -299,7 +299,7 @@ public class Serializer extends Subsystem {
 
     private SystemState handleRebalancing(double timeInState) {
 
-        if (timeInState < kRebalacingTime && !mPeriodicIO.break_beam_triggered) {
+        if (timeInState < kRebalancingTime && !mPeriodicIO.break_beam_triggered) {
             return SystemState.REBALANCING;
         }
 
@@ -307,7 +307,7 @@ public class Serializer extends Subsystem {
         switch (mWantedState) {
             case PREPARE_TO_SHOOT:
             case IDLE:
-                if (timeInState >= kRebalacingTime && !mPeriodicIO.break_beam_triggered) {
+                if (timeInState >= kRebalancingTime && !mPeriodicIO.break_beam_triggered) {
                     return SystemState.REBALANCED;
                 } else if (mPeriodicIO.break_beam_triggered && !mSerializerCanceled) {
                     return SystemState.SERIALIZE;
@@ -316,7 +316,7 @@ public class Serializer extends Subsystem {
             case SERIALIZE:
                 return SystemState.SERIALIZE;
             case FEED:
-                if (timeInState >= kRebalacingTime) {
+                if (timeInState >= kRebalancingTime) {
                     return SystemState.REBALANCED;
                 }
                 return SystemState.REBALANCING;
@@ -382,7 +382,7 @@ public class Serializer extends Subsystem {
     }
 
     private void setRebalancingStateDemands(double timeInState) {
-        if (timeInState < kRebalacingTime) {
+        if (timeInState < kRebalancingTime) {
             mPeriodicIO.spin_cycle_demand = kSpinCycleRebalancingDemand;
         } else {
             mPeriodicIO.spin_cycle_demand = 0.0;

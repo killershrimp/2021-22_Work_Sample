@@ -29,8 +29,8 @@ public class ClimbingStateMachine {
     private SystemState mSystemState = SystemState.PRECLIMB;
     private double mStateStartTime = Timer.getFPGATimestamp();
     private LatchedBoolean mDeployToggle = new LatchedBoolean();
-    private LatchedBoolean mBreakToggle = new LatchedBoolean();
-    private double mBreakTime = Double.NaN;
+    private LatchedBoolean mBrakeToggle = new LatchedBoolean();
+    private double mBrakeTime = Double.NaN;
     private AtomicBoolean mIsInPitMode = new AtomicBoolean(false);
     private double mCurrentLimit = 60;
 
@@ -42,14 +42,14 @@ public class ClimbingStateMachine {
     public synchronized void reset() {
         mSystemState = SystemState.PRECLIMB;
         mDrive.setPTOEngaged(false);
-        mDrive.setBreakEngaged(true);
+        mDrive.setBrakeEngaged(true);
         mDrive.configPTOPID(false);
         mDrive.setDeploy(false);
         mDrive.stop();
         mDeployToggle.update(true);
-        mBreakToggle.update(true);
+        mBrakeToggle.update(true);
         mDrive.configPTOCurrentLimits(60);
-        mBreakTime = Double.NaN;
+        mBrakeTime = Double.NaN;
     }
 
     public synchronized void setInPitMode(boolean enable) {
@@ -57,7 +57,7 @@ public class ClimbingStateMachine {
     }
 
     public synchronized void handle(double timestamp, double climbThrottle, boolean climb,
-                                    boolean deploy, boolean breakOn, boolean breakOff) {
+                                    boolean deploy, boolean brakeOn, boolean brakeOff) {
         double timeInState = timestamp - mStateStartTime;
         double wantedCurrentLimit = mCurrentLimit;
 
@@ -65,24 +65,24 @@ public class ClimbingStateMachine {
             mDrive.setDeploy(!mDrive.getDeploy());
         }
 
-        if (breakOn) {
-            mDrive.setBreakEngaged(true);
-            if (Double.isNaN(mBreakTime)) {
-                mBreakTime = timestamp;
+        if (brakeOn) {
+            mDrive.setBrakeEngaged(true);
+            if (Double.isNaN(mBrakeTime)) {
+                mBrakeTime = timestamp;
             }
-        } else if (breakOff) {
-            mDrive.setBreakEngaged(false);
-            mBreakTime = Double.NaN;
+        } else if (brakeOff) {
+            mDrive.setBrakeEngaged(false);
+            mBrakeTime = Double.NaN;
         }
 
-        if (mDrive.getBreak()) {
+        if (mDrive.getBrake()) {
             mLED.setClimbLEDState(TimedLEDState.BlinkingLEDState.BlinkingLEDState.kClimbing);
         } else {
-            mLED.setClimbLEDState(TimedLEDState.BlinkingLEDState.BlinkingLEDState.kBreakEngaged);
+            mLED.setClimbLEDState(TimedLEDState.BlinkingLEDState.BlinkingLEDState.kBrakeEngaged);
         }
 
         boolean stopMotors = false;
-        if (mDrive.getBreak() && !Double.isNaN(mBreakTime) && (timestamp - mBreakTime > 0.5)) {
+        if (mDrive.getBrake() && !Double.isNaN(mBrakeTime) && (timestamp - mBrakeTime > 0.5)) {
             climbThrottle = 0.0;
             stopMotors = true;
         }
@@ -100,7 +100,7 @@ public class ClimbingStateMachine {
         switch (mSystemState) {
             case PRECLIMB:
                 mDrive.setPTOEngaged(true);
-                mDrive.setBreakEngaged(false);
+                mDrive.setBrakeEngaged(false);
                 mDrive.zeroPTOMotors();
                 wantedCurrentLimit = 20;
                 break;

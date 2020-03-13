@@ -11,7 +11,7 @@ public class LEDState {
     public static final LEDState kFaultHood = new LEDState(1.0, 0.0, 1.0);
 
     public static final LEDState kClimbing = new LEDState(0.0, 0.3, 1.0);
-    public static final LEDState kBreakEngaged = new LEDState(1.0, 0.0, 0.0);
+    public static final LEDState kBrakeEngaged = new LEDState(1.0, 0.0, 0.0);
 
     public static final LEDState kWOF = new LEDState(1.0, 0.3, 0.0);
 
