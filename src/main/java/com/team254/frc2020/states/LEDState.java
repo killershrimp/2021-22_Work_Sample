@@ -1,4 +1,4 @@
-package com.team254.frc2020.subsystems.utils;
+package com.team254.frc2020.states;
 
 public class LEDState {
     public static final LEDState kOff = new LEDState(0.0, 0.0, 0.0);

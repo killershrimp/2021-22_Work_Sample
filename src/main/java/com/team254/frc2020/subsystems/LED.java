@@ -2,8 +2,8 @@ package com.team254.frc2020.subsystems;
 
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
-import com.team254.frc2020.subsystems.utils.LEDState;
-import com.team254.frc2020.subsystems.utils.TimedLEDState;
+import com.team254.frc2020.states.LEDState;
+import com.team254.frc2020.states.TimedLEDState;
 
 public class LED extends Subsystem {
     private boolean mTurretFault = false;
@@ -128,9 +128,7 @@ public class LED extends Subsystem {
             }
 
             @Override
-            public void onStop(double timestamp) {
-
-            }
+            public void onStop(double timestamp) {}
         });
     }
 

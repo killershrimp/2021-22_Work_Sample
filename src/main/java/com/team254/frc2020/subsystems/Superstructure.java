@@ -5,7 +5,7 @@ import com.team254.frc2020.RobotState;
 import com.team254.frc2020.limelight.LimelightManager;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
-import com.team254.frc2020.subsystems.utils.TimedLEDState;
+import com.team254.frc2020.states.TimedLEDState;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.util.InterpolatingDouble;
