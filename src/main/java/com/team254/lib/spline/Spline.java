@@ -12,7 +12,7 @@ public abstract class Spline {
 
     public abstract double getCurvature(double t);
 
-    // dk/ds
+    // dk/dt
     public abstract double getDCurvature(double t);
 
     // ds/dt
