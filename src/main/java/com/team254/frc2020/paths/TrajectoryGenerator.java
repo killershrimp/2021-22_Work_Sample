@@ -143,7 +143,7 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToPickup() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(Translation2d.identity(), Rotation2d.fromDegrees(180)));
-            waypoints.add(new Pose2d(-93.5, 65, Rotation2d.fromDegrees(116.59)));
+            waypoints.add(new Pose2d(-97.5, 63.5, Rotation2d.fromDegrees(116.59)));
 
             return generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(60)),
                     kMaxVel, kMaxAccel, kMaxVoltage);
