@@ -1,6 +1,10 @@
 package com.team254.lib.util;
 
+import Jama.Matrix;
 import com.team254.frc2020.Constants;
+import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.stats.MultivariateGaussian;
 
 import java.util.List;
 
@@ -94,5 +98,16 @@ public class Util {
         }
         double scaledValue = (value + (value < 0 ? deadband : -deadband)) / (1 - deadband);
         return (Math.abs(value) > Math.abs(deadband)) ? scaledValue : 0;
+    }
+
+    public static MultivariateGaussian getPose2dToGauss(Pose2d pose, Matrix cov) {
+        Matrix means = new Matrix(new double[][]{
+                new double[]{pose.getTranslation().x(), pose.getTranslation().y(), pose.getRotation().getRadians()}}).transpose();
+        return new MultivariateGaussian(means, cov);
+    }
+
+    public static Pose2d getGaussToPose2d(MultivariateGaussian x) {
+        Matrix a = x.getMeans();
+        return new Pose2d(a.get(0, 0), a.get(0, 1), Rotation2d.fromRadians(a.get(0, 2)));
     }
 }

@@ -141,11 +141,10 @@ public class RobotState {
         vehicle_to_turret_.put(new InterpolatingDouble(timestamp), observation);
     }
 
-    public synchronized void addObservations(double timestamp, Twist2d displacement, Twist2d measured_velocity,
-                                             Twist2d predicted_velocity) {
+    public synchronized void logStates(double timestamp, Twist2d displacement, Twist2d measured_velocity,
+                                             Twist2d predicted_velocity, Pose2d field_to_robot) {
         distance_driven_ += displacement.dx;
-        addFieldToVehicleObservation(timestamp,
-                Kinematics.integrateForwardKinematics(getLatestFieldToVehicle().getValue(), displacement));
+        addFieldToVehicleObservation(timestamp, field_to_robot);
         vehicle_velocity_measured_ = measured_velocity;
         if (Math.abs(vehicle_velocity_measured_.dtheta) < 2.0 * Math.PI) {
             // Reject really high angular velocities from the filter.

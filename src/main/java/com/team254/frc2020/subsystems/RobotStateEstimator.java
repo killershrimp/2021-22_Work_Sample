@@ -1,22 +1,37 @@
 package com.team254.frc2020.subsystems;
 
+import Jama.Matrix;
 import com.team254.frc2020.Constants;
 import com.team254.frc2020.Kinematics;
 import com.team254.frc2020.RobotState;
 import com.team254.frc2020.loops.ILooper;
 import com.team254.frc2020.loops.Loop;
+import com.team254.lib.filters.MultivariateKalman;
+import com.team254.lib.filters.PoseKalman;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Twist2d;
+import com.team254.lib.stats.MultivariateGaussian;
+import com.team254.lib.util.Util;
+
+import java.util.IdentityHashMap;
+import java.util.Optional;
 
 public class RobotStateEstimator extends Subsystem {
     static RobotStateEstimator mInstance = new RobotStateEstimator();
     private RobotState mRobotState = RobotState.getInstance();
     private Drive mDrive = Drive.getInstance();
+
     private double left_encoder_prev_distance_ = 0.0;
     private double right_encoder_prev_distance_ = 0.0;
     private double prev_timestamp_ = -1.0;
     private Rotation2d prev_heading_ = null;
+
+    private final Matrix kProcessCov = new Matrix(0, 0); // TODO set
+    private final Matrix kMeasurementCov = new Matrix(0, 0); // TODO set
+    private final Matrix kMeasurementFunc = Matrix.identity(3, 3);// convert before
+    private final Matrix kProcessModel = Matrix.identity(3, 3);   // convert before
+    private PoseKalman mPoseFilter = new PoseKalman(kProcessModel, kProcessCov, kMeasurementFunc);
 
     public static RobotStateEstimator getInstance() {
         if (mInstance == null) {
@@ -66,8 +81,12 @@ public class RobotStateEstimator extends Subsystem {
             mRobotState.addVehicleToTurretObservation(timestamp,
                     new Pose2d(Constants.kVehicleToTurretTranslation, Rotation2d.fromDegrees(Turret.getInstance().getAngle())));
 
-            mRobotState.addObservations(timestamp, odometry_twist, measured_velocity,
-                    predicted_velocity);
+            mPoseFilter.addObservation(timestamp, mRobotState.getRobot(), predicted_velocity, measured_velocity, odometry_twist, kMeasurementCov);
+            Optional<MultivariateGaussian> filtered_state = mPoseFilter.getFilteredState();
+            Pose2d filteredPose = Util.getGaussToPose2d(filtered_state.get());
+            Twist2d displacement = Pose2d.log(filteredPose.transformBy(mRobotState.getRobot().inverse()));
+            mRobotState.logStates(timestamp, displacement, measured_velocity, predicted_velocity, filteredPose);
+
             left_encoder_prev_distance_ = left_distance;
             right_encoder_prev_distance_ = right_distance;
             prev_heading_ = gyro_angle;
