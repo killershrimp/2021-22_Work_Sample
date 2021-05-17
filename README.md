@@ -1,6 +1,6 @@
-# FRC 2020 [![Java CI Status](https://github.com/Team254/FRC-2020/workflows/Java%20CI/badge.svg)](https://github.com/Team254/FRC-2020/actions?query=workflow%3A%22Java+CI%22)
+# FRC 2020
 
-This repository contains Team 254's 2020 FRC robot code. The code is written in Java and is based off of WPILib's Java control system.
+This repository includes an implementation of a multivariate Kalman Filter for more accurate field-relative position estimation, based off FRC Team 254's 2020 code.
 
 The code is divided into several packages, each responsible for a different aspect of the robot function. This README explains setup instructions and some of the style conventions used.
 
